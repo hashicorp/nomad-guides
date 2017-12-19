@@ -119,6 +119,7 @@ sudo chmod a+w /etc/nomad.d
 sudo sed -i -e "s/.*nomad.*/$(ip route get 1 | awk '{print $NF;exit}') nomad/" /etc/hosts
 
 nomad -autocomplete-install
+sudo rm -f /vagrant/nomad.zip
 NOMAD_INSTALL
 
 
@@ -144,6 +145,7 @@ EOF
 
 sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
+sudo rm -f /vagrant/consul.zip
 CONSUL_INSTALL
 
 
@@ -184,6 +186,7 @@ fi
 
 sudo mkdir -pm 0755 /etc/vault.d/
 sudo chmod a+w /etc/vault.d
+sudo rm -f /vagrant/vault.zip
 VAULT_INST
 
 
@@ -365,7 +368,6 @@ Vagrant.configure(2) do |config|
     node1.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
     node1.vm.hostname = "node1"
     node1.vm.network "private_network", type: "dhcp"
-    node1.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
     node1.vm.network :forwarded_port, guest: 8500, host: 8500, auto_correct: true
     node1.vm.network :forwarded_port, guest: 4646, host: 4646, auto_correct: true
     node1.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: true
@@ -373,6 +375,14 @@ Vagrant.configure(2) do |config|
     node1.vm.network :forwarded_port, guest: 9999, host: 9999, auto_correct: true
     node1.vm.network :forwarded_port, guest: 80,   host: 9080, auto_correct: true
     node1.vm.network :forwarded_port, guest: 443,  host: 9443, auto_correct: true
+    config.vm.post_up_message = "
+    Nomad has been provisioned and is available at the following web address:
+    http://localhost:4646/ui/     <<----  Primary Nomad UI (node1)
+    Nomad has Consul storage backend with web UI available at the following web address:
+    http://localhost:8500/ui/     <<----  Primary Consul UI (node1)
+    Primary Vault node has been provisioned and is available at the following web address:
+    http://localhost:8200/ui/     <<----  Primary Vault UI (node3)"
+
   end
 
   config.vm.define "node2" do |node2|
@@ -390,17 +400,19 @@ Vagrant.configure(2) do |config|
     node3.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
     node3.vm.hostname = "node3"
     node3.vm.network "private_network", type: "dhcp"
+    node3.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
     node3.vm.network :forwarded_port, guest: 8500, host: 8502, auto_correct: true
-    node3.vm.network :forwarded_port, guest: 8200, host: 8202, auto_correct: true
+    node3.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
     node3.vm.network :forwarded_port, guest: 4646, host: 6646, auto_correct: true
     ### Start Vault on Node3
-    config.vm.provision "config vault environment", type: "shell", inline: $vault_env
     config.vm.provision "enable vault", type: "shell", inline: "sudo systemctl enable vault.service"
     config.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
     config.vm.provision "shell", path: "vault_init_and_unseal.sh",
       privileged: true,
       env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"}
   end
+
+  config.vm.synced_folder "../../", "/vagrant"
 
   config.vm.provision "base", type: "shell", inline: $base, privileged: false
   config.vm.provision "docker",type: "shell", inline: $docker_install, privileged: false
@@ -434,6 +446,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "enable consul-template", type: "shell", inline: "sudo systemctl enable consul-template.service"
   config.vm.provision "start consul-template", type: "shell", inline: "sudo systemctl start consul-template"
 
+  config.vm.provision "config vault env variables", type: "shell", inline: $vault_env
 
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
