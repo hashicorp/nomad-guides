@@ -8,3 +8,7 @@
 
 # SSH Keys
 *.pem
+.vagrant
+nomad
+vault
+consul
