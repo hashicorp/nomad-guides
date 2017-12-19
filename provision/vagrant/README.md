@@ -1,20 +1,20 @@
 # Vagrant: Nomad Cluster (Single Vault server on node3)
 
 # Usage
-If you would like to use the enterprise binaries download and place the unzipped binary in the root directory of nomad-guides
+If you would like to use the enterprise binaries download and place the unzipped binaries in the root directory of nomad-guides
 
 ```bash
 $ pwd
 /Users/andrewklaas/hashicorp/nomad-guides
 $ ls -l
 application-deployment
-consul #consul binary
+consul #consul enterprise binary
 multi-cloud
-nomad #nomad binary
+nomad #nomad enterprise binary
 operations
 provision
 shared
-vault #vault binary
+vault #vault enterprise binary
 workload-flexibility
 ```
 
@@ -24,16 +24,19 @@ $ vagrant up
 . . . 
 . . . Vagrant running . . .
 . . .
-==> node1: Machine 'node1' has a post `vagrant up` message. This is a message
-==> node1: from the creator of the Vagrantfile, and not from Vagrant itself:
-==> node1:
-==> node1:
 ==> node1:     Nomad has been provisioned and is available at the following web address:
 ==> node1:     http://localhost:4646/ui/     <<----  Primary Nomad UI (node1)
 ==> node1:     Nomad has Consul storage backend with web UI available at the following web address:
 ==> node1:     http://localhost:8500/ui/     <<----  Primary Consul UI (node1)
 ==> node1:     Primary Vault node has been provisioned and is available at the following web address:
 ==> node1:     http://localhost:8200/ui/     <<----  Primary Vault UI (node3)
+==> node1:
+==> node1:     Nomad node2 has been provisioned and is available at the following web address:
+==> node1:     http://localhost:5646/ui/     <<----  Nomad UI (node2)
+==> node1:     Nomad node3 has been provisioned and is available at the following web address:
+==> node1:     http://localhost:6646/ui/     <<----  Nomad UI (node3)
+
+
 ```
 
 2. Ssh into one of the nodes (Vault is running on Node3)

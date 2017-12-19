@@ -263,8 +263,6 @@ CONSUL_CONFIG
 
 
 
-
-
 $consul_online_target = <<CONSUL_ONLINE_TARGET
 sudo cat << EOF > /etc/systemd/system/consul-online.target
 [Unit]
@@ -375,14 +373,18 @@ Vagrant.configure(2) do |config|
     node1.vm.network :forwarded_port, guest: 9999, host: 9999, auto_correct: true
     node1.vm.network :forwarded_port, guest: 80,   host: 9080, auto_correct: true
     node1.vm.network :forwarded_port, guest: 443,  host: 9443, auto_correct: true
-    config.vm.post_up_message = "
+    node1.vm.post_up_message = "
     Nomad has been provisioned and is available at the following web address:
     http://localhost:4646/ui/     <<----  Primary Nomad UI (node1)
-    Nomad has Consul storage backend with web UI available at the following web address:
+    Nomad has Consul installed as well with web UI available at the following web address:
     http://localhost:8500/ui/     <<----  Primary Consul UI (node1)
     Primary Vault node has been provisioned and is available at the following web address:
-    http://localhost:8200/ui/     <<----  Primary Vault UI (node3)"
+    http://localhost:8200/ui/     <<----  Primary Vault UI (node3)
 
+    Nomad node2 has been provisioned and is available at the following web address:
+    http://localhost:5646/ui/     <<----  Nomad UI (node2)
+    Nomad node3 has been provisioned and is available at the following web address:
+    http://localhost:6646/ui/     <<----  Nomad UI (node3)"
   end
 
   config.vm.define "node2" do |node2|
