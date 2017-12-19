@@ -190,7 +190,7 @@ VAULT_INST
 
 $vault_env = <<VAULT_ENV
 sudo cat << EOF > /etc/profile.d/vault.sh
-export VAULT_ADDR="http://127.0.0.1:8200"
+export VAULT_ADDR="http://active.vault.service.consul:8200"
 export VAULT_SKIP_VERIFY=true
 EOF
 VAULT_ENV
@@ -313,17 +313,17 @@ $consul_template_install = <<CONSUL_TEMPLATE_INSTALL
 CONSUL_TEMPLATE_VERSION=${VERSION:-"0.19.4"}
 CONSUL_TEMPLATE_ZIP="consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip"
 CONSUL_TEMPLATE_URL=${URL:-"https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/${CONSUL_TEMPLATE_ZIP}"}
-CONSUL_TEMPLATE_USER=${USER:-"consul-template"}
-CONSUL_TEMPLATE_GROUP=${GROUP:-"consul-template"}
+#CONSUL_TEMPLATE_USER=${USER:-"consul-template"}
+#CONSUL_TEMPLATE_GROUP=${GROUP:-"consul-template"}
 CONFIG_DIR="/etc/consul-template.d"
 DATA_DIR="/opt/consul-template/data"
 DOWNLOAD_DIR="/tmp"
 curl --silent --output ${DOWNLOAD_DIR}/${CONSUL_TEMPLATE_ZIP} ${CONSUL_TEMPLATE_URL}
 sudo unzip -o ${DOWNLOAD_DIR}/${CONSUL_TEMPLATE_ZIP} -d /usr/local/bin/
 sudo chmod 0755 /usr/local/bin/consul-template
-sudo chown ${CONSUL_TEMPLATE_USER}:${CONSUL_TEMPLATE_GROUP} /usr/local/bin/consul-template
+sudo chown root:root /usr/local/bin/consul-template
 sudo mkdir -pm 0755 ${CONFIG_DIR} ${DATA_DIR}
-sudo chown -R ${CONSUL_TEMPLATE_USER}:${CONSUL_TEMPLATE_GROUP} ${CONFIG_DIR} ${DATA_DIR}
+sudo chown -R root:root ${CONFIG_DIR} ${DATA_DIR}
 CONSUL_TEMPLATE_INSTALL
 
 $consul_template_service = <<CONSUL_TEMPLATE_SERVICE
@@ -344,6 +344,7 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 sudo chmod 044 /etc/systemd/system/consul-template.service
+
 CONSUL_TEMPLATE_SERVICE
 
 $consul_template_config = <<CONSUL_TEMPLATE_CONFIG 
@@ -393,12 +394,12 @@ Vagrant.configure(2) do |config|
     node3.vm.network :forwarded_port, guest: 8200, host: 8202, auto_correct: true
     node3.vm.network :forwarded_port, guest: 4646, host: 6646, auto_correct: true
     ### Start Vault on Node3
-    #config.vm.provision "config vault environment", type: "shell", inline: $vault_env
-    #config.vm.provision "enable vault", type: "shell", inline: "sudo systemctl enable vault.service"
-    #config.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
-    #config.vm.provision "shell", path: "config/vault_init_and_unseal.sh",
-    #  privileged: true,
-    #  env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"}
+    config.vm.provision "config vault environment", type: "shell", inline: $vault_env
+    config.vm.provision "enable vault", type: "shell", inline: "sudo systemctl enable vault.service"
+    config.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
+    config.vm.provision "shell", path: "vault_init_and_unseal.sh",
+      privileged: true,
+      env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"}
   end
 
   config.vm.provision "base", type: "shell", inline: $base, privileged: false
@@ -426,6 +427,13 @@ Vagrant.configure(2) do |config|
   config.vm.provision "sleep for Consul", type: "shell", inline: "sleep 5s"
   config.vm.provision "enable nomad", type: "shell", inline: "sudo systemctl enable nomad.service"
   config.vm.provision "start nomad", type: "shell", inline: "sudo systemctl start nomad"
+
+  config.vm.provision "install consul-template", type: "shell", inline: $consul_template_install
+  config.vm.provision "install consul-template service", type: "shell", inline: $consul_template_service
+  config.vm.provision "Configure consul-template Nomad", type: "shell", inline: $consul_template_config
+  config.vm.provision "enable consul-template", type: "shell", inline: "sudo systemctl enable consul-template.service"
+  config.vm.provision "start consul-template", type: "shell", inline: "sudo systemctl start consul-template"
+
 
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
