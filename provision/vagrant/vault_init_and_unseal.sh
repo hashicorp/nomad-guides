@@ -33,4 +33,15 @@ vault unseal $(cget unseal-key-3)
 
 logger "$0 - Vault setup complete"
 
+vault auth $ROOT_TOKEN
+
+echo '
+path "*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}' | vault policy-write vault-admin -
+
+vault auth-enable userpass
+
+vault write auth/userpass/users/vault password=vault policies=vault-admin
+
 vault status
