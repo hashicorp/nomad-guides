@@ -31,17 +31,23 @@ vault unseal $(cget unseal-key-1)
 vault unseal $(cget unseal-key-2)
 vault unseal $(cget unseal-key-3)
 
-logger "$0 - Vault setup complete"
 
 vault auth $ROOT_TOKEN
 
+#Create admin user
 echo '
 path "*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }' | vault policy-write vault-admin -
-
 vault auth-enable userpass
-
 vault write auth/userpass/users/vault password=vault policies=vault-admin
+
+#Setup Mysql backend
+vault mount mysql
+vault write mysql/config/connection connection_url="root:root@tcp(127.0.0.1:3306)/"
+vault write mysql/roles/app sql="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT ALL PRIVILEGES ON app.* TO '{{name}}'@'%';"
+#vault read mysql/creds/app
+
+logger "$0 - Vault setup complete"
 
 vault status
