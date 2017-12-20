@@ -75,7 +75,7 @@ fb792a08  dc1  node3  <none>  false  ready
 1a3bf4ca  dc1  node1  <none>  false  ready
 ```
 
-5. If you want to use Vault, Grab the root-token from Consul (NOT BEST PRACTICE: DEMO USE ONLY)
+5. If you want to use Vault from the CLI, Grab the root-token from Consul (NOT BEST PRACTICE: DEMO USE ONLY)
 ```bash
 vagrant@node1:~$ consul kv get service/vault/root-token
 6389c4e7-9f0a-f5f2-9c71-d5cec294c99a
