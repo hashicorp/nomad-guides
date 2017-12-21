@@ -6,7 +6,7 @@
 $base = <<BASE
 # Update apt and get dependencies
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq netcat \
     apt-transport-https \
     ca-certificates \
     software-properties-common
@@ -363,6 +363,25 @@ EOF
 CONSUL_TEMPLATE_CONFIG
 
 
+
+$mysql_install = <<MYSQL_INSTALL
+sudo apt-get install -y mariadb-server
+sudo mysqladmin -u root password R00tPassword
+
+sudo mysql -u root -p'R00tPassword' << EOF
+GRANT ALL PRIVILEGES ON *.* TO 'vaultadmin'@'%' IDENTIFIED BY 'vaultadminpassword' WITH GRANT OPTION;
+CREATE DATABASE app;
+FLUSH PRIVILEGES;
+EOF
+sudo sed -i 's/bind-address/#bind-address/g' /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo service mysql restart;
+
+echo '{"service": {"name": "db", "tags": ["mysql"], "port":3306}}' | sudo tee /etc/consul.d/mysql.json
+sudo service consul restart
+MYSQL_INSTALL
+
+
+
 Vagrant.configure(2) do |config|
 
   config.vm.define "node1" do |node1|
@@ -411,6 +430,7 @@ Vagrant.configure(2) do |config|
     node3.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
     node3.vm.network :forwarded_port, guest: 4646, host: 6646, auto_correct: true
     ### Start Vault on Node3
+    config.vm.provision "mysql", type: "shell", inline: $mysql_install, privileged: false
     config.vm.provision "enable vault", type: "shell", inline: "sudo systemctl enable vault.service"
     config.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
     config.vm.provision "shell", path: "vault_init_and_unseal.sh",

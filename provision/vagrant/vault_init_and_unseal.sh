@@ -31,6 +31,37 @@ vault unseal $(cget unseal-key-1)
 vault unseal $(cget unseal-key-2)
 vault unseal $(cget unseal-key-3)
 
+vault auth $ROOT_TOKEN
+
+#Create admin user
+echo '
+path "*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}' | vault policy-write vault-admin -
+vault auth-enable userpass
+vault write auth/userpass/users/vault password=vault policies=vault-admin
+
+#TODO: NEW Mysql setup, Also change golang_vault_setup.sh vault ACL path
+#export INSTANCE_IP="$(/sbin/ifconfig eth1 | grep 'inet addr:' | awk '{print substr($2,6)}')"
+#vault mount database
+#vault write database/config/mysql \
+#  plugin_name=mysql-legacy-database-plugin \
+#  connection_url="vaultadmin:vaultadminpassword@tcp(192.168.50.152:3306)/"  \
+#  allowed_roles="readonly"
+
+#vault write database/roles/readonly \
+#  db_name=mysql \
+#  creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \
+#  default_ttl="30m" \
+#  max_ttl="24h"
+
+vault mount mysql
+vault write mysql/config/connection \
+  connection_url="vaultadmin:vaultadminpassword@tcp(192.168.50.152:3306)/" 
+
+vault write mysql/roles/app \
+  sql="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" 
+
 logger "$0 - Vault setup complete"
 
 vault status
