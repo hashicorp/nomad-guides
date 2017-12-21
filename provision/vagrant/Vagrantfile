@@ -6,7 +6,7 @@
 $base = <<BASE
 # Update apt and get dependencies
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq netcat \
     apt-transport-https \
     ca-certificates \
     software-properties-common
@@ -365,10 +365,16 @@ CONSUL_TEMPLATE_CONFIG
 
 
 $mysql_install = <<MYSQL_INSTALL
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
-sudo apt-get -y install mysql-server
-sudo service mysql start
+sudo apt-get install -y mariadb-server
+sudo mysqladmin -u root password R00tPassword
+
+sudo mysql -u root -p'R00tPassword' << EOF
+GRANT ALL PRIVILEGES ON *.* TO 'vaultadmin'@'%' IDENTIFIED BY 'vaultadminpassword' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
+sudo sed -i 's/bind-address/#bind-address/g' /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo service mysql restart;
+
 echo '{"service": {"name": "db", "tags": ["mysql"], "port":3306}}' | sudo tee /etc/consul.d/mysql.json
 sudo service consul restart
 MYSQL_INSTALL
