@@ -34,6 +34,13 @@ DOCKER_INSTALL
 
 
 
+$java_install = <<JAVA_INSTALL 
+sudo apt-get update -y
+sudo apt-get install -y default-jdk
+JAVA_INSTALL
+
+
+
 $dnsmasq = <<DNSMASQ
 YUM=$(which yum 2>/dev/null)
 APT_GET=$(which apt-get 2>/dev/null)
@@ -447,6 +454,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "base", type: "shell", inline: $base, privileged: false
   config.vm.provision "docker",type: "shell", inline: $docker_install, privileged: false
+  config.vm.provision "java",type: "shell", inline: $java_install, privileged: false
   config.vm.provision "dnsmasq",type: "shell", inline: $dnsmasq, privileged: false
 
   config.vm.provision "download nomad",type: "shell", inline: $nomad_download, privileged: false
