@@ -389,6 +389,11 @@ Vagrant.configure(2) do |config|
     node1.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
     node1.vm.hostname = "node1"
     node1.vm.network "private_network", type: "dhcp"
+    
+    node1.vm.network :forwarded_port, guest: 3646, host: 3646, auto_correct: true
+    node1.vm.network :forwarded_port, guest: 3200, host: 3200, auto_correct: true
+    node1.vm.network :forwarded_port, guest: 3500, host: 3500, auto_correct: true
+
     node1.vm.network :forwarded_port, guest: 8500, host: 8500, auto_correct: true
     node1.vm.network :forwarded_port, guest: 4646, host: 4646, auto_correct: true
     node1.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: true

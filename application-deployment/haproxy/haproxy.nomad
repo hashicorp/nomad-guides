@@ -44,9 +44,18 @@ job "lb" {
           stats uri /haproxy?stats
           default_backend http_back 
         listen nomad
-          bind 0.0.0.0:443
+          bind 0.0.0.0:3646
           balance roundrobin {{range service "nomad" }}
           server {{.Node}} {{.Address}}:4646 check{{end}}
+        listen vault
+          bind 0.0.0.0:3200
+          balance roundrobin 
+          option httpchk GET /v1/sys/health{{range service "vault"}}
+          server {{.Node}} {{.Address}}:8200 check{{end}}
+        listen consul
+          bind 0.0.0.0:3500
+          balance roundrobin {{range service "consul" }}
+          server {{.Node}} {{.Address}}:8500 check{{end}}
         backend http_back
  					balance roundrobin{{range service "go-app"}}
 					server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
@@ -54,9 +63,6 @@ job "lb" {
 
         destination = "custom/haproxy.cfg"
       }
-#              backend http_back
-#          balance roundrobin{{range service "goapp"}}
-#          server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
       service {
         name = "haproxy"
         tags = [ "global", "lb", "urlprefix-/haproxy" ]
