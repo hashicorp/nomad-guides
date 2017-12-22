@@ -2,8 +2,7 @@ job "lb" {
   region = "global"
   datacenters = ["dc1"]
   type = "service"
-  update {
-    stagger = "10s"
+  update { stagger = "10s"
     max_parallel = 1
   }
   group "lb" {
@@ -57,8 +56,8 @@ job "lb" {
           balance roundrobin {{range service "consul" }}
           server {{.Node}} {{.Address}}:8500 check{{end}}
         backend http_back
- 					balance roundrobin{{range service "go-app"}}
-					server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
+          balance roundrobin{{range service "go-app"}}
+	  server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
         EOH
 
         destination = "custom/haproxy.cfg"
