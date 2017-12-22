@@ -57,7 +57,7 @@ job "lb" {
           server {{.Node}} {{.Address}}:8500 check{{end}}
         backend http_back
           balance roundrobin{{range service "go-app"}}
-	  server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
+          server {{.Node}} {{.Address}}:{{.Port}} check{{end}}
         EOH
 
         destination = "custom/haproxy.cfg"
