@@ -45,7 +45,7 @@ job "go-app" {
       }
       service {
         name = "go-app"
-        tags = [ "urlprefix-/go-app", "goapp" ]
+        tags = [ "urlprefix-/go-app", "go-app" ]
         port = "http"
         check {
           name     = "alive"
