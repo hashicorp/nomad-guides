@@ -1,0 +1,25 @@
+main = rule { all_drivers_docker and allowed_docker_images }
+
+allowed_images = [
+	"https://hub.docker.internal/",
+	"https://hub-test.docker.internal/",
+        "redis", 
+]
+
+all_drivers_docker = rule {
+	all job.task_groups as tg {
+		all tg.tasks as task {
+			task.driver is "docker"
+		}
+	}
+}
+
+allowed_docker_images = rule {
+	all job.task_groups as tg {
+		all tg.tasks as task {
+			any allowed_images as allowed {
+				task.config.image matches allowed
+			}
+		}
+	}
+}
