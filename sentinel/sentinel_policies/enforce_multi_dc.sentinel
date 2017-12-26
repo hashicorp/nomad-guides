@@ -1,0 +1,5 @@
+main = rule { enforce_multi_dc }
+
+enforce_multi_dc = rule {
+  length(job.datacenters) > 1
+}
