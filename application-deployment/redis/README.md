@@ -12,15 +12,14 @@ Containerization improved developer workflows but also enabled an immutable appl
 
 ## Solution
 
-Schedulers and orchestration tools leverage containerization to improve deployment workflows, increase resilience of running applications, and enable more efficient use of compute resources.
+Nomad is operationally simlpe to setup, supports several workload types (driver, exec, qemu, lxc, etc.), supports multi-region out of the box, and is easy to use by both oeprators and developers through job files.
 
-When using Nomad, jobs are the primary configuration that users interact with when using Nomad. A job is an easy to write, declarative specification of tasks that Nomad should run. Jobs have a globally unique name, one or many task groups, which are themselves collections of one or many tasks.
+Jobs are the primary configuration that users interact with when using Nomad. A job is an easy to write, declarative specification of tasks that Nomad should run. Jobs have a globally unique name, one or many task groups, which are themselves collections of one or many tasks.
 
-In addition to easy to use job files, Nomad is operationally simlpe to setup, supports several workload types (driver, exec, qemu, lxc, etc.), and is multi-region out of the box.
 
 
 # Steps
-In this example we will walk through some simple CLI commands for deploying and and managing Nomad jobs. First, go through `redis.nomad` in depth and take time review all the available job configuration options. Note: `redis.nomad` can be created by using the ```nomad init``` command. More information here: https://www.nomadproject.io/intro/getting-started/jobs.html
+In this example we will walk through some simple CLI commands for deploying and managing Nomad jobs. First, go through `redis.nomad` in depth and take to time review all the available job configuration options. Note: `redis.nomad` can be created by using the `nomad init` command. More information here: https://www.nomadproject.io/intro/getting-started/jobs.html
 
 ## Step 0: Review redis.nomad (example.nomad)
 Read about all the Nomad job config options:
@@ -28,14 +27,14 @@ https://github.com/hashicorp/nomad-guides/blob/master/application-deployment/red
 Details are documented in depth here:
 https://www.nomadproject.io/docs/job-specification/index.html
 
-Some important bits here:
+Some important bits:
 ``` bash
     task "redis" {           # The task stanza specifices a task (unit of work) within a group
       . . .
       driver = "docker"      # This task uses Docker, other examples: exec, LXC, QEMU
       config {
         image = "redis:3.2"  # Docker image to download (uses public hub by default)
-        port_map {           # Port on container you would like to map to Nomad chosen Dynamic port
+        port_map {           # Port on container you would like to map to Nomad chosen Dynamic port on host
           db = 6379
         }
       }
@@ -49,7 +48,7 @@ Some important bits here:
         }
       }
       . . .
-      service {       # Register this task in Consul and defines health checks
+      service {       # Register this task in Consul and define health checks
         name = "global-redis-check" 
         tags = ["global", "cache"]
         port = "db"  # Health check will be performed against dynamic port named "db" from above
@@ -95,7 +94,7 @@ c4146f97  dc1  node2  <none>  false  ready
 ```
 
 ## Step 2: Nomad plan
-use Nomad plan to invoke a dry-run of the scheduler on our job. This is similar to `terraform plan` where we can see the potential outcome of an actually job deploy beforehand.
+Use Nomad plan to invoke a dry-run of the scheduler on our job. This is similar to `terraform plan` where we can see the potential outcome of an actual job deploy beforehand.
 
 ```bash
 vagrant@node1:/vagrant/application-deployment/redis$ nomad plan redis.nomad
@@ -117,7 +116,7 @@ changed, another user has modified the job and the plan's results are
 potentially invalid.
 ```
 
-All tasks were succesfully allocated by our dry-run. If you see errors, you might be missing the docker driver or not have enough capacity on your modes.
+All tasks were succesfully allocated by our dry-run. If you see errors, you might be missing the docker driver or do not have enough capacity on your nodes.
 
 ## Step 3: Nomad run
 
@@ -134,7 +133,7 @@ vagrant@node1:/vagrant/application-deployment/redis$ nomad run redis.nomad
 ```
 Nomad first created an evaulation to determine if a new job needs to be allocated. Once the evalaution was confirmed and a scheduler found an appropriate node to place the tasks, an allocation was created and scheduled to a Nomad client (worker node).
 
-Inspect the status of the job
+Inspect the status of the job:
 ```bash
 vagrant@node1:/vagrant/application-deployment/redis$ nomad status
 ID     Type     Priority  Status   Submit Date
@@ -239,13 +238,13 @@ vagrant@node1:/vagrant/application-deployment/redis$ nomad logs 919f7100 redis
 ## Step 5: Nomad GUI
 Make sure the redis job was deployed in the Nomad GUI. You will need to authenitcate using an appropriate nomad acl token.
 
-If using This repo's vagrantfile check: http://localhost:4646/ui/jobs  (try 5646 or 6646 depending on leader)
+If using this repo's vagrantfile check: http://localhost:4646/ui/jobs  (try 5646 or 6646 depending on leader)
 ![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/Nomad_GUI_redis.png)
 
 ## Step 6: Consul GUI
 See the registered tasks in the Consul GUI.
 
-If using This repo's vagrantfile check: http://localhost:8500/ui/#/dc1/services
+If using this repo's vagrantfile check: http://localhost:8500/ui/#/dc1/services
 ![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/Consul_GUI_redis.png)
 
 
