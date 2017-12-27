@@ -1,17 +1,17 @@
 # There can only be a single job definition per file. This job is named
-# "example" so it will create a job with the ID and Name "example".
+# "redis" so it will create a job with the ID and Name "redis".
 
 # The "job" stanza is the top-most configuration option in the job
 # specification. A job is a declarative specification of tasks that Nomad
 # should run. Jobs have a globally unique name, one or many task groups, which
 # are themselves collections of one or many tasks.
 #
-# For more information and examples on the "job" stanza, please see
+# For more information and rediss on the "job" stanza, please see
 # the online documentation at:
 #
 #     https://www.nomadproject.io/docs/job-specification/job.html
 #
-job "example" {
+job "redis" {
   # The "region" parameter specifies the region in which to execute the job. If
   # omitted, this inherits the default region name of "global".
   # region = "global"
@@ -35,7 +35,7 @@ job "example" {
   # in addition to any resource or driver constraints. This stanza may be placed
   # at the "job", "group", or "task" level, and supports variable interpolation.
   #
-  # For more information and examples on the "constraint" stanza, please see
+  # For more information and rediss on the "constraint" stanza, please see
   # the online documentation at:
   #
   #     https://www.nomadproject.io/docs/job-specification/constraint.html
@@ -52,7 +52,7 @@ job "example" {
   # job, it applies to all groups within the job. When placed at both the job and
   # group level, the stanzas are merged with the group's taking precedence.
   #
-  # For more information and examples on the "update" stanza, please see
+  # For more information and rediss on the "update" stanza, please see
   # the online documentation at:
   #
   #     https://www.nomadproject.io/docs/job-specification/update.html
@@ -96,7 +96,7 @@ job "example" {
   # the same Nomad client. Any task within a group will be placed on the same
   # client.
   #
-  # For more information and examples on the "group" stanza, please see
+  # For more information and rediss on the "group" stanza, please see
   # the online documentation at:
   #
   #     https://www.nomadproject.io/docs/job-specification/group.html
@@ -110,7 +110,7 @@ job "example" {
     # The "restart" stanza configures a group's behavior on task failure. If
     # left unspecified, a default restart policy is used based on the job type.
     #
-    # For more information and examples on the "restart" stanza, please see
+    # For more information and rediss on the "restart" stanza, please see
     # the online documentation at:
     #
     #     https://www.nomadproject.io/docs/job-specification/restart.html
@@ -136,7 +136,7 @@ job "example" {
     # not specify disk requirements in the resources stanza of the task. All
     # tasks in this group will share the same ephemeral disk.
     #
-    # For more information and examples on the "ephemeral_disk" stanza, please
+    # For more information and rediss on the "ephemeral_disk" stanza, please
     # see the online documentation at:
     #
     #     https://www.nomadproject.io/docs/job-specification/ephemeral_disk.html
@@ -160,7 +160,7 @@ job "example" {
     # The "task" stanza creates an individual unit of work, such as a Docker
     # container, web application, or batch processing.
     #
-    # For more information and examples on the "task" stanza, please see
+    # For more information and rediss on the "task" stanza, please see
     # the online documentation at:
     #
     #     https://www.nomadproject.io/docs/job-specification/task.html
@@ -187,7 +187,7 @@ job "example" {
       # task. It is possible to specify the "artifact" stanza multiple times to
       # download multiple artifacts.
       #
-      # For more information and examples on the "artifact" stanza, please see
+      # For more information and rediss on the "artifact" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/artifact.html
@@ -204,7 +204,7 @@ job "example" {
       # default, but the "logs" stanza allows for finer-grained control over
       # the log rotation and storage configuration.
       #
-      # For more information and examples on the "logs" stanza, please see
+      # For more information and rediss on the "logs" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/logs.html
@@ -219,7 +219,7 @@ job "example" {
       # This ensures the task will execute on a machine that contains enough
       # resource capacity.
       #
-      # For more information and examples on the "resources" stanza, please see
+      # For more information and rediss on the "resources" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/resources.html
@@ -238,7 +238,7 @@ job "example" {
       # make the service addressable after Nomad has placed it on a host and
       # port.
       #
-      # For more information and examples on the "service" stanza, please see
+      # For more information and rediss on the "service" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/service.html
@@ -259,7 +259,7 @@ job "example" {
       # a configuration file or script. This template can optionally pull data
       # from Consul or Vault to populate runtime configuration data.
       #
-      # For more information and examples on the "template" stanza, please see
+      # For more information and rediss on the "template" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/template.html
@@ -288,7 +288,7 @@ job "example" {
       # available to the "template" stanza. The Nomad client handles the renewal
       # and revocation of the Vault token.
       #
-      # For more information and examples on the "vault" stanza, please see
+      # For more information and rediss on the "vault" stanza, please see
       # the online documentation at:
       #
       #     https://www.nomadproject.io/docs/job-specification/vault.html
