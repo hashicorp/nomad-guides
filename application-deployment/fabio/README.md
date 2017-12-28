@@ -1,33 +1,34 @@
-# Fabio Service Deployment 
+# Fabio Load Balancer Deployment 
 In this example we will deploy fabio load balancers across our worker nodes. Fabio is a loadbalancer that natively integrates with Consul to dynamically create routes for our other deployed Nomad services.
 
 ## Estimated Time to Complete
-20 minutes
+10 minutes
 
 ## Prerequisites
 A Nomad cluster should be up and running. Setup a cluster with OSS or enterprise binaries using the vagrantfile here: https://github.com/hashicorp/nomad-guides/tree/master/provision/vagrant
 
 ## Challenge
 
-Keeping load balancers and webservers up to date in a microservice environment is difficult do to the ephermal nature of containers and services. Many legacy load balancers require a static config file to be reloaded whenever service IP's/routes change. 
+Keeping load balancers and webservers up to date in a microservice environment is difficult due to the ephermal nature of containers. Many legacy load balancers require a static config file to be reloaded whenever service IP's/routes change. 
 
 
 ## Solution
 
 Fabio is a fast, modern, zero-conf load balancing HTTP(S) and TCP router for deploying applications managed by consul.
 
-Using Nomad we can deploy fabio across our worker nodes. Whenever we launch new jobs on nomad we can specify a special tag that Fabio will detect and create routes to.
+Using Nomad we can deploy fabio across our worker nodes. Whenever we launch new jobs on Nomad we can specify a special Consul tag that Fabio will detect. Once detected, Fabio will then dynamically create routes to those services.
 
 # Steps
 
 ## Step 1: Review Fabio job file.
+https://github.com/hashicorp/nomad-guides/blob/master/application-deployment/fabio/fabio.nomad
 
-## Step 2: Using Fabio for other jobs
+## Step 2: Using Fabio
 This will be covered more in the goapp guide covered here: https://github.com/hashicorp/nomad-guides/tree/master/application-deployment/go-blue-green
 
 Here is a quick overview:
 
-When registering our service stanza in a Nomad job file we can define Consul tags. Fabio looks for a specific tag. If found, Fabio will create a route to that tasks address and port automatically. This removes any need for template or updating configuration files.
+When registering our service stanza in a Nomad job file we can define Consul tags. Fabio looks for a specific tag. If found, Fabio will create a route to that tasks address and port automatically. This removes any need for templating or updating hardcoded configuration files.
 
 An example Nomad job config:
 ```bash
@@ -43,7 +44,22 @@ An example Nomad job config:
         }
       }
 ```
-The `urlprefix-` instructs fabio to create a dynamic route to this task. So we will be able to leverage this in another example by visiting the `http://FABIO_IP:9999/go-app/`
+The `urlprefix-` instructs fabio to create a dynamic route to this task. More details are described here: (https://github.com/fabiolb/fabio#getting-started). 
+Examples:
+```bash
+# HTTP/S examples
+urlprefix-/css                                     # path route
+urlprefix-i.com/static                             # host specific path route
+urlprefix-mysite.com/                              # host specific catch all route
+urlprefix-/foo/bar strip=/foo                      # path stripping (forward '/bar' to upstream)
+urlprefix-/foo/bar proto=https                     # HTTPS upstream
+urlprefix-/foo/bar proto=https tlsskipverify=true  # HTTPS upstream and self-signed cert
+
+# TCP examples
+urlprefix-:3306 proto=tcp                          # route external port 3306
+```
+
+We will be able to leverage this in another example by visiting the `http://FABIO_IP:9999/go-app/`
 
 ## Step 3: Launch the Fabio job file
 
@@ -91,5 +107,5 @@ The Fabio GUI should load. However, there will not be any populated routes yet. 
 ![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/Fabio_GUI_empty.png)
 
 # Next Steps:
-See an example of Fabio dynamic route creation in this goapp example: 
+See an example of Fabio dynamic route creation in this goapp (Golang) example: 
 https://github.com/hashicorp/nomad-guides/tree/master/application-deployment/go-blue-green
