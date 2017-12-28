@@ -1,5 +1,5 @@
 # Golang app example Part 1:(Dynamic routing), Part 2:(blue-green upgrade)
-This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and the Go app. Part 2 will cover a blue-green upgrade.
+This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and a Golang docker app. Part 2 will cover a blue-green upgrade of that app.
 
 ## Estimated Time to Complete
 20 minutes
@@ -14,14 +14,15 @@ Part 1 is optional and not required for part 2.
 # Part 1 (Fabio Dynamic Routing)
 
 ## Challenge
-Orchestrators and microservice architectures enable developers and operators to more efficiently utilize their compute resources and manage the lifecycles of their applicaitons. However, the highly ephemeral nature of these technologies makes configuration, load balancing, and service discovery difficult.
+Orchestrators and microservice architectures enable operatores and developers to more efficiently utilize their compute resources and manage the lifecycles of their applicaitons. However, the highly ephemeral nature of these technologies makes configuration, load balancing, and service discovery difficult.
 
 ## Solution
-We can leverage Nomad, Consul, and load balancers like Fabio to automtically create routes to our dynamic containers. This removes the need for hardcoded configurations and enables our micro services to locate one another.
+We can leverage Nomad, Consul, and load balancers like Fabio to automtically create routes to our containers. This removes the need for hardcoded configurations and enables our microservices to locate one another.
 
 ## Step 1: Review go-app.nomad
-The golang code for the image is from the simple golang "outyet" example posted here: https://github.com/golang/example/tree/master/outyet
+The golang code for this docker image is from the simple golang "outyet" example posted here: https://github.com/golang/example/tree/master/outyet.
 
+Nomad job file go-app.nomad:
 ```bash
     task "go-app" {
       # The "driver" parameter specifies the task driver that should be used to
@@ -36,7 +37,7 @@ The golang code for the image is from the simple golang "outyet" example posted 
       }
 ```
 
-Lets take a look at the service stanza of our job file. The 'urlprefix-/goapp' tag is registred in Consul for this service. Fabio looks for this tag and will create a dynamic route to the IP address and port given to this container. 
+Lets take a look at the service stanza of our job file. The `urlprefix-/goapp` tag is registered in Consul for this service. Fabio looks for this tag and will create a dynamic route to the IP address and port given to this container. It will create a route to the path `/go-app`
 ```bash
       service {
         name = "go-app"
@@ -104,7 +105,7 @@ Most applications are long-lived and require updates over time. This can be very
 ## Solution
  Nomad has built-in support for rolling, blue/green, and canary updates. When a job specifies a rolling update, Nomad uses task state and health check information in order to detect allocation health and minimize or eliminate downtime.
 
-## Step 0: Review the Update Stanza
+## Step 1: Review the Update Stanza
 Upgrade strategies are enabled by configuring the update stanza. Detailed notes are described here: https://www.nomadproject.io/docs/operating-a-job/update-strategies/index.html.
 This example will cover a blue-green upgrade. 
 
@@ -126,7 +127,7 @@ See: https://www.nomadproject.io/docs/job-specification/update.html for explanat
 
 
 
-## Step 1: Run V1 of the go-app
+## Step 2: Run V1 of the go-app
 Make sure the go-app image is using version 1.
 ```bash
       config {
@@ -165,17 +166,18 @@ If using Fabio, verify the app is running. You can also assign a static port and
         }
       }
 ```
+
 ![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/go-app-v1.png)
 
-## Step 2: Update the go-app job file
+## Step 3: Update the go-app job file
 Make the following change to the go-app.nomad image
 `image = "aklaas2/go-app-1.0"`
 to
 `image = "aklaas2/go-app-2.0"`
 
-Now perform a plan on the go-app job file.
+Next perform a plan on the go-app job file.
 
-## Step 3: Nomad plan
+## Step 4: Nomad plan
 Perform a dry-run
 ```bash
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad plan go-app.nomad
@@ -192,7 +194,7 @@ Scheduler dry-run:
 ```
 Notice the Task Group: Nomad will place 3 canaries with the updated image.
 
-## Step 4: Nomad run
+## Step 5: Nomad run
 Run the job
 ```bash
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run go-app.nomad
@@ -220,7 +222,7 @@ b25f41fd  c4b9b97e  go-app      0        run      running  12/28/17 16:05:19 UTC
 c59f836c  34bec70a  go-app      0        run      running  12/28/17 16:05:19 UTC
 ```
 
-## Step 4: Finish deployment
+## Step 6: Finish deployment
 
 Once testing of the new application is complete we can promote the deployment
 
@@ -245,6 +247,6 @@ b25f41fd  c4b9b97e  go-app      0        stop     complete  12/28/17 16:05:19 UT
 c59f836c  34bec70a  go-app      0        stop     complete  12/28/17 16:05:19 UTC
 ```
 
-Once the deployment is promoted check the app to verify the upgrade (the website should be checking of golang 2.0 is out yet!).
+Once the deployment is promoted check the app to verify the upgrade (the website should now be checking if golang 2.0 is out yet!).
 
-![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/go-app-v1.png)
+![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/go-app-v2.png)
