@@ -3,7 +3,7 @@ job "nginx" {
   type = "service"
 
   group "nginx" {
-    count = 1
+    count = 3
 
     vault {
       policies = ["superuser"]
@@ -61,6 +61,12 @@ EOH
       template {
         data = <<EOH
             Good morning.
+            <br />
+{{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
+{{ .Data.certificate }}
+            <br />
+{{ .Data.private_key }}
+{{ end }}
         EOH
 
         destination = "local/data/index.html"

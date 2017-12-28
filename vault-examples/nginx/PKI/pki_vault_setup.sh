@@ -1,3 +1,7 @@
+#!/bin/bash
+
+consul kv get service/vault/root-token | vault auth -
+
 vault mount pki
 
 vault write pki/root/generate/internal \
