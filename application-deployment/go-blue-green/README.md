@@ -1,6 +1,45 @@
 # Golang app example Part 1:(Dynamic routing), Part 2:(blue-green upgrade)
 This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and a Golang docker app. Part 2 will cover a blue-green upgrade of that app.
 
+### Demo TLDR:
+```bash
+##PART 1
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run /vagrant/application-deployment/fabio/fabio.nomad
+
+#containers takes a minute or two to download and start
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run go-app.nomad
+
+#in your browser go to 
+http://localhost:9998/routes
+
+#in your browser go to "golang 1.9 out yet?"
+http://localhost:9999/go-app/
+
+##PART 2
+#Make the following change to the go-app.nomad image
+image = "aklaas2/go-app-1.0"
+#to
+image = "aklaas2/go-app-2.0"
+
+#See canaries
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad plan go-app.nomad
+
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run go-app.nomad
+
+#There should be 6 allocs now (three old image)(three new image)
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad status go-app
+
+#Grab job ID from status
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad deployment promote 562b9ba3
+
+#Back to only 3 allocs with the new image
+vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad status go-app
+
+#in your browser see upgraded app "golang 2.0 out yet?"
+http://localhost:9999/go-app/
+
+```
+
 ## Estimated Time to Complete
 20 minutes
 
@@ -224,7 +263,7 @@ c59f836c  34bec70a  go-app      0        run      running  12/28/17 16:05:19 UTC
 
 ## Step 6: Finish deployment
 
-Once testing of the new application is complete we can promote the deployment
+Once testing of the new application is complete, we can promote the deployment
 
 ```bash
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad deployment promote 95eceb6a
@@ -247,6 +286,6 @@ b25f41fd  c4b9b97e  go-app      0        stop     complete  12/28/17 16:05:19 UT
 c59f836c  34bec70a  go-app      0        stop     complete  12/28/17 16:05:19 UTC
 ```
 
-Once the deployment is promoted check the app to verify the upgrade (the website should now be checking if golang 2.0 is out yet!).
+Once the deployment is promoted, check the app to verify the upgrade (the website should now be checking if golang 2.0 is out yet!).
 
 ![](https://raw.githubusercontent.com/hashicorp/nomad-guides/master/assets/go-app-v2.png)

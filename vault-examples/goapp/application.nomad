@@ -34,7 +34,9 @@ job "app" {
         memory = 64
         network {
           mbits = 1
-          port "http" {}
+          port "http" {
+	    static = 8080
+	  }
         }
       }
 
