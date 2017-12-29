@@ -1,7 +1,7 @@
 # Golang Application + Dynamic Database Credentials (MySQL) 
 This guide will discuss native app library integration and dynamic database credentials with Nomad, Vault, and MySQL. It will also show revoking those dynamic database credentials with Vault's GUI.
 
-#### Demo TLDR:
+#### TLDR;
 Using Vagrantfile setup:
 ```bash
 vagrant@node1:/vagrant/vault-examples/goapp$ ./golang_vault_setup.sh
@@ -10,7 +10,7 @@ vagrant@node1:/vagrant/vault-examples/goapp$ nomad run application.nomad
 
 vagrant@node1:/vagrant/vault-examples/goapp$ nomad status app
 
-#Pull an alloc id from status
+#Pull an alloc id from status, logs show dynamic username password
 vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 435bf5cd
 . . .
 2017/12/28 20:43:30 dynamic_user:  app-toke-0fa451f  dynamic_password:  9c50b4b7-008e-6e5a-dca4-ab4f753872a6
@@ -57,7 +57,7 @@ A Nomad cluster should be up and running. Setup a cluster with OSS or enterprise
 
 A MySQL server should be available (the vagrantfile above automatically stands up a MySQL database).
 
-A Vault server should be available and Nomad should be configured to talk to and create tokens with Vault (the vagrantfile above installs Vault and configures Nomad to talk with it automatically). More details here:
+A Vault server should be available and Nomad should be configured to talk to and create tokens with Vault (the vagrantfile above installs Vault and configures the Nomad integration automatically). More details here:
 https://www.nomadproject.io/docs/agent/configuration/vault.html
 https://www.nomadproject.io/docs/vault-integration/index.html
 
@@ -70,7 +70,7 @@ Another key challenge is secret lifecycle management. If secrets are exposed or 
 To enable secure, auditable and easy access to your secrets, Nomad integrates with HashiCorp's Vault. Nomad servers and clients coordinate with Vault to derive a Vault token that has access to only the Vault policies the tasks needs. Nomad clients make the token available to the task and handle the tokens renewal. Further, Nomad's template block can retrieve secrets from Vault making it easier than ever to secure your infrastructure.
 
 ## Nomad-Vault Architecture
-1. Nomad server creates wrapped token scoped to job's requested vault policy. (Nomad server uses root or token role token).
+1. Nomad server creates wrapped token scoped to job's requested vault policy and sends to Nomad Client. (Nomad server uses root or token role token, details here: https://www.nomadproject.io/docs/vault-integration/index.html#required-vault-policies)
 2. Nomad client unwraps the wrapped token via Vault API.
 3. Nomad client injects unwrapped auth token into task (env variable).
 4. Task uses auth token to authenticate to Vault and read secrets.
@@ -182,7 +182,7 @@ vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 2d6db3e2
 2017/12/28 19:41:52 Renewing credentials: mysql/creds/app/2d98930c-f7d7-60bd-b279-af7fcdc57a05
 ```
 
-Vault created the `app-toke-b761d50` user and assosciated password in MySQL. Each of these usernames and passwords has an assosciated short lived lease. At the end of the lease Vault will revoke these credentials and delete them from the database (unless renewed). This feature gives operatores the ability to revoke credentials early if the system is compromised or a database password is exposed.
+Vault created the `app-toke-b761d50` user and assosciated password in MySQL. Each of these usernames and passwords has an assosciated short lived lease. At the end of the lease, Vault will revoke these credentials and delete them from the database (unless renewed). This feature gives operatores the ability to revoke credentials early if the system is compromised or a database password is exposed.
 
 Lets verify the users in the database quickly. (If using the Vagrantfile, login to node3)
 

@@ -42,7 +42,7 @@ job "app" {
 
       service {
         name = "app"
-        tags = ["urlprefix-/app"]
+        tags = ["urlprefix-/app", "go-mysql-app"]
         port = "http"
         check {
           type = "http"
