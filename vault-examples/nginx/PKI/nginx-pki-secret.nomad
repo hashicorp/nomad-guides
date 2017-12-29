@@ -53,7 +53,7 @@ job "nginx" {
 {{ .Data.certificate }}
 {{ .Data.private_key }}
 {{ end }}
-EOH
+      EOH
 
         destination = "secret/cert.key"
       }
@@ -62,8 +62,10 @@ EOH
         data = <<EOH
             Good morning.
             <br />
+            <br />
 {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
 {{ .Data.certificate }}
+            <br />
             <br />
 {{ .Data.private_key }}
 {{ end }}
