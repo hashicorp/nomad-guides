@@ -28,7 +28,7 @@ job "go-app" {
       driver = "docker"
       config {
         # change to go-app-2.0 
-        image = "aklaas2/go-app-2.0"
+        image = "aklaas2/go-app-1.0"
         port_map {
           http = 8080
         }

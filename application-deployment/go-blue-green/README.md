@@ -1,7 +1,7 @@
-# Golang app example Part 1:(Dynamic routing), Part 2:(blue-green upgrade)
-This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and a Golang docker app. Part 2 will cover a blue-green upgrade of that app.
+# Golang app example: Part 1 (Dynamic routing), Part 2 (blue-green upgrade)
+This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and a Golang Docker app. Part 2 will cover a blue-green upgrade of that app.
 
-### Demo TLDR:
+### TLDR;
 ```bash
 ##PART 1
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run /vagrant/application-deployment/fabio/fabio.nomad
@@ -29,7 +29,7 @@ vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad run go-app.no
 #There should be 6 allocs now (three old image)(three new image)
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad status go-app
 
-#Grab job ID from status
+#Grab Deployment ID from "nomad status go-app"
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad deployment promote 562b9ba3
 
 #Back to only 3 allocs with the new image
@@ -263,7 +263,7 @@ c59f836c  34bec70a  go-app      0        run      running  12/28/17 16:05:19 UTC
 
 ## Step 6: Finish deployment
 
-Once testing of the new application is complete, we can promote the deployment
+Once testing of the new application is complete, we can promote the deployment. Grab the deployment ID from "nomad status go-app".
 
 ```bash
 vagrant@node1:/vagrant/application-deployment/go-blue-green$ nomad deployment promote 95eceb6a
