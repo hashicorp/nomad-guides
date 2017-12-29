@@ -1,4 +1,4 @@
-#Nomad-Vault Nginx PKI
+# Nomad-Vault Nginx PKI
 
 ### TLDR;
 ```bash
@@ -6,7 +6,7 @@ vagrant@node1:/vagrant/vault-examples/nginx/PKI$ ./pki_vault_setup.sh
 
 vagrant@node1:/vagrant/vault-examples/nginx/PKI$ nomad run nginx-pki-secret.nomad
 
-#visit your browser (If using Vagrantfile)
+#visit your browser (If using Vagrantfile). Job uses static port 443
 https://localhost:9443/
 ```
 
@@ -49,7 +49,7 @@ Second, this template block is used to pull secrets from Vault using the token f
         destination = "secret/cert.key"
       }
 ```
-Nomad reads from the configured Vault pki secret backend path (pki/issue/consul-service) to generate a dynamic cert and key. Nomad then templates that information to the destination file within nginx container.
+Nomad reads from the configured Vault pki secret backend path (pki/issue/consul-service) to generate a dynamic cert and key. Nomad then templates that information to the destination file within the nginx container.
 
 ## Step 1: Configure Vault
 We need to setup the Vault PKI backend and create a role for signing certs. We will also create a super user policy that Nomad will create a token for and pass to our tasks/template.
@@ -58,6 +58,7 @@ We need to setup the Vault PKI backend and create a role for signing certs. We w
 vagrant@node1:/vagrant/vault-examples/nginx/pki$ cat pki_vault_setup.sh
 #!/bin/bash
 
+#Not best practice, used for demo/testing simplicity in Vagrant environment
 consul kv get service/vault/root-token | vault auth -
 
 vault mount pki
