@@ -1,23 +1,35 @@
-# Nginx Service Deployment 
+# Nginx Deployment (Template Example)
 The goal of this guide is to help users deploy Nginx on Nomad. In the process we will also show how to use Nomad templating to update the configuration of our deployed tasks. (Nomad uses Consul Template under the hood) 
 
+### TLDR;
+```bash
+vagrant@node1:/vagrant/application-deployment/nginx$ ./kv_consul_setup.sh
+
+vagrant@node1:/vagrant/application-deployment/nginx$ nomad run nginx-consul.nomad
+
+#Validate the results on Nomad clients, job assigns static port 8080 
+#if using vagrantfile check:
+http://localhost:8080/nginx/
+
+```
+
 ## Estimated Time to Complete
-20 minutes
+10 minutes
 
 ## Prerequisites
 A Nomad cluster should be up and running. Setup a cluster with OSS or enterprise binaries using the vagrantfile here: https://github.com/hashicorp/nomad-guides/tree/master/provision/vagrant
 
 ## Challenge
-Keeping environment variables and application configuration files up to date in a dynamic or micro service environment can be extremly difficult to manage and scale.
+Keeping environment variables and application configuration files up to date in a dynamic or microservice environment can be difficult to manage and scale.
 
 ## Solution
 Nomad's template block instantiates an instance of a template renderer. This creates a convenient way to ship configuration files that are populated from environment variables, Consul data, Vault secrets, or just general configurations within a Nomad task.
 
-In this example, we will leverage Consul for our tasks configuration and deploy Nginx containers.
+In this example, we will leverage Consul for our tasks' configuration and deploy Nginx containers.
 
 # Steps
 
-## Step 1: Write a test Value to Consul 
+## Step 1: Write a Test Value to Consul 
 Write the test value to Consul (script included)
 
 ```bash
@@ -31,7 +43,7 @@ Success! Data written to: features/demo
 ```
 
 ## Step 2: Review Template stanza
-The important piece of this examle lies in the template stanza
+The important piece of this example lies in the template stanza
 ```
      template {
         data = <<EOH
@@ -53,7 +65,7 @@ The important piece of this examle lies in the template stanza
       }
 ```
 
-In this example the `if KeyExists` block instructs Nomad to pull a value from the Consul key `features/demo` if it exists. 
+In this example the `if KeyExists` block instructs Nomad to pull a value from the Consul key `features/demo` if it exists. We wrote this Consul value in step 1.
 
 We can also use Nomad's interpolation features to populate config/env variables based on Nomad's runtime information. The `env "node.unique.id"` and `env "NOMAD_DC"` options showcase this. More information is provided here: https://www.nomadproject.io/docs/runtime/interpolation.html
 
@@ -61,7 +73,7 @@ Nomad will populate the template with those values and place the rendered templa
 
 More template options are outlined here: https://www.nomadproject.io/docs/job-specification/template.html
 
-## Step 3: run the job
+## Step 3: Run the Job
 Run the nginx job
 ```bash
 vagrant@node1:/vagrant/application-deployment/nginx$ nomad run nginx-consul.nomad

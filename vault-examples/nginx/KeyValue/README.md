@@ -1,6 +1,6 @@
-#Nomad-Vault Nginx Key/Value 
+# Nomad-Vault Nginx Key/Value 
 
-### Demo TLDR
+### TLDR;
 ```bash
 vagrant@node1:/vagrant/vault-examples/nginx/KeyValue$ ./kv_vault_setup.sh
 Successfully authenticated! You are now logged in.
@@ -12,13 +12,10 @@ Policy 'test' written.
 
 vagrant@node1:/vagrant/vault-examples/nginx/KeyValue$ nomad run nginx-kv-secret.nomad
 
-# in your browser goto:
+# in your browser goto (Runs on clients on static port 8080):
 http://localhost:8080/nginx-secret/
 #Good morning. secret: Live demos rock!!!
 
 ```
-
-
-
 
 #Guide: TODO
