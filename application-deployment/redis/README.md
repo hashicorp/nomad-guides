@@ -34,7 +34,7 @@ Some important bits:
       driver = "docker"      # This task uses Docker, other examples: exec, LXC, QEMU
       config {
         image = "redis:3.2"  # Docker image to download (uses public hub by default)
-        port_map {           # Port on container you would like to map to Nomad chosen Dynamic port on host
+        port_map {           # Port on container you would like to map to chosen dynamic port on host
           db = 6379
         }
       }
@@ -168,7 +168,7 @@ ID        Node ID   Task Group  Version  Desired  Status   Created At
 919f7100  c4146f97  cache       0        run      running  12/27/17 20:01:35 UTC
 ```
 
-An allocation represents an instance of Task Group placed on a node. To inspect an allocation we use the alloc-status command:
+An allocation represents an instance of a Task Group placed on a node. To inspect an allocation we use the alloc-status command:
 
 ```bash
 vagrant@node1:/vagrant/application-deployment/redis$ nomad alloc-status 919f7100

@@ -1,22 +1,32 @@
 # Fabio Load Balancer Deployment 
 In this example we will deploy fabio load balancers across our worker nodes. Fabio is a loadbalancer that natively integrates with Consul to dynamically create routes for our other deployed Nomad services.
 
+### TLDR;
+```bash
+vagrant@node1:/vagrant/application-deployment/fabio$ nomad run fabio.nomad
+
+#Check the fabio GUI (Adjust IP for your setup, this example assumes the Vagrantfile)
+http://localhost:9998/routes
+
+#After we register services with Consul using "urlprefix-/app" we will be able to reach them via port 9999
+```
+
 ## Estimated Time to Complete
-10 minutes
+5 minutes
 
 ## Prerequisites
 A Nomad cluster should be up and running. Setup a cluster with OSS or enterprise binaries using the vagrantfile here: https://github.com/hashicorp/nomad-guides/tree/master/provision/vagrant
 
 ## Challenge
 
-Keeping load balancers and webservers up to date in a microservice environment is difficult due to the ephermal nature of containers. Many legacy load balancers require a static config file to be reloaded whenever service IP's/routes change. 
+Keeping load balancers and webservers up to date in a microservice environment is difficult due to their ephemeral nature. Many legacy load balancers require a static config file to be reloaded whenever service IP's/routes change. 
 
 
 ## Solution
 
 Fabio is a fast, modern, zero-conf load balancing HTTP(S) and TCP router for deploying applications managed by consul.
 
-Using Nomad we can deploy fabio across our worker nodes. Whenever we launch new jobs on Nomad we can specify a special Consul tag that Fabio will detect. Once detected, Fabio will then dynamically create routes to those services.
+Using Nomad, we can deploy fabio across our worker nodes. Whenever we launch new jobs on Nomad, we can specify a special Consul tag that Fabio will detect. Once detected, Fabio will then dynamically create routes to those services.
 
 # Steps
 
@@ -28,7 +38,7 @@ This will be covered more in the goapp guide covered here: https://github.com/ha
 
 Here is a quick overview:
 
-When registering our service stanza in a Nomad job file we can define Consul tags. Fabio looks for a specific tag. If found, Fabio will create a route to that tasks address and port automatically. This removes any need for templating or updating hardcoded configuration files.
+When registering our service stanza in a Nomad job file, we can define Consul tags. Fabio looks for a specific tag. If found, Fabio will create a route to that task's address and port automatically. This removes any need for templating or updating hardcoded configuration files.
 
 An example Nomad job config:
 ```bash
