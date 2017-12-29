@@ -1,6 +1,8 @@
 # Golang Application + Dynamic Database Credentials (MySQL) 
 This guide will discuss native app library integration and dynamic database credentials with Nomad, Vault, and MySQL. It will also show revoking those dynamic database credentials with Vault's GUI.
 
+## TODO: Update guide and application with new Vault database backend 
+
 #### TLDR;
 Using Vagrantfile setup:
 ```bash
