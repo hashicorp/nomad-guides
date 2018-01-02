@@ -21,5 +21,14 @@ This area will contain instructions to provision Nomad and Consul as a first ste
 
 These may include use cases installing Nomad in cloud services via Terraform, or within virtual environments using Vagrant, or running Nomad in a local development mode.  
 
+## application-deployment
+This area will contain instructions and gudies for deploying applications on Nomad
+
+## operations
+This area will contain instructions for operating Nomad. This includes topics such as configuring Sentinel policies, namespaces, ACLs etc.
+
+## vault-examples
+This area contains examples and guides for deploying secrets (from Vault) into your Nomad applications.
+
 ### Contributing
 We welcome contributions and feedback!  For guide submissions, please see [the contributions guide](CONTRIBUTING.md)

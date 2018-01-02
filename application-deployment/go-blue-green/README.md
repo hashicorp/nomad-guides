@@ -1,4 +1,4 @@
-# Golang app example: Part 1 (Dynamic routing), Part 2 (blue-green upgrade)
+# Golang app example: Part 1 (dynamic routing), Part 2 (blue-green upgrade)
 This guide will cover two examples. Part 1 will cover a dynamic routing example using Fabio and a Golang Docker app. Part 2 will cover a blue-green upgrade of that app.
 
 ### TLDR;

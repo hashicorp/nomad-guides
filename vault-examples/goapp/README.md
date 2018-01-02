@@ -69,10 +69,10 @@ Many workloads require access to tokens, passwords, certificates, API keys, and 
 Another key challenge is secret lifecycle management. If secrets are exposed or compromised, how do we stop the bleeding? Vault's dynamic secret backends generate secrets with short time to lives through leases. Those leases can also be manually revoked before their expiration in the event of a break glass scenario (exposure/compromise). In a database example, a revoked secret lease will cause Vault to delete the assosciated username/password from the database.
 
 ## Solution
-To enable secure, auditable and easy access to your secrets, Nomad integrates with HashiCorp's Vault. Nomad servers and clients coordinate with Vault to derive a Vault token that has access to only the Vault policies the tasks needs. Nomad clients make the token available to the task and handle the tokens renewal. Further, Nomad's template block can retrieve secrets from Vault making it easier than ever to secure your infrastructure.
+To enable secure, auditable and easy access to your secrets, Nomad integrates with HashiCorp's Vault. Nomad servers and clients coordinate with Vault to derive a Vault token that has access to only the Vault policies the tasks need. Nomad clients make the token available to the task and handle the tokens renewal. Further, Nomad's template block can retrieve secrets from Vault making it easier than ever to secure your infrastructure.
 
 ## Nomad-Vault Architecture
-1. Nomad server creates wrapped token scoped to job's requested vault policy and sends to Nomad Client. (Nomad server uses root or token role token, details here: https://www.nomadproject.io/docs/vault-integration/index.html#required-vault-policies)
+1. Nomad server asks for and receives wrapped token (from Vault) scoped to job's requested vault policy and sends to Nomad Client. (Nomad server uses root or token role token, details here: https://www.nomadproject.io/docs/vault-integration/index.html#required-vault-policies)
 2. Nomad client unwraps the wrapped token via Vault API.
 3. Nomad client injects unwrapped auth token into task (env variable).
 4. Task uses auth token to authenticate to Vault and read secrets.
@@ -170,7 +170,7 @@ ID        Node ID   Task Group  Version  Desired  Status   Created At
 ```
 ## Step 3: Validate dynamic credentials
 
-Now, lets check the application logs to make sure they were able to receive dynamic credentials from Vault and authenticate to the database.
+Now, lets check the application logs to make sure they were able to receive dynamic credentials from Vault and authenticate to the database. Grab an allocation ID from the `nomad status app` command.
 
 ```bash
 vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 2d6db3e2
@@ -207,7 +207,7 @@ You should see the dynamic users created by Vault in the database.
 ## Step 4: Revoking Dynamic Credentials GUI
 In this step we imagine that a secret has been compromised (password committed to github, lost sticky note, etc.).
 
-Authenticate to the Vault GUI with admin credentials (Requires access to revoke auth and database tokens).
+Authenticate to the Vault GUI with admin credentials (Requires access to revoke auth and database tokens). If using the vagrantfile you can login using `username: vault` and `password: vault` or use the root token.
 
 If using Vagrantfile: http://localhost:8200/ui/vault/auth
 

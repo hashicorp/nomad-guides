@@ -1,4 +1,4 @@
-# Redis Service Deployment (introduction to Nomad job operations)
+# Redis Service Deployment (introduction)
 The goal of this guide is to help users get started with deplying jobs on Nomad. In this Guide we will walk through some simple operational commands in Nomad and deploy some Redis Docker containers.
 
 ## Estimated Time to Complete
@@ -19,7 +19,7 @@ Jobs are the primary configuration that users interact with when using Nomad. A 
 
 
 # Steps
-In this example we will walk through some simple CLI commands for deploying and managing Nomad jobs. First, go through `redis.nomad` in depth and take to time review all the available job configuration options. Note: `redis.nomad` can be created by using the `nomad init` command. More information here: https://www.nomadproject.io/intro/getting-started/jobs.html
+In this example we will walk through some simple CLI commands for deploying and managing Nomad jobs. First, go through `redis.nomad` in depth to review all the available job configuration options. Note: `redis.nomad` can be created by using the `nomad init` command. More information here: https://www.nomadproject.io/intro/getting-started/jobs.html
 
 ## Step 0: Review redis.nomad (example.nomad)
 Read about all the Nomad job config options:
@@ -34,24 +34,24 @@ Some important bits:
       driver = "docker"      # This task uses Docker, other examples: exec, LXC, QEMU
       config {
         image = "redis:3.2"  # Docker image to download (uses public hub by default)
-        port_map {           # Port on container you would like to map to chosen dynamic port on host
+        port_map {           # Port on container that will map to dynamic port on host
           db = 6379
         }
       }
       . . .
-      resources {    # Resource limits to reserve for this task
-        cpu    = 500 # 500 MHz, capacity is calculated by (CPU Freq * Num CPUs)
-        memory = 256 # 256MB
+      resources {      # Resource limits to reserve for this task
+        cpu    = 500   # 500 MHz, capacity is calculated by (CPU Freq * Num CPUs)
+        memory = 256   # 256MB
         network {
           mbits = 10
           port "db" {} # Allocate a dynamic port called "db"
         }
       }
       . . .
-      service {       # Register this task in Consul and define health checks
+      service {        # Register this task in Consul and define health checks
         name = "global-redis-check" 
         tags = ["global", "cache"]
-        port = "db"  # Health check will be performed against dynamic port named "db" from above
+        port = "db"    # Health check will be performed against dynamic port named "db" from above
         check {
           name     = "alive"
           type     = "tcp"

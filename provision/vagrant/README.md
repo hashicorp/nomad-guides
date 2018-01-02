@@ -1,5 +1,5 @@
 # Vagrant: Nomad Cluster (Single Vault server on node3)
-Spins up 3 virtual machines with Nomad installed as both Client and Server mode. Node3 also has Vault installed to show Nomad-Vault integration. Warning: Nomad severs are configured with the root-token. A Nomad token role should be used in production as shown here: https://www.nomadproject.io/docs/vault-integration/index.html.
+Spins up 3 virtual machines with Nomad installed as both Client and Server mode. Node3 also has Vault installed to show Nomad-Vault integration as well as MySQL server. WARNING: Nomad severs are configured with the root-token. A Nomad token role should be used in production as shown here: https://www.nomadproject.io/docs/vault-integration/index.html.
 
 # Usage
 If you would like to use the enterprise binaries download and place the unzipped binaries in the root directory of nomad-guides
@@ -75,7 +75,7 @@ fb792a08  dc1  node3  <none>  false  ready
 1a3bf4ca  dc1  node1  <none>  false  ready
 ```
 
-5. If you want to use Vault from the CLI, Grab the root-token from Consul (NOT BEST PRACTICE: DEMO USE ONLY)
+5. If you want to use Vault from the CLI, Grab the root-token from Consul (NOT BEST PRACTICE: FOR DEMO USE ONLY)
 ```bash
 vagrant@node1:~$ consul kv get service/vault/root-token
 6389c4e7-9f0a-f5f2-9c71-d5cec294c99a
@@ -98,4 +98,3 @@ High-Availability Enabled: true
 	Leader Cluster Address: https://192.168.50.152:8201
 
 ```
-
