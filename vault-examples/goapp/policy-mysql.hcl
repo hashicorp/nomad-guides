@@ -1,1 +1,1 @@
-path "mysql/creds/app" { capabilities = [ "read", "list" ] }
+path "database/creds/readonly" { capabilities = [ "read", "list" ] }
