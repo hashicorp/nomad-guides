@@ -13,7 +13,7 @@ job "app" {
     task "app" {
       driver = "exec"
       config {
-        command = "app"
+        command = "goapp"
       }
 
       env {
@@ -26,7 +26,7 @@ job "app" {
       }
 
       artifact {
-        source = "https://s3.amazonaws.com/ak-bucket-1/app"
+        source = "https://s3.amazonaws.com/ak-bucket-1/goapp"
       }
 
       resources {
@@ -35,8 +35,8 @@ job "app" {
         network {
           mbits = 1
           port "http" {
-	    static = 8080
-	  }
+	          static = 8080
+	        }
         }
       }
 

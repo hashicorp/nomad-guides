@@ -15,7 +15,7 @@ vagrant@node1:/vagrant/vault-examples/goapp$ nomad status app
 #Pull an alloc id from status, logs show dynamic username password
 vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 435bf5cd
 . . .
-2017/12/28 20:43:30 dynamic_user:  app-toke-0fa451f  dynamic_password:  9c50b4b7-008e-6e5a-dca4-ab4f753872a6
+2018/01/04 20:28:49 username v-read-40xpu913r, password A1a-73r2ywpqx6wrqqts
 
 #On Node3 
 vagrant@node3:~$ mysql -h 192.168.50.152 -u vaultadmin -pvaultadminpassword
@@ -23,12 +23,12 @@ MariaDB [(none)]> SELECT User FROM mysql.user;
 +------------------+
 | User             |
 +------------------+
-| app-toke-0fa451f |
-| app-toke-d357ab7 |
-| app-toke-de4a48e |
+| v-read-40xpu913r |
+| v-read-q5sr6rzrz |
+| v-read-xr3v2yrsr |
 | vaultadmin       |
 | root             |
-+------------------
++------------------+
 
 #login to Vault GUI
 username: vault   password: vault
@@ -90,7 +90,7 @@ vagrant@node1:/vagrant/vault-examples/goapp$ cat golang_vault_setup.sh
 
 consul kv get service/vault/root-token | vault auth -
 
-POLICY='path "mysql/creds/app" { capabilities = [ "read", "list" ] }'
+POLICY='path "database/creds/readonly" { capabilities = [ "read", "list" ] }'
 
 echo $POLICY > policy-mysql.hcl
 
@@ -144,7 +144,7 @@ func main() {
     client, err := api.NewClient(&config)
     client.SetToken(vaultToken)
     . . .
-    secret, err := client.Logical().Read("database/creds/app")
+    secret, err := client.Logical().Read("database/creds/readonly")
 }
 ```
 ## Step 2: Run the application.
@@ -163,28 +163,26 @@ vagrant@node1:/vagrant/vault-examples/goapp$ nomad status app
 . . .
 . . .
 Allocations
-ID        Node ID   Task Group  Version  Desired  Status   Created At
-2d6db3e2  a79b11ff  app         0        run      running  12/28/17 19:41:42 UTC
-748b358f  34bec70a  app         0        run      running  12/28/17 19:41:42 UTC
-9112a050  c4b9b97e  app         0        run      running  12/28/17 19:41:42 UTC
+ID        Node ID   Task Group  Version  Desired  Status    Created At
+280d05c8  4b2bd3e6  app         2        run      running   01/04/18 20:28:40 UTC
+793b5ecb  5183f61b  app         2        run      running   01/04/18 20:28:40 UTC
+d17855b9  e338c9d0  app         2        run      running   01/04/18 20:28:40 UTC
 ```
 ## Step 3: Validate dynamic credentials
 
 Now, lets check the application logs to make sure they were able to receive dynamic credentials from Vault and authenticate to the database. Grab an allocation ID from the `nomad status app` command.
 
 ```bash
-vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 2d6db3e2
-2017/12/28 19:41:52 Starting app...
-2017/12/28 19:41:52 Getting database credentials...
-2017/12/28 19:41:52 dynamic_user:  app-toke-b761d50  dynamic_password:  528cb789-2b11-709a-2c15-8c6383c3394e
-2017/12/28 19:41:52 Initializing database connection pool...
-2017/12/28 19:41:52 dbAddr  db.service.consul:3306
-2017/12/28 19:41:52 dsn  app-toke-b761d50:528cb789-2b11-709a-2c15-8c6383c3394e@tcp(db.service.consul:3306)/app
-2017/12/28 19:41:52 HTTP service listening on 10.0.2.15:31640
-2017/12/28 19:41:52 Renewing credentials: mysql/creds/app/2d98930c-f7d7-60bd-b279-af7fcdc57a05
+$ nomad logs -stderr 280d05c8
+2018/01/04 20:28:49 Starting Go App
+2018/01/04 20:28:49 Getting database credentials...
+2018/01/04 20:28:49 username v-read-40xpu913r, password A1a-73r2ywpqx6wrqqts
+2018/01/04 20:28:49 Initializing database connection pool...
+2018/01/04 20:28:49 HTTP service listening on 10.0.2.15:8080
+2018/01/04 20:28:49 Renewing credentials: database/creds/readonly/01730a17-5fcb-61d9-093b-c228c8b2502e
 ```
 
-Vault created the `app-toke-b761d50` user and assosciated password in MySQL. Each of these usernames and passwords has an assosciated short lived lease. At the end of the lease, Vault will revoke these credentials and delete them from the database (unless renewed). This feature gives operatores the ability to revoke credentials early if the system is compromised or a database password is exposed.
+Vault created the `v-read-40xpu913r` user and assosciated password in MySQL. Each of these usernames and passwords has an assosciated short lived lease. At the end of the lease, Vault will revoke these credentials and delete them from the database (unless renewed). This feature gives operatores the ability to revoke credentials early if the system is compromised or a database password is exposed.
 
 Lets verify the users in the database quickly. (If using the Vagrantfile, login to node3)
 
@@ -195,9 +193,9 @@ MariaDB [(none)]> SELECT User FROM mysql.user;
 +------------------+
 | User             |
 +------------------+
-| app-toke-4b30fd7 |
-| app-toke-8428432 |
-| app-toke-b761d50 |
+| v-read-40xpu913r |
+| v-read-q5sr6rzrz |
+| v-read-xr3v2yrsr |
 | vaultadmin       |
 | root             |
 +------------------+

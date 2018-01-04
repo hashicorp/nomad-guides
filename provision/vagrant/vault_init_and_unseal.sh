@@ -41,19 +41,17 @@ path "*" {
 vault auth-enable userpass
 vault write auth/userpass/users/vault password=vault policies=vault-admin
 
-#TODO: NEW Mysql setup, Also change golang_vault_setup.sh vault ACL path
-#export INSTANCE_IP="$(/sbin/ifconfig eth1 | grep 'inet addr:' | awk '{print substr($2,6)}')"
-#vault mount database
-#vault write database/config/mysql \
-#  plugin_name=mysql-legacy-database-plugin \
-#  connection_url="vaultadmin:vaultadminpassword@tcp(192.168.50.152:3306)/"  \
-#  allowed_roles="readonly"
+vault mount database
+vault write database/config/mysql \
+  plugin_name=mysql-legacy-database-plugin \
+  connection_url="vaultadmin:vaultadminpassword@tcp(192.168.50.152:3306)/"  \
+  allowed_roles="readonly"
 
-#vault write database/roles/readonly \
-#  db_name=mysql \
-#  creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \
-#  default_ttl="30m" \
-#  max_ttl="24h"
+vault write database/roles/readonly \
+  db_name=mysql \
+  creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \
+  default_ttl="30m" \
+  max_ttl="24h"
 
 vault mount mysql
 vault write mysql/config/connection \
