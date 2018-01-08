@@ -363,8 +363,9 @@ $consul_template_config = <<CONSUL_TEMPLATE_CONFIG
 sudo cat << 'EOF' > /tmp/nomad-vault.hcl.tpl
 vault {
   enabled = true
+  create_from_role = "nomad-cluster"
   address = "http://active.vault.service.consul:8200"
-  token = "{{ key "service/vault/root-token" }}"
+  token = "{{ key "service/vault/nomad-token" }}"
 }
 EOF
 CONSUL_TEMPLATE_CONFIG
@@ -446,6 +447,9 @@ Vagrant.configure(2) do |config|
     config.vm.provision "enable vault", type: "shell", inline: "sudo systemctl enable vault.service"
     config.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
     config.vm.provision "shell", path: "vault_init_and_unseal.sh",
+      privileged: true,
+      env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"}
+    config.vm.provision "shell", path: "vault_nomad_integration.sh",
       privileged: true,
       env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"}
   end
