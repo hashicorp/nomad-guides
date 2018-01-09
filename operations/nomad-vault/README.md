@@ -17,7 +17,7 @@ In this Guide we will quickly walk through the configuratinon of Nomad and Vault
 This explanation is covered in greater detail here: https://www.nomadproject.io/docs/vault-integration/index.html
 
 # Steps
-To see a more in depth explanation we highly recommend you read through the following example in the Hashicorp Nomad documentation.
+To see a more in depth explanation we highly recommend you read through the following Nomad documentation.
 
 1. Vault stanza in Nomad CONFIGURATION file: https://www.nomadproject.io/docs/agent/configuration/vault.html
 
@@ -30,9 +30,9 @@ To see a more in depth explanation we highly recommend you read through the foll
 Review setup code for the Nomad-Vault configuration code here: https://github.com/hashicorp/nomad-guides/blob/master/provision/vagrant/vault_nomad_integration.sh
 
 ## Step 2: nomad-server policy
-Before we can use Nomad integrated with Vault we need to configure Vault properly. This entails a couple things.
+Before we can use Nomad integrated with Vault, we need to configure Vault properly. This entails a couple things.
 
-First we need to create a policy for our Nomad Servers. This policy will allow the Nomad Servers to take actions like creating tokens against our "Token Role" that we will create in a subsequent step. Essentially we are giving Nomad the priviledge to create (allowed) tokens for tasks/containers that it launches.
+First, we need to create a policy for our Nomad Servers. This policy will allow the Nomad servers to take actions like creating tokens against our "Token Role" that we will create in a subsequent step. Essentially, we are giving Nomad the priviledge to create (allowed) tokens for tasks/containers that it launches.
 
 The Entire workflow looks like this:
 1. Nomad server asks for and receives wrapped token (from Vault) scoped to job's requested vault policy and sends to Nomad Client. (Nomad server uses token role)
