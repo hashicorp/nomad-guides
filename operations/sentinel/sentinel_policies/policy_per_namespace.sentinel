@@ -1,0 +1,19 @@
+main = rule { task_users() }
+# Check that the namespace is using the correct user
+task_users = func() {
+    ns = job.namespace
+    for job.task_groups as tg {
+        for tg.tasks as task {
+            user = task.user
+            if user is "" {
+                continue
+            }
+            if ns == "groupA" and user != "ubuntu" {
+                return false
+            } else if ns == "groupB" and user != "nobody" {
+                return false
+            }
+        }
+    }
+    return true
+}
