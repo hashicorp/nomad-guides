@@ -65,7 +65,7 @@ DNSMASQ
 
 
 $nomad_download = <<NOMAD_DOWNLOAD
-NOMAD_VERSION="0.7.0"
+NOMAD_VERSION="0.7.1"
 
 echo "Fetching Nomad..."
 if [[ ! -f /vagrant/nomad ]] ; then
@@ -87,7 +87,7 @@ fi
 CONSUL_DOWNLOAD
 
 $vault_download = <<VAULT_DOWNLOAD
-VAULT_VERSION="0.9.0"
+VAULT_VERSION="0.9.3"
 
 if [[ ! -f /vagrant/vault ]] ; then
     cd /vagrant/
@@ -489,6 +489,9 @@ Vagrant.configure(2) do |config|
   config.vm.provision "enable consul-template", type: "shell", inline: "sudo systemctl enable consul-template.service"
   config.vm.provision "start consul-template", type: "shell", inline: "sudo systemctl start consul-template"
 
+  config.vm.provision "restart docker", type: "shell", inline: "sudo systemctl restart docker"
+
+  
   config.vm.provision "config vault env variables", type: "shell", inline: $vault_env
 
   # Increase memory for Parallels Desktop

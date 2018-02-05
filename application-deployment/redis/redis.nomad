@@ -245,7 +245,7 @@ job "redis" {
       #
       service {
         name = "global-redis-check"
-        tags = ["global", "cache"]
+        tags = ["global", "cache", "urlprefix-/redis" ]
         port = "db"
         check {
           name     = "alive"
