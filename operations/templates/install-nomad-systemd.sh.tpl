@@ -27,6 +27,6 @@ echo "Install Oracle JDK"
 curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/nomad/scripts/install-oracle-jdk.sh | bash
 
 echo "Cleanup install files"
-sudo rm -rf /tmp/*
+curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/shared/scripts/cleanup.sh | bash
 
 echo "[---install-nomad-systemd.sh Complete---]"
