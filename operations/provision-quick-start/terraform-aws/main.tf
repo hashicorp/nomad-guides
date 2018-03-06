@@ -86,8 +86,8 @@ ${data.template_file.consul_quick_start.rendered} # Configure Consul quick start
 EOF
 }
 
-data "template_file" "nomad_quick_start" {
-  template = "${file("${path.module}/../../templates/quick-start-nomad-systemd.sh.tpl")}"
+data "template_file" "nomad_server_quick_start" {
+  template = "${file("${path.module}/../../templates/quick-start-nomad-server-systemd.sh.tpl")}"
 
   vars = {
     name            = "${var.name}"
@@ -97,19 +97,49 @@ data "template_file" "nomad_quick_start" {
   }
 }
 
-module "nomad_aws" {
+data "template_file" "nomad_client_quick_start" {
+  template = "${file("${path.module}/../../templates/quick-start-nomad-client-systemd.sh.tpl")}"
+
+  vars = {
+    name            = "${var.name}"
+    provider        = "${var.provider}"
+    local_ip_url    = "${var.local_ip_url}"
+    nomad_bootstrap = "${length(module.network_aws.subnet_private_ids)}"
+  }
+}
+
+module "nomad_server_aws" {
   # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
   source = "../../../../../hashicorp-modules/nomad-aws"
 
-  name         = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
+  name         = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id       = "${module.network_aws.vpc_id}"
   vpc_cidr     = "${module.network_aws.vpc_cidr_block}"
   subnet_ids   = "${module.network_aws.subnet_private_ids}"
+  count        = "${var.nomad_servers}"
   image_id     = "${var.nomad_image_id != "" ? var.nomad_image_id : data.aws_ami.base.id}"
   ssh_key_name = "${element(split(",", module.network_aws.ssh_key_name), 0)}"
   user_data    = <<EOF
 ${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mode
 ${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mode
-${data.template_file.nomad_quick_start.rendered} # Configure Nomad quick start
+${data.template_file.nomad_server_quick_start.rendered} # Configure Nomad quick start
+EOF
+}
+
+module "nomad_client_aws" {
+  # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/nomad-aws"
+
+  name         = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
+  vpc_id       = "${module.network_aws.vpc_id}"
+  vpc_cidr     = "${module.network_aws.vpc_cidr_block}"
+  subnet_ids   = "${module.network_aws.subnet_private_ids}"
+  count        = "${var.nomad_clients}"
+  image_id     = "${var.nomad_image_id != "" ? var.nomad_image_id : data.aws_ami.base.id}"
+  ssh_key_name = "${element(split(",", module.network_aws.ssh_key_name), 0)}"
+  user_data    = <<EOF
+${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mode
+${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mode
+${data.template_file.nomad_client_quick_start.rendered} # Configure Nomad quick start
 EOF
 }

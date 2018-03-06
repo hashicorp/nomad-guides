@@ -12,11 +12,12 @@ The public part of the key loaded into the agent ("public_key_openssh" output) h
 
 To SSH into a Bastion host using this private key, run one of the below commands.
 
-  ${join("\n  ", formatlist("ssh -A -i %s %s@%s", module.network_aws.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
+  ${join("\n  ", formatlist("$ ssh -A -i %s %s@%s", module.network_aws.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
 
 You can now interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
 
   $ nomad server-members # Check Nomad's server members
+  $ nomad node-status # Check Nomad's client nodes
   $ nomad init # Create a skeletion job file to deploy a Redis Docker container
 
   # Use the CLI to deploy a Redis Docker container
@@ -52,8 +53,9 @@ You can now interact with Nomad using any of the CLI (https://www.nomadproject.i
 
 Once on the Bastion host, you can use Consul's DNS functionality to seemlessly SSH into other Consul or Nomad nodes.
 
-  ssh -A ${module.consul_aws.consul_username}@consul.service.consul
-  ssh -A ${module.nomad_aws.nomad_username}@nomad-server.service.consul
+  $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
+  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad-server.service.consul
+  $ ssh -A ${module.nomad_client_aws.nomad_username}@nomad-client.service.consul
 
 To force the generation of a new key, the private key instance can be "tainted" using the below command.
 
@@ -74,8 +76,10 @@ Below are output variables that are currently commented out to reduce clutter. I
  - "public_key_pem"
  - "public_key_openssh"
  - "ssh_key_name"
- - "nomad_asg_id"
- - "nomad_sg_id"
+ - "nomad_server_asg_id"
+ - "nomad_server_sg_id"
+ - "nomad_client_asg_id"
+ - "nomad_client_sg_id"
 README
 }
 
@@ -140,11 +144,19 @@ output "consul_sg_id" {
   value = "${module.consul_aws.consul_sg_id}"
 }
 
-output "nomad_asg_id" {
-  value = "${module.nomad_aws.nomad_asg_id}"
+output "nomad_server_asg_id" {
+  value = "${module.nomad_server_aws.nomad_asg_id}"
 }
 
-output "nomad_sg_id" {
-  value = "${module.nomad_aws.nomad_sg_id}"
+output "nomad_server_sg_id" {
+  value = "${module.nomad_server_aws.nomad_sg_id}"
+}
+
+output "nomad_client_asg_id" {
+  value = "${module.nomad_client_aws.nomad_asg_id}"
+}
+
+output "nomad_client_sg_id" {
+  value = "${module.nomad_client_aws.nomad_sg_id}"
 }
 */

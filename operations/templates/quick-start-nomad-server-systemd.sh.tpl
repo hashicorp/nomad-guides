@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "[---Begin quick-start-nomad-systemd.sh---]"
+echo "[---Begin quick-start-nomad-server-systemd.sh---]"
 
 echo "Set variables"
 LOCAL_IPV4=$(curl -s ${local_ip_url})
@@ -41,16 +41,6 @@ server {
   heartbeat_grace  = "30s"
 }
 
-client {
-  enabled         = true
-  client_max_port = 15000
-
-  options {
-    "docker.cleanup.image"   = "0"
-    "driver.raw_exec.enable" = "1"
-  }
-}
-
 consul {
   address        = "127.0.0.1:8500"
   auto_advertise = true
@@ -79,4 +69,4 @@ SWITCHES
 echo "Restart Nomad"
 sudo systemctl restart nomad
 
-echo "[---quick-start-nomad-systemd.sh Complete---]"
+echo "[---quick-start-nomad-server-systemd.sh Complete---]"

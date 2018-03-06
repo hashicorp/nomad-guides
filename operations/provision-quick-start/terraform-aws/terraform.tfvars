@@ -10,3 +10,5 @@ name = "nomad-quick-start"
 # nomad_version  = "0.6.2" # Nomad Version for runtime install, defaults to 0.8.1
 # nomad_url      = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
+# nomad_servers  = "3" # Nomad server count
+# nomad_clients  = "1" # Nomad clients count

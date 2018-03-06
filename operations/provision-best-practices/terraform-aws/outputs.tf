@@ -6,17 +6,18 @@ A private RSA key has been generated and downloaded locally. The file permission
 
 Run the below command to add this private key to the list maintained by ssh-agent so you're not prompted for it when using SSH or scp to connect to hosts with your public key.
 
-  ${join("\n  ", formatlist("ssh-add %s", module.ssh_keypair_aws_override.private_key_filename))}
+  ${join("\n  ", formatlist("$ ssh-add %s", module.ssh_keypair_aws_override.private_key_filename))}
 
 The public part of the key loaded into the agent ("public_key_openssh" output) has been placed on the target system in ~/.ssh/authorized_keys.
 
 To SSH into a Bastion host using this private key, run one of the below commands.
 
-  ${join("\n  ", formatlist("ssh -A -i %s %s@%s", module.ssh_keypair_aws_override.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
+  ${join("\n  ", formatlist("$ ssh -A -i %s %s@%s", module.ssh_keypair_aws_override.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
 
 You can now interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
 
   $ nomad server-members # Check Nomad's server members
+  $ nomad node-status # Check Nomad's client nodes
   $ nomad init # Create a skeletion job file to deploy a Redis Docker container
 
   # Use the CLI to deploy a Redis Docker container
@@ -58,8 +59,8 @@ You can now interact with Nomad using any of the CLI (https://www.nomadproject.i
 
 Once on the Bastion host, you can use Consul's DNS functionality to seemlessly SSH into other Consul or Nomad nodes.
 
-  ssh -A ${module.consul_aws.consul_username}@consul.service.consul
-  ssh -A ${module.nomad_aws.nomad_username}@nomad-server.service.consul
+  $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
+  $ ssh -A ${module.nomad_aws.nomad_username}@nomad-server.service.consul
 
 To force the generation of a new key, the private key instance can be "tainted" using the below command.
 

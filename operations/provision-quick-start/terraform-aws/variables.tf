@@ -11,3 +11,5 @@ variable "consul_image_id" { default = "" }
 variable "nomad_version"  { default = "0.6.2" }
 variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
+variable "nomad_servers"  { default = "-1" }
+variable "nomad_clients"  { default = "1" }

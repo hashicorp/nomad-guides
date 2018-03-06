@@ -6,17 +6,18 @@ A private RSA key has been generated and downloaded locally. The file permission
 
 Run the below command to add this private key to the list maintained by ssh-agent so you're not prompted for it when using SSH or scp to connect to hosts with your public key.
 
-  ${join("\n  ", formatlist("ssh-add %s", module.ssh_keypair_aws.private_key_filename))}
+  ${join("\n  ", formatlist("$ ssh-add %s", module.ssh_keypair_aws.private_key_filename))}
 
 The public part of the key loaded into the agent ("public_key_openssh" output) has been placed on the target system in ~/.ssh/authorized_keys.
 
 To SSH into a Nomad host using this private key, run the below command after replacing "HOST" with the public IP of one of the provisioned Nomad hosts.
 
-  ${join("\n  ", formatlist("ssh -A -i %s %s@HOST", module.ssh_keypair_aws.private_key_filename, module.nomad_aws.nomad_username))}
+  ${join("\n  ", formatlist("$ ssh -A -i %s %s@HOST", module.ssh_keypair_aws.private_key_filename, module.nomad_aws.nomad_username))}
 
 You can now interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
 
   $ nomad server-members # Check Nomad's server members
+  $ nomad node-status # Check Nomad's client nodes
   $ nomad init # Create a skeletion job file to deploy a Redis Docker container
 
   # Use the CLI to deploy a Redis Docker container

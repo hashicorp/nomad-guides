@@ -7,18 +7,18 @@ sudo sed -i '1i nameserver 127.0.0.1\n' /etc/resolv.conf
 
 echo "Set variables"
 LOCAL_IPV4=$(curl -s ${local_ip_url})
-CONSUL_TLS_FILE=/opt/consul/tls
-CONSUL_CACERT_FILE="$CONSUL_TLS_FILE/ca.crt"
-CONSUL_CLIENT_CERT_FILE="$CONSUL_TLS_FILE/consul.crt"
-CONSUL_CLIENT_KEY_FILE="$CONSUL_TLS_FILE/consul.key"
+CONSUL_TLS_PATH=/opt/consul/tls
+CONSUL_CACERT_FILE="$CONSUL_TLS_PATH/ca.crt"
+CONSUL_CLIENT_CERT_FILE="$CONSUL_TLS_PATH/consul.crt"
+CONSUL_CLIENT_KEY_FILE="$CONSUL_TLS_PATH/consul.key"
 CONSUL_CONFIG_FILE=/etc/consul.d/consul-client.json
-NOMAD_TLS_FILE=/opt/nomad/tls
-NOMAD_CACERT_FILE="$NOMAD_TLS_FILE/ca.crt"
-NOMAD_CLIENT_CERT_FILE="$NOMAD_TLS_FILE/nomad.crt"
-NOMAD_CLIENT_KEY_FILE="$NOMAD_TLS_FILE/nomad.key"
+NOMAD_TLS_PATH=/opt/nomad/tls
+NOMAD_CACERT_FILE="$NOMAD_TLS_PATH/ca.crt"
+NOMAD_CLIENT_CERT_FILE="$NOMAD_TLS_PATH/nomad.crt"
+NOMAD_CLIENT_KEY_FILE="$NOMAD_TLS_PATH/nomad.key"
 
 echo "Create TLS dir for Consul certs"
-sudo mkdir -pm 0755 $CONSUL_TLS_FILE
+sudo mkdir -pm 0755 $CONSUL_TLS_PATH
 
 echo "Write Consul CA certificate to $CONSUL_CACERT_FILE"
 cat <<EOF | sudo tee $CONSUL_CACERT_FILE
@@ -56,7 +56,7 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
 CONFIG
 
 echo "Update Consul configuration & certificates file owner"
-sudo chown -R consul:consul $CONSUL_CONFIG_FILE $CONSUL_TLS_FILE
+sudo chown -R consul:consul $CONSUL_CONFIG_FILE $CONSUL_TLS_PATH
 
 echo "Don't start Consul in -dev mode"
 cat <<SWITCHES | sudo tee /etc/consul.d/consul.conf
@@ -66,7 +66,7 @@ echo "Restart Consul"
 sudo systemctl restart consul
 
 echo "Create tls dir for Nomad certs"
-sudo mkdir -pm 0755 $NOMAD_TLS_FILE
+sudo mkdir -pm 0755 $NOMAD_TLS_PATH
 
 echo "Write Nomad CA certificate to $NOMAD_CACERT_FILE"
 cat <<EOF | sudo tee $NOMAD_CACERT_FILE
@@ -84,7 +84,7 @@ ${nomad_leaf_key}
 EOF
 
 echo "Update Nomad certificates file owner"
-sudo chown -R nomad:nomad $NOMAD_TLS_FILE
+sudo chown -R nomad:nomad $NOMAD_TLS_PATH
 
 echo "Configure Nomad environment variables to point Nomad client CLI to remote Nomad cluster & set TLS certs on login"
 cat <<ENVVARS | sudo tee /etc/profile.d/nomad.sh
