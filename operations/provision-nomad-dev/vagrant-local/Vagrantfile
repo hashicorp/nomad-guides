@@ -114,6 +114,40 @@ Vagrant.configure("2") do |config|
   end
 
    config.vm.post_up_message = "
-Consul: http://#{private_ip}:#{consul_host_port}/
-Nomad: http://#{private_ip}:#{nomad_host_port}/"
+Your Nomad dev cluster has been successfully provisioned!
+
+To SSH into a Nomad host, run the below command.
+
+  $ vagrant ssh
+
+You can interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
+
+  $ nomad server-members # Check Nomad's server members
+  $ nomad node-status # Check Nomad's client nodes
+  $ nomad init # Create a skeletion job file to deploy a Redis Docker container
+
+  # Use the CLI to deploy a Redis Docker container
+  $ nomad plan example.nomad # Run a nomad plan on the example job
+  $ nomad run example.nomad # Run the example job
+  $ nomad status # Check that the job is running
+  $ nomad status example # Check job details
+  $ nomad stop example # Stop the example job
+  $ nomad status # Check that the job is stopped
+
+  # Use the API to deploy a Redis Docker container
+  $ nomad run -output example.nomad > example.json # Convert the example Nomad HCL job file to JSON
+  $ curl -X POST -d @example.json http://127.0.0.1:4646/v1/job/example/plan | jq '.' # Run a nomad plan on the example job
+  $ curl -X POST -d @example.json http://127.0.0.1:4646/v1/job/example | jq '.' # Run the example job
+  $ curl -X GET http://127.0.0.1:4646/v1/jobs | jq '.' # Check that the job is running
+  $ curl -X GET http://127.0.0.1:4646/v1/job/example | jq '.' # Check job details
+  $ curl -X DELETE http://127.0.0.1:4646/v1/job/example | jq '.' # Stop the example job
+  $ curl -X GET http://127.0.0.1:4646/v1/jobs | jq '.' # Check that the job is stopped
+
+Visit the Consul UI: http://#{private_ip}:#{consul_host_port}/
+Visit the Nomad UI: http://#{private_ip}:#{nomad_host_port}/
+
+Don't forget to tear your VM down after.
+
+  $ vagrant destroy
+"
 end

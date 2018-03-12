@@ -1,6 +1,6 @@
-G#!/bin/bash
+#!/bin/bash
 
-echo "[---Begin best-practices-bastion-systemd.sh---]"
+echo "[---Begin best-practices-nomad-systemd.sh---]"
 
 echo "Update resolv.conf"
 sudo sed -i '1i nameserver 127.0.0.1\n' /etc/resolv.conf
@@ -16,6 +16,7 @@ NOMAD_TLS_PATH=/opt/nomad/tls
 NOMAD_CACERT_FILE="$NOMAD_TLS_PATH/ca.crt"
 NOMAD_CLIENT_CERT_FILE="$NOMAD_TLS_PATH/nomad.crt"
 NOMAD_CLIENT_KEY_FILE="$NOMAD_TLS_PATH/nomad.key"
+NOMAD_CONFIG_FILE=/etc/nomad.d/nomad-server.hcl
 
 echo "Create TLS dir for Consul certs"
 sudo mkdir -pm 0755 $CONSUL_TLS_PATH
@@ -35,7 +36,7 @@ cat <<EOF | sudo tee $CONSUL_CLIENT_KEY_FILE
 ${consul_leaf_key}
 EOF
 
-echo "Configure Bastion Consul client"
+echo "Configure Nomad Consul client"
 cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
 {
   "datacenter": "${name}",
@@ -83,12 +84,57 @@ cat <<EOF | sudo tee $NOMAD_CLIENT_KEY_FILE
 ${nomad_leaf_key}
 EOF
 
-echo "Update Nomad certificates file owner"
-sudo chown -R root:root $NOMAD_TLS_PATH
+echo "Configure Nomad client"
+cat <<CONFIG | sudo tee $NOMAD_CONFIG_FILE
+data_dir  = "/opt/nomad/data"
+log_level = "INFO"
+enable_debug = true
+
+client {
+  enabled         = true
+  client_max_port = 15000
+
+  options {
+    "docker.cleanup.image"   = "0"
+    "driver.raw_exec.enable" = "1"
+  }
+}
+
+tls {
+  http = true
+  rpc  = true
+
+  ca_file   = "$NOMAD_CACERT_FILE"
+  cert_file = "$NOMAD_CLIENT_CERT_FILE"
+  key_file  = "$NOMAD_CLIENT_KEY_FILE"
+
+  verify_server_hostname = true
+  verify_https_client    = true
+}
+
+consul {
+  address        = "127.0.0.1:8500"
+  auto_advertise = true
+
+  client_service_name = "nomad-client"
+  client_auto_join    = true
+
+  server_service_name = "nomad-server"
+  server_auto_join    = true
+
+  verify_ssl = true
+  ca_file    = "$CONSUL_CACERT_FILE"
+  cert_file  = "$CONSUL_CLIENT_CERT_FILE"
+  key_file   = "$CONSUL_CLIENT_KEY_FILE"
+}
+CONFIG
+
+echo "Update Nomad configuration & certificates file owner"
+sudo chown -R root:root $NOMAD_CONFIG_FILE $NOMAD_TLS_PATH
 
 echo "Configure Nomad environment variables to point Nomad client CLI to remote Nomad cluster & set TLS certs on login"
 cat <<ENVVARS | sudo tee /etc/profile.d/nomad.sh
-export NOMAD_ADDR="https://nomad-server.service.consul:4646"
+export NOMAD_ADDR="https://127.0.0.1:4646"
 export NOMAD_CACERT="$NOMAD_CACERT_FILE"
 export NOMAD_CLIENT_CERT="$NOMAD_CLIENT_CERT_FILE"
 export NOMAD_CLIENT_KEY="$NOMAD_CLIENT_KEY_FILE"
@@ -98,8 +144,10 @@ echo "Don't start Nomad in -dev mode"
 cat <<SWITCHES | sudo tee /etc/nomad.d/nomad.conf
 SWITCHES
 
-echo "Stop Nomad now that the CLI is pointing to a live Nomad cluster & Vault since it's not being used"
-sudo systemctl stop nomad
-sudo systemctl stop vault
+echo "Restart Nomad"
+sudo systemctl restart nomad
 
-echo "[---best-practices-bastion-systemd.sh Complete---]"
+echo "Restart Docker"
+sudo systemctl restart docker
+
+echo "[---best-practices-nomad-systemd.sh Complete---]"

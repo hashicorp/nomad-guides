@@ -27,5 +27,19 @@ nomad_release_version = "0.1.0-dev1" # Release version tag (e.g. 0.1.0, 0.1.0-rc
 nomad_version         = "0.6.2" # Nomad version tag (e.g. 0.6.2 or 0.6.2-ent) - https://releases.hashicorp.com/nomad/
 nomad_os              = "RHEL" # OS (e.g. RHEL, Ubuntu)
 nomad_os_version      = "7.3" # OS Version (e.g. 7.3 for RHEL, 16.04 for Ubuntu)
-nomad_count           = "3" # Number of Nomad nodes to provision across public subnets, defaults to public subnet count.
+nomad_servers         = "3" # Number of Nomad server nodes to provision across public subnets, defaults to public subnet count.
+nomad_clients         = "3" # Number of Nomad client nodes to provision across public subnets, defaults to public subnet count.
 nomad_instance_type   = "t2.small"
+
+# Example tags
+# network_tags = {"owner" = "hashicorp", "TTL" = "24"}
+#
+# consul_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]
+#
+# nomad_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]

@@ -10,3 +10,18 @@ variable "ami_name"          { default = "*RHEL-7.3_HVM_GA-*" } # Base RHEL name
 variable "nomad_version"     { default = "0.7.1" }
 variable "nomad_url"         { default = "" }
 variable "nomad_image_id"    { default = "" }
+
+variable "network_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "consul_tags" {
+  type    = "list"
+  default = [ ]
+}
+
+variable "nomad_tags" {
+  type    = "list"
+  default = [ ]
+}

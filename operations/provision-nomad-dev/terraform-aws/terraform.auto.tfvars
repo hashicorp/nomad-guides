@@ -10,3 +10,16 @@ nomad_count       = "1"
 # nomad_version     = "0.7.1" # Nomad Version for runtime install, defaults to 0.7.1
 # nomad_url         = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_image_id    = "" # AMI ID override, defaults to base RHEL AMI
+
+# Example tags
+# network_tags = {"owner" = "hashicorp", "TTL" = "24"}
+#
+# consul_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]
+#
+# nomad_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]

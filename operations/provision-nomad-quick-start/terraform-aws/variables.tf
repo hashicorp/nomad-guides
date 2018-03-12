@@ -13,3 +13,18 @@ variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 variable "nomad_servers"  { default = "-1" }
 variable "nomad_clients"  { default = "1" }
+
+variable "network_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "consul_tags" {
+  type    = "list"
+  default = [ ]
+}
+
+variable "nomad_tags" {
+  type    = "list"
+  default = [ ]
+}

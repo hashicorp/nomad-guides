@@ -14,7 +14,7 @@ To SSH into a Nomad host using this private key, run the below command after rep
 
   ${join("\n  ", formatlist("$ ssh -A -i %s %s@HOST", module.ssh_keypair_aws.private_key_filename, module.nomad_aws.nomad_username))}
 
-You can now interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
+You can interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
 
   $ nomad server-members # Check Nomad's server members
   $ nomad node-status # Check Nomad's client nodes

@@ -12,3 +12,16 @@ name = "nomad-quick-start"
 # nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
 # nomad_servers  = "3" # Nomad server count
 # nomad_clients  = "1" # Nomad clients count
+
+# Example tags
+# network_tags = {"owner" = "hashicorp", "TTL" = "24"}
+#
+# consul_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]
+#
+# nomad_tags = [
+#   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
+#   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
+# ]

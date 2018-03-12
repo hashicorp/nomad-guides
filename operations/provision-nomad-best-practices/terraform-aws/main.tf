@@ -26,7 +26,7 @@ module "consul_tls_self_signed_cert" {
   ca_common_name        = "hashicorp.com"
   organization_name     = "HashiCorp Inc."
   common_name           = "hashicorp.com"
-  dns_names             = ["*.node.consul", "*.service.consul", "server.global.nomad"]
+  dns_names             = ["*.node.consul", "*.service.consul"]
   ip_addresses          = ["0.0.0.0", "127.0.0.1"]
 }
 
@@ -60,7 +60,8 @@ data "template_file" "bastion_user_data" {
 }
 
 module "network_aws" {
-  source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  # source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/network-aws"
 
   name              = "${var.name}"
   vpc_cidr          = "${var.vpc_cidr}"
@@ -78,6 +79,7 @@ module "network_aws" {
   user_data         = "${data.template_file.bastion_user_data.rendered}" # Override user_data
   ssh_key_name      = "${element(module.ssh_keypair_aws_override.name, 0)}"
   ssh_key_override  = "true"
+  tags              = "${var.network_tags}"
 }
 
 data "template_file" "consul_user_data" {
@@ -96,7 +98,8 @@ data "template_file" "consul_user_data" {
 }
 
 module "consul_aws" {
-  source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  # source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/consul-aws"
 
   name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -111,10 +114,11 @@ module "consul_aws" {
   instance_type    = "${var.consul_instance_type}"
   user_data        = "${data.template_file.consul_user_data.rendered}" # Custom user_data
   ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  tags             = "${var.consul_tags}"
 }
 
-data "template_file" "nomad_user_data" {
-  template = "${file("${path.module}/../../templates/best-practices-nomad-systemd.sh.tpl")}"
+data "template_file" "nomad_server_best_practices" {
+  template = "${file("${path.module}/../../templates/best-practices-nomad-server-systemd.sh.tpl")}"
 
   vars = {
     name            = "${var.name}"
@@ -124,7 +128,7 @@ data "template_file" "nomad_user_data" {
     consul_ca_crt   = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
     consul_leaf_crt = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
     consul_leaf_key = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
-    nomad_bootstrap = "${length(module.network_aws.subnet_private_ids)}"
+    nomad_bootstrap = "${var.nomad_servers != "-1" ? var.nomad_servers : length(module.network_aws.subnet_private_ids)}"
     nomad_encrypt   = "${random_id.nomad_encrypt.b64_std}"
     nomad_ca_crt    = "${element(module.nomad_tls_self_signed_cert.ca_cert_pem, 0)}"
     nomad_leaf_crt  = "${element(module.nomad_tls_self_signed_cert.leaf_cert_pem, 0)}"
@@ -132,11 +136,11 @@ data "template_file" "nomad_user_data" {
   }
 }
 
-module "nomad_aws" {
+module "nomad_server_aws" {
   # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
   source = "../../../../../hashicorp-modules/nomad-aws"
 
-  name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
+  name             = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
   vpc_cidr         = "${module.network_aws.vpc_cidr_block}"
   subnet_ids       = "${module.network_aws.subnet_private_ids}"
@@ -144,9 +148,48 @@ module "nomad_aws" {
   nomad_version    = "${var.nomad_version}"
   os               = "${var.nomad_os}"
   os_version       = "${var.nomad_os_version}"
-  count            = "${var.nomad_count}"
+  count            = "${var.nomad_servers}"
   instance_profile = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
   instance_type    = "${var.nomad_instance_type}"
-  user_data        = "${data.template_file.nomad_user_data.rendered}" # Custom user_data
+  user_data        = "${data.template_file.nomad_server_best_practices.rendered}" # Custom user_data
   ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  tags             = "${var.nomad_tags}"
+}
+
+data "template_file" "nomad_client_best_practices" {
+  template = "${file("${path.module}/../../templates/best-practices-nomad-client-systemd.sh.tpl")}"
+
+  vars = {
+    name            = "${var.name}"
+    provider        = "${var.provider}"
+    local_ip_url    = "${var.local_ip_url}"
+    consul_encrypt  = "${random_id.consul_encrypt.b64_std}"
+    consul_ca_crt   = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
+    consul_leaf_crt = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
+    consul_leaf_key = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    nomad_encrypt   = "${random_id.nomad_encrypt.b64_std}"
+    nomad_ca_crt    = "${element(module.nomad_tls_self_signed_cert.ca_cert_pem, 0)}"
+    nomad_leaf_crt  = "${element(module.nomad_tls_self_signed_cert.leaf_cert_pem, 0)}"
+    nomad_leaf_key  = "${element(module.nomad_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+  }
+}
+
+module "nomad_client_aws" {
+  # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/nomad-aws"
+
+  name             = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
+  vpc_id           = "${module.network_aws.vpc_id}"
+  vpc_cidr         = "${module.network_aws.vpc_cidr_block}"
+  subnet_ids       = "${module.network_aws.subnet_private_ids}"
+  release_version  = "${var.nomad_release_version}"
+  nomad_version    = "${var.nomad_version}"
+  os               = "${var.nomad_os}"
+  os_version       = "${var.nomad_os_version}"
+  count            = "${var.nomad_clients}"
+  instance_profile = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
+  instance_type    = "${var.nomad_instance_type}"
+  user_data        = "${data.template_file.nomad_client_best_practices.rendered}" # Custom user_data
+  ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  tags             = "${var.nomad_tags}"
 }

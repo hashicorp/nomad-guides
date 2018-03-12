@@ -97,16 +97,6 @@ server {
   encrypt          = "${nomad_encrypt}"
 }
 
-client {
-  enabled         = true
-  client_max_port = 15000
-
-  options {
-    "docker.cleanup.image"   = "0"
-    "driver.raw_exec.enable" = "1"
-  }
-}
-
 tls {
   http = true
   rpc  = true
@@ -137,7 +127,7 @@ consul {
 CONFIG
 
 echo "Update Nomad configuration & certificates file owner"
-sudo chown -R nomad:nomad $NOMAD_CONFIG_FILE $NOMAD_TLS_PATH
+sudo chown -R root:root $NOMAD_CONFIG_FILE $NOMAD_TLS_PATH
 
 echo "Configure Nomad environment variables to point Nomad client CLI to remote Nomad cluster & set TLS certs on login"
 cat <<ENVVARS | sudo tee /etc/profile.d/nomad.sh

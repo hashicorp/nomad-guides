@@ -47,12 +47,14 @@ data "template_file" "bastion_quick_start" {
 }
 
 module "network_aws" {
-  source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  # source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/network-aws"
 
   name          = "${var.name}"
   nat_count     = "1"
   bastion_count = "1"
   image_id      = "${data.aws_ami.base.id}"
+  tags          = "${var.network_tags}"
   user_data     = <<EOF
 ${data.template_file.consul_install.rendered}
 ${data.template_file.nomad_install.rendered}
@@ -72,7 +74,8 @@ data "template_file" "consul_quick_start" {
 }
 
 module "consul_aws" {
-  source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  # source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  source = "../../../../../hashicorp-modules/consul-aws"
 
   name         = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id       = "${module.network_aws.vpc_id}"
@@ -80,6 +83,7 @@ module "consul_aws" {
   subnet_ids   = "${module.network_aws.subnet_private_ids}"
   image_id     = "${var.consul_image_id != "" ? var.consul_image_id : data.aws_ami.base.id}"
   ssh_key_name = "${element(split(",", module.network_aws.ssh_key_name), 0)}"
+  tags         = "${var.consul_tags}"
   user_data    = <<EOF
 ${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mode
 ${data.template_file.consul_quick_start.rendered} # Configure Consul quick start
@@ -93,18 +97,7 @@ data "template_file" "nomad_server_quick_start" {
     name            = "${var.name}"
     provider        = "${var.provider}"
     local_ip_url    = "${var.local_ip_url}"
-    nomad_bootstrap = "${length(module.network_aws.subnet_private_ids)}"
-  }
-}
-
-data "template_file" "nomad_client_quick_start" {
-  template = "${file("${path.module}/../../templates/quick-start-nomad-client-systemd.sh.tpl")}"
-
-  vars = {
-    name            = "${var.name}"
-    provider        = "${var.provider}"
-    local_ip_url    = "${var.local_ip_url}"
-    nomad_bootstrap = "${length(module.network_aws.subnet_private_ids)}"
+    nomad_bootstrap = "${var.nomad_servers != "-1" ? var.nomad_servers : length(module.network_aws.subnet_private_ids)}"
   }
 }
 
@@ -119,11 +112,22 @@ module "nomad_server_aws" {
   count        = "${var.nomad_servers}"
   image_id     = "${var.nomad_image_id != "" ? var.nomad_image_id : data.aws_ami.base.id}"
   ssh_key_name = "${element(split(",", module.network_aws.ssh_key_name), 0)}"
+  tags         = "${var.nomad_tags}"
   user_data    = <<EOF
 ${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mode
 ${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mode
 ${data.template_file.nomad_server_quick_start.rendered} # Configure Nomad quick start
 EOF
+}
+
+data "template_file" "nomad_client_quick_start" {
+  template = "${file("${path.module}/../../templates/quick-start-nomad-client-systemd.sh.tpl")}"
+
+  vars = {
+    name         = "${var.name}"
+    provider     = "${var.provider}"
+    local_ip_url = "${var.local_ip_url}"
+  }
 }
 
 module "nomad_client_aws" {
@@ -137,6 +141,7 @@ module "nomad_client_aws" {
   count        = "${var.nomad_clients}"
   image_id     = "${var.nomad_image_id != "" ? var.nomad_image_id : data.aws_ami.base.id}"
   ssh_key_name = "${element(split(",", module.network_aws.ssh_key_name), 0)}"
+  tags         = "${var.nomad_tags}"
   user_data    = <<EOF
 ${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mode
 ${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mode

@@ -29,5 +29,21 @@ variable "nomad_release_version" { }
 variable "nomad_version"         { }
 variable "nomad_os"              { }
 variable "nomad_os_version"      { }
-variable "nomad_count"           { }
+variable "nomad_servers"         { default = "-1" }
+variable "nomad_clients"         { default = "1" }
 variable "nomad_instance_type"   { }
+
+variable "network_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "consul_tags" {
+  type    = "list"
+  default = [ ]
+}
+
+variable "nomad_tags" {
+  type    = "list"
+  default = [ ]
+}
