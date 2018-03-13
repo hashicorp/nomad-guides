@@ -60,8 +60,8 @@ data "template_file" "bastion_user_data" {
 }
 
 module "network_aws" {
-  # source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
-  source = "../../../../../hashicorp-modules/network-aws"
+  source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  # source = "../../../../../hashicorp-modules/network-aws"
 
   name              = "${var.name}"
   vpc_cidr          = "${var.vpc_cidr}"
@@ -98,8 +98,8 @@ data "template_file" "consul_user_data" {
 }
 
 module "consul_aws" {
-  # source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
-  source = "../../../../../hashicorp-modules/consul-aws"
+  source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  # source = "../../../../../hashicorp-modules/consul-aws"
 
   name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -137,8 +137,8 @@ data "template_file" "nomad_server_best_practices" {
 }
 
 module "nomad_server_aws" {
-  # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
-  source = "../../../../../hashicorp-modules/nomad-aws"
+  source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name             = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -175,8 +175,8 @@ data "template_file" "nomad_client_best_practices" {
 }
 
 module "nomad_client_aws" {
-  # source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
-  source = "../../../../../hashicorp-modules/nomad-aws"
+  source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name             = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
