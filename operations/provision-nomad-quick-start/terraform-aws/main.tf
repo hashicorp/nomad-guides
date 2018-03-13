@@ -47,7 +47,7 @@ data "template_file" "bastion_quick_start" {
 }
 
 module "network_aws" {
-  source = "git@github.com:hashicorp-modules/network-aws.git?ref=f-refactor"
+  source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
   # source = "../../../../../hashicorp-modules/network-aws"
 
   name          = "${var.name}"
@@ -74,7 +74,7 @@ data "template_file" "consul_quick_start" {
 }
 
 module "consul_aws" {
-  source = "git@github.com:hashicorp-modules/consul-aws.git?ref=f-refactor"
+  source = "github.com/hashicorp-modules/consul-aws?ref=f-refactor"
   # source = "../../../../../hashicorp-modules/consul-aws"
 
   name         = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
@@ -102,7 +102,7 @@ data "template_file" "nomad_server_quick_start" {
 }
 
 module "nomad_server_aws" {
-  source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
   # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name         = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
@@ -131,7 +131,7 @@ data "template_file" "nomad_client_quick_start" {
 }
 
 module "nomad_client_aws" {
-  source = "git@github.com:hashicorp-modules/nomad-aws.git?ref=f-refactor"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
   # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name         = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
