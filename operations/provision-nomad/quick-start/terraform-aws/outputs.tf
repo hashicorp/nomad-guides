@@ -1,18 +1,22 @@
 output "zREADME" {
   value = <<README
-Your AWS Consul cluster has been successfully provisioned!
+Your AWS Nomad cluster has been successfully provisioned!
 
 A private RSA key has been generated and downloaded locally. The file permissions have been changed to 0600 so the key can be used immediately for SSH or scp.
 
+If you're not running Terraform locally (e.g. in TFE or Jenkins) but are using remote state and need the private key locally for SSH, run the below command to download.
+
+  ${join("\n  ", formatlist("$ echo \"$(terraform output private_key_pem)\" > %s && chmod 0600 %s", split(",", module.network_aws.private_key_filename), split(",", module.network_aws.private_key_filename)))}
+
 Run the below command to add this private key to the list maintained by ssh-agent so you're not prompted for it when using SSH or scp to connect to hosts with your public key.
 
-  ${join("\n  ", formatlist("$ ssh-add %s", module.ssh_keypair_aws_override.private_key_filename))}
+  ${join("\n  ", formatlist("$ ssh-add %s", split(",", module.network_aws.private_key_filename)))}
 
 The public part of the key loaded into the agent ("public_key_openssh" output) has been placed on the target system in ~/.ssh/authorized_keys.
 
 To SSH into a Bastion host using this private key, run one of the below commands.
 
-  ${join("\n  ", formatlist("$ ssh -A -i %s %s@%s", module.ssh_keypair_aws_override.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
+  ${join("\n  ", formatlist("$ ssh -A -i %s %s@%s", module.network_aws.private_key_filename, module.network_aws.bastion_username, module.network_aws.bastion_ips_public))}
 
 You can now interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
 
@@ -33,29 +37,23 @@ You can now interact with Nomad using any of the CLI (https://www.nomadproject.i
   $ curl \
       -X POST \
       -d @example.json \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/job/example/plan | jq '.' # Run a nomad plan on the example job
+      http://nomad-server.service.consul:4646/v1/job/example/plan | jq '.' # Run a nomad plan on the example job
   $ curl \
       -X POST \
       -d @example.json \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/job/example | jq '.' # Run the example job
+      http://nomad-server.service.consul:4646/v1/job/example | jq '.' # Run the example job
   $ curl \
       -X GET \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/jobs | jq '.' # Check that the job is running
+      http://nomad-server.service.consul:4646/v1/jobs | jq '.' # Check that the job is running
   $ curl \
       -X GET \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/job/example | jq '.' # Check job details
+      http://nomad-server.service.consul:4646/v1/job/example | jq '.' # Check job details
   $ curl \
       -X DELETE \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/job/example | jq '.' # Stop the example job
+      http://nomad-server.service.consul:4646/v1/job/example | jq '.' # Stop the example job
   $ curl \
       -X GET \
-      -k --cacert /opt/nomad/tls/ca.crt --cert /opt/nomad/tls/nomad.crt --key /opt/nomad/tls/nomad.key \
-      https://nomad-server.service.consul:4646/v1/jobs | jq '.' # Check that the job is stopped
+      http://nomad-server.service.consul:4646/v1/jobs | jq '.' # Check that the job is stopped
 
 Once on the Bastion host, you can use Consul's DNS functionality to seemlessly SSH into other Consul or Nomad nodes.
 
@@ -65,29 +63,10 @@ Once on the Bastion host, you can use Consul's DNS functionality to seemlessly S
 
 To force the generation of a new key, the private key instance can be "tainted" using the below command.
 
-  $ terraform taint -module=ssh_keypair_aws_override.tls_private_key tls_private_key.key
-
-Below are output variables that are currently commented out to reduce clutter. If you need the value of a certain output variable, such as "private_key_pem", just uncomment in outputs.tf.
-
- - "vpc_cidr_block"
- - "vpc_id"
- - "subnet_public_ids"
- - "subnet_private_ids"
- - "bastion_security_group"
- - "bastion_ips_public"
- - "bastion_username"
- - "private_key_name"
- - "private_key_filename"
- - "private_key_pem"
- - "public_key_pem"
- - "public_key_openssh"
- - "ssh_key_name"
- - "nomad_asg_id"
- - "nomad_sg_id"
+  $ terraform taint -module=network_aws.ssh_keypair_aws.tls_private_key tls_private_key.key
 README
 }
 
-/*
 output "vpc_cidr_block" {
   value = "${module.network_aws.vpc_cidr_block}"
 }
@@ -117,27 +96,27 @@ output "bastion_username" {
 }
 
 output "private_key_name" {
-  value = "${module.ssh_keypair_aws_override.private_key_name}"
+  value = "${module.network_aws.private_key_name}"
 }
 
 output "private_key_filename" {
-  value = "${module.ssh_keypair_aws_override.private_key_filename}"
+  value = "${module.network_aws.private_key_filename}"
 }
 
 output "private_key_pem" {
-  value = "${module.ssh_keypair_aws_override.private_key_pem}"
+  value = "${module.network_aws.private_key_pem}"
 }
 
 output "public_key_pem" {
-  value = "${module.ssh_keypair_aws_override.public_key_pem}"
+  value = "${module.network_aws.public_key_pem}"
 }
 
 output "public_key_openssh" {
-  value = "${module.ssh_keypair_aws_override.public_key_openssh}"
+  value = "${module.network_aws.public_key_openssh}"
 }
 
 output "ssh_key_name" {
-  value = "${module.ssh_keypair_aws_override.name}"
+  value = "${module.network_aws.ssh_key_name}"
 }
 
 output "consul_asg_id" {
@@ -163,4 +142,3 @@ output "nomad_client_asg_id" {
 output "nomad_client_sg_id" {
   value = "${module.nomad_client_aws.nomad_sg_id}"
 }
-*/
