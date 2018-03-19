@@ -11,6 +11,39 @@ data "template_file" "spacely_backup" {
     }
 }
 
+resource "aws_instance" "nomadserver" {
+    ami = "${var.demoami}"
+    instance_type = "${var.nomad_instance_type}"
+    key_name = "${var.key_name}"
+    count = "1"
+    vpc_security_group_ids = ["${aws_security_group.demo_ecommerce.id}"]
+    # This puts one server in each subnet, up to the total number of subnets.
+    subnet_id = "${lookup(var.subnets, count.index % var.nomad_servers)}"
+
+    # This is the provisioning user
+    connection {
+        user = "${var.user}"
+        private_key = "${file("${var.private_key_file}")}"
+    }
+
+    # AWS Instance Tags
+    tags {
+        Name = "nomad-server-${count.index}"
+        owner = "${var.key_name}"
+        TTL = "24"
+    }
+
+    # Set SELinux to non-enforcing mode
+    provisioner "remote-exec" {
+        inline = [
+            "sudo setenforce 0"
+        ]
+    }
+
+
+
+}
+
 # Let's deploy our legacy Tomcat application using Terraform
 resource "aws_instance" "spacelysprockets" {
     ami = "${var.demoami}"
