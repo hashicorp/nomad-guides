@@ -14,6 +14,18 @@ variable "nomad_image_id" { default = "" }
 variable "nomad_servers"  { default = "-1" }
 variable "nomad_clients"  { default = "1" }
 
+variable "consul_server_config"       { default = "" }
+variable "consul_client_config"       { default = "" }
+variable "nomad_server_config"        { default = "# No additional Nomad Server config" }
+variable "nomad_server_stanza"        { default = "# No additional Nomad Server stanza config" }
+variable "nomad_server_consul_stanza" { default = "# No additional Nomad Server Consul stanza config" }
+variable "nomad_client_config"        { default = "# No additional Nomad Client config" }
+variable "nomad_client_stanza"        { default = "# No additional Nomad Client stanza config" }
+variable "nomad_client_consul_stanza" { default = "# No additional Nomad Client Consul stanza config" }
+
+variable "install_docker"     { default = true }
+variable "install_oracle_jdk" { default = false }
+
 variable "network_tags" {
   type    = "map"
   default = { }

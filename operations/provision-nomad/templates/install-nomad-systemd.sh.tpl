@@ -2,6 +2,9 @@
 
 echo "[---Begin install-nomad-systemd.sh---]"
 
+echo "Wait for system to be ready"
+sleep 10
+
 echo "Run base script"
 curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/shared/scripts/base.sh | bash
 
@@ -14,12 +17,6 @@ curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor
 
 echo "Install Nomad Systemd"
 curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/nomad/scripts/install-nomad-systemd.sh | bash
-
-echo "Install Docker"
-curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/nomad/scripts/install-docker.sh | bash
-
-echo "Install Oracle JDK"
-curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/nomad/scripts/install-oracle-jdk.sh | bash
 
 echo "Cleanup install files"
 curl https://raw.githubusercontent.com/hashicorp/guides-configuration/f-refactor/shared/scripts/cleanup.sh | bash

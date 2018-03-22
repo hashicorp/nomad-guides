@@ -50,12 +50,12 @@ data "template_file" "bastion_user_data" {
     provider        = "${var.provider}"
     local_ip_url    = "${var.local_ip_url}"
     consul_encrypt  = "${random_id.consul_encrypt.b64_std}"
-    consul_ca_crt   = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
-    consul_leaf_crt = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    consul_leaf_key = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
-    nomad_ca_crt    = "${element(module.nomad_tls_self_signed_cert.ca_cert_pem, 0)}"
-    nomad_leaf_crt  = "${element(module.nomad_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    nomad_leaf_key  = "${element(module.nomad_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    consul_ca_crt   = "${module.consul_tls_self_signed_cert.ca_cert_pem}"
+    consul_leaf_crt = "${module.consul_tls_self_signed_cert.leaf_cert_pem}"
+    consul_leaf_key = "${module.consul_tls_self_signed_cert.leaf_private_key_pem}"
+    nomad_ca_crt    = "${module.nomad_tls_self_signed_cert.ca_cert_pem}"
+    nomad_leaf_crt  = "${module.nomad_tls_self_signed_cert.leaf_cert_pem}"
+    nomad_leaf_key  = "${module.nomad_tls_self_signed_cert.leaf_private_key_pem}"
   }
 }
 
@@ -73,10 +73,10 @@ module "network_aws" {
   os                = "${var.bastion_os}"
   os_version        = "${var.bastion_os_version}"
   bastion_count     = "${var.bastion_count}"
-  instance_profile  = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
+  instance_profile  = "${module.consul_auto_join_instance_role.instance_profile_id}" # Override instance_profile
   instance_type     = "${var.bastion_instance_type}"
   user_data         = "${data.template_file.bastion_user_data.rendered}" # Override user_data
-  ssh_key_name      = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  ssh_key_name      = "${module.ssh_keypair_aws_override.name}"
   ssh_key_override  = "true"
   tags              = "${var.network_tags}"
 }
@@ -90,9 +90,9 @@ data "template_file" "consul_user_data" {
     local_ip_url     = "${var.local_ip_url}"
     consul_bootstrap = "${length(module.network_aws.subnet_private_ids)}"
     consul_encrypt   = "${random_id.consul_encrypt.b64_std}"
-    consul_ca_crt    = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
-    consul_leaf_crt  = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    consul_leaf_key  = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    consul_ca_crt    = "${module.consul_tls_self_signed_cert.ca_cert_pem}"
+    consul_leaf_crt  = "${module.consul_tls_self_signed_cert.leaf_cert_pem}"
+    consul_leaf_key  = "${module.consul_tls_self_signed_cert.leaf_private_key_pem}"
   }
 }
 
@@ -108,10 +108,10 @@ module "consul_aws" {
   os               = "${var.consul_os}"
   os_version       = "${var.consul_os_version}"
   count            = "${var.consul_count}"
-  instance_profile = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
+  instance_profile = "${module.consul_auto_join_instance_role.instance_profile_id}" # Override instance_profile
   instance_type    = "${var.consul_instance_type}"
   user_data        = "${data.template_file.consul_user_data.rendered}" # Custom user_data
-  ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  ssh_key_name     = "${module.ssh_keypair_aws_override.name}"
   tags             = "${var.consul_tags}"
 }
 
@@ -123,20 +123,19 @@ data "template_file" "nomad_server_best_practices" {
     provider        = "${var.provider}"
     local_ip_url    = "${var.local_ip_url}"
     consul_encrypt  = "${random_id.consul_encrypt.b64_std}"
-    consul_ca_crt   = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
-    consul_leaf_crt = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    consul_leaf_key = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    consul_ca_crt   = "${module.consul_tls_self_signed_cert.ca_cert_pem}"
+    consul_leaf_crt = "${module.consul_tls_self_signed_cert.leaf_cert_pem}"
+    consul_leaf_key = "${module.consul_tls_self_signed_cert.leaf_private_key_pem}"
     nomad_bootstrap = "${var.nomad_servers != "-1" ? var.nomad_servers : length(module.network_aws.subnet_private_ids)}"
     nomad_encrypt   = "${random_id.nomad_encrypt.b64_std}"
-    nomad_ca_crt    = "${element(module.nomad_tls_self_signed_cert.ca_cert_pem, 0)}"
-    nomad_leaf_crt  = "${element(module.nomad_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    nomad_leaf_key  = "${element(module.nomad_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    nomad_ca_crt    = "${module.nomad_tls_self_signed_cert.ca_cert_pem}"
+    nomad_leaf_crt  = "${module.nomad_tls_self_signed_cert.leaf_cert_pem}"
+    nomad_leaf_key  = "${module.nomad_tls_self_signed_cert.leaf_private_key_pem}"
   }
 }
 
 module "nomad_server_aws" {
   source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name             = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -148,10 +147,10 @@ module "nomad_server_aws" {
   os               = "${var.nomad_os}"
   os_version       = "${var.nomad_os_version}"
   count            = "${var.nomad_servers}"
-  instance_profile = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
+  instance_profile = "${module.consul_auto_join_instance_role.instance_profile_id}" # Override instance_profile
   instance_type    = "${var.nomad_instance_type}"
   user_data        = "${data.template_file.nomad_server_best_practices.rendered}" # Custom user_data
-  ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  ssh_key_name     = "${module.ssh_keypair_aws_override.name}"
   tags             = "${var.nomad_tags}"
 }
 
@@ -163,19 +162,18 @@ data "template_file" "nomad_client_best_practices" {
     provider        = "${var.provider}"
     local_ip_url    = "${var.local_ip_url}"
     consul_encrypt  = "${random_id.consul_encrypt.b64_std}"
-    consul_ca_crt   = "${element(module.consul_tls_self_signed_cert.ca_cert_pem, 0)}"
-    consul_leaf_crt = "${element(module.consul_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    consul_leaf_key = "${element(module.consul_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    consul_ca_crt   = "${module.consul_tls_self_signed_cert.ca_cert_pem}"
+    consul_leaf_crt = "${module.consul_tls_self_signed_cert.leaf_cert_pem}"
+    consul_leaf_key = "${module.consul_tls_self_signed_cert.leaf_private_key_pem}"
     nomad_encrypt   = "${random_id.nomad_encrypt.b64_std}"
-    nomad_ca_crt    = "${element(module.nomad_tls_self_signed_cert.ca_cert_pem, 0)}"
-    nomad_leaf_crt  = "${element(module.nomad_tls_self_signed_cert.leaf_cert_pem, 0)}"
-    nomad_leaf_key  = "${element(module.nomad_tls_self_signed_cert.leaf_private_key_pem, 0)}"
+    nomad_ca_crt    = "${module.nomad_tls_self_signed_cert.ca_cert_pem}"
+    nomad_leaf_crt  = "${module.nomad_tls_self_signed_cert.leaf_cert_pem}"
+    nomad_leaf_key  = "${module.nomad_tls_self_signed_cert.leaf_private_key_pem}"
   }
 }
 
 module "nomad_client_aws" {
   source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name             = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -187,9 +185,9 @@ module "nomad_client_aws" {
   os               = "${var.nomad_os}"
   os_version       = "${var.nomad_os_version}"
   count            = "${var.nomad_clients}"
-  instance_profile = "${element(module.consul_auto_join_instance_role.instance_profile_id, 0)}" # Override instance_profile
+  instance_profile = "${module.consul_auto_join_instance_role.instance_profile_id}" # Override instance_profile
   instance_type    = "${var.nomad_instance_type}"
   user_data        = "${data.template_file.nomad_client_best_practices.rendered}" # Custom user_data
-  ssh_key_name     = "${element(module.ssh_keypair_aws_override.name, 0)}"
+  ssh_key_name     = "${module.ssh_keypair_aws_override.name}"
   tags             = "${var.nomad_tags}"
 }

@@ -5,6 +5,7 @@ echo "[---Begin quick-start-nomad-client-systemd.sh---]"
 echo "Set variables"
 LOCAL_IPV4=$(curl -s ${local_ip_url})
 CONSUL_CONFIG_FILE=/etc/consul.d/consul-client.json
+CONSUL_CUSTOM_CONFIG_FILE=/etc/consul.d/consul-client-custom.json
 NOMAD_CONFIG_FILE=/etc/nomad.d/nomad-client.hcl
 
 echo "Configure Nomad Consul client"
@@ -14,14 +15,20 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
   "advertise_addr": "$LOCAL_IPV4",
   "data_dir": "/opt/consul/data",
   "client_addr": "0.0.0.0",
-  "log_level": "INFO",
   "ui": true,
   "retry_join": ["provider=${provider} tag_key=Consul-Auto-Join tag_value=${name}"]
 }
 CONFIG
 
+if [[ ! -z "${consul_config}" ]]; then
+  echo "Add custom Nomad Consul client config"
+  cat <<CONFIG | sudo tee $CONSUL_CUSTOM_CONFIG_FILE
+${consul_config}
+CONFIG
+fi
+
 echo "Update Consul configuration file permissions"
-sudo chown consul:consul $CONSUL_CONFIG_FILE
+sudo chown consul:consul $CONSUL_CONFIG_FILE $CONSUL_CUSTOM_CONFIG_FILE
 
 echo "Don't start Consul in -dev mode"
 cat <<SWITCHES | sudo tee /etc/consul.d/consul.conf
@@ -32,28 +39,25 @@ sudo systemctl restart consul
 
 echo "Configure Nomad client"
 cat <<CONFIG | sudo tee $NOMAD_CONFIG_FILE
-data_dir  = "/opt/nomad/data"
-log_level = "INFO"
+# Default Config
+data_dir = "/opt/nomad/data"
 
+${nomad_config}
 client {
-  enabled         = true
-  client_max_port = 15000
+  # Default client stanza
+  enabled = true
 
-  options {
-    "docker.cleanup.image"   = "0"
-    "driver.raw_exec.enable" = "1"
-  }
+${client_stanza}
 }
 
 consul {
-  address        = "127.0.0.1:8500"
-  auto_advertise = true
+  # Default Consul stanza
+  address          = "127.0.0.1:8500"
+  auto_advertise   = true
+  server_auto_join = true
+  client_auto_join = true
 
-  client_service_name = "nomad-client"
-  client_auto_join    = true
-
-  server_service_name = "nomad-server"
-  server_auto_join    = true
+${consul_stanza}
 }
 CONFIG
 

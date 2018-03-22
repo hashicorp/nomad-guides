@@ -11,6 +11,9 @@ nomad_count       = "1"
 # nomad_url         = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_image_id    = "" # AMI ID override, defaults to base RHEL AMI
 
+# install_docker     = "true" # Install Docker on Nomad clients
+# install_oracle_jdk = "true" # Install Oracle JDK on Nomad clients
+
 # Example tags
 # network_tags = {"owner" = "hashicorp", "TTL" = "24"}
 #

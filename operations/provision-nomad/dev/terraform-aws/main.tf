@@ -33,7 +33,7 @@ data "aws_ami" "base" {
   }
 }
 
-data "template_file" "nomad_user_data" {
+data "template_file" "nomad_install" {
   template = "${file("${path.module}/../../templates/install-nomad-systemd.sh.tpl")}"
 
   vars = {
@@ -42,9 +42,24 @@ data "template_file" "nomad_user_data" {
   }
 }
 
+data "template_file" "docker_install" {
+  template = "${file("${path.module}/../../templates/install-docker.sh.tpl")}"
+
+  vars = {
+    install_docker = "${var.install_docker}"
+  }
+}
+
+data "template_file" "oracle_jdk_install" {
+  template = "${file("${path.module}/../../templates/install-oracle-jdk.sh.tpl")}"
+
+  vars = {
+    install_oracle_jdk = "${var.install_oracle_jdk}"
+  }
+}
+
 module "nomad_aws" {
   source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  # source = "../../../../../hashicorp-modules/nomad-aws"
 
   name         = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id       = "${module.network_aws.vpc_id}"
@@ -53,7 +68,12 @@ module "nomad_aws" {
   public_ip    = "${var.nomad_public_ip}"
   count        = "${var.nomad_count}"
   image_id     = "${var.nomad_image_id != "" ? var.nomad_image_id : data.aws_ami.base.id}"
-  ssh_key_name = "${element(module.ssh_keypair_aws.name, 0)}"
+  ssh_key_name = "${module.ssh_keypair_aws.name}"
   user_data    = "${data.template_file.nomad_user_data.rendered}" # Custom user_data
   tags         = "${var.nomad_tags}"
+  user_data    = <<EOF
+${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mode
+${data.template_file.docker_install.rendered} # Runtime install Docker
+${data.template_file.oracle_jdk_install.rendered} # Runtime install Oracle JDK
+EOF
 }
