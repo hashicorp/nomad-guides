@@ -11,8 +11,8 @@ variable "nomad_version"     { default = "0.7.1" }
 variable "nomad_url"         { default = "" }
 variable "nomad_image_id"    { default = "" }
 
-variable "install_docker"     { default = true }
-variable "install_oracle_jdk" { default = false }
+variable "install_docker"     { default = "true" }
+variable "install_oracle_jdk" { default = "false" }
 
 variable "network_tags" {
   type    = "map"

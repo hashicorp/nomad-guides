@@ -23,8 +23,8 @@ variable "nomad_client_config"        { default = "# No additional Nomad Client 
 variable "nomad_client_stanza"        { default = "# No additional Nomad Client stanza config" }
 variable "nomad_client_consul_stanza" { default = "# No additional Nomad Client Consul stanza config" }
 
-variable "install_docker"     { default = true }
-variable "install_oracle_jdk" { default = false }
+variable "install_docker"     { default = "true" }
+variable "install_oracle_jdk" { default = "false" }
 
 variable "network_tags" {
   type    = "map"
