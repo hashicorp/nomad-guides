@@ -1,42 +1,117 @@
-variable "name"         { }
-variable "provider"     { default = "aws" }
-variable "local_ip_url" { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
+# ---------------------------------------------------------------------------------------------------------------------
+# General Variables
+# ---------------------------------------------------------------------------------------------------------------------
+variable "name"         { default = "nomad-quick-start" }
 variable "ami_owner"    { default = "309956199498" } # Base RHEL owner
 variable "ami_name"     { default = "*RHEL-7.3_HVM_GA-*" } # Base RHEL name
+variable "provider"     { default = "aws" }
+variable "local_ip_url" { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
 
-variable "consul_version"  { default = "0.9.2" }
-variable "consul_url"      { default = "" }
-variable "consul_image_id" { default = "" }
+# ---------------------------------------------------------------------------------------------------------------------
+# Network Variables
+# ---------------------------------------------------------------------------------------------------------------------
+variable "vpc_cidr" { default = "10.139.0.0/16" }
 
-variable "nomad_version"  { default = "0.6.2" }
-variable "nomad_url"      { default = "" }
-variable "nomad_image_id" { default = "" }
-variable "nomad_servers"  { default = "-1" }
-variable "nomad_clients"  { default = "1" }
+variable "vpc_cidrs_public" {
+  type    = "list"
+  default = ["10.139.1.0/24", "10.139.2.0/24", "10.139.3.0/24",]
+}
 
-variable "consul_server_config"       { default = "" }
-variable "consul_client_config"       { default = "" }
-variable "nomad_server_config"        { default = "# No additional Nomad Server config" }
-variable "nomad_server_stanza"        { default = "# No additional Nomad Server stanza config" }
-variable "nomad_server_consul_stanza" { default = "# No additional Nomad Server Consul stanza config" }
-variable "nomad_client_config"        { default = "# No additional Nomad Client config" }
-variable "nomad_client_stanza"        { default = "# No additional Nomad Client stanza config" }
-variable "nomad_client_consul_stanza" { default = "# No additional Nomad Client Consul stanza config" }
+variable "vpc_cidrs_private" {
+  type    = "list"
+  default = ["10.139.11.0/24", "10.139.12.0/24", "10.139.13.0/24",]
+}
 
-variable "install_docker"     { default = "true" }
-variable "install_oracle_jdk" { default = "false" }
+variable "nat_count"        { default = 1 }
+variable "bastion_count"    { default = 1 }
+variable "bastion_instance" { default = "t2.micro" }
+variable "bastion_image_id" { default = "" }
 
 variable "network_tags" {
   type    = "map"
   default = { }
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Consul Variables
+# ---------------------------------------------------------------------------------------------------------------------
+variable "consul_version"  { default = "1.0.6" }
+variable "consul_url"      { default = "" }
+variable "consul_servers"  { default = -1 }
+variable "consul_instance" { default = "t2.micro" }
+variable "consul_image_id" { default = "" }
+
+variable "consul_public" {
+  description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
+  default     = false
+}
+
+variable "consul_server_config_override" { default = "" }
+variable "consul_client_config_override" { default = "" }
+
 variable "consul_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "consul_tags_list" {
   type    = "list"
   default = [ ]
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Vault Variables
+# ---------------------------------------------------------------------------------------------------------------------
+variable "vault_provision" { default = false }
+variable "vault_version"   { default = "0.9.6" }
+variable "vault_url"       { default = "" }
+variable "vault_servers"   { default = -1 }
+variable "vault_instance"  { default = "t2.micro" }
+variable "vault_image_id"  { default = "" }
+
+variable "vault_public" {
+  description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
+  default     = false
+}
+
+variable "vault_server_config_override" { default = "" }
+
+variable "vault_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "vault_tags_list" {
+  type    = "list"
+  default = [ ]
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Nomad Variables
+# ---------------------------------------------------------------------------------------------------------------------
+variable "nomad_version"  { default = "0.7.1" }
+variable "nomad_url"      { default = "" }
+variable "nomad_servers"  { default = -1 }
+variable "nomad_clients"  { default = 1 }
+variable "nomad_instance" { default = "t2.micro" }
+variable "nomad_image_id" { default = "" }
+
+variable "nomad_public" {
+  description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
+  default     = false
+}
+
+variable "nomad_server_config_override" { default = "" }
+variable "nomad_client_config_override" { default = "" }
+variable "nomad_client_docker_install"  { default = true }
+variable "nomad_client_java_install"    { default = true }
+
 variable "nomad_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "nomad_tags_list" {
   type    = "list"
   default = [ ]
 }

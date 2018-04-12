@@ -1,45 +1,36 @@
 #!/bin/bash
 
-echo "[---Begin best-practices-nomad-systemd.sh---]"
+echo "[---Begin best-practices-nomad-server-systemd.sh---]"
+
+NODE_NAME=$(hostname)
+LOCAL_IPV4=$(curl -s ${local_ip_url})
+CONSUL_TLS_DIR=/opt/consul/tls
+CONSUL_CONFIG_DIR=/etc/consul.d
+NOMAD_TLS_DIR=/opt/nomad/tls
+NOMAD_CONFIG_DIR=/etc/nomad.d
 
 echo "Update resolv.conf"
 sudo sed -i '1i nameserver 127.0.0.1\n' /etc/resolv.conf
 
-echo "Set variables"
-LOCAL_IPV4=$(curl -s ${local_ip_url})
-CONSUL_TLS_PATH=/opt/consul/tls
-CONSUL_CACERT_FILE="$CONSUL_TLS_PATH/ca.crt"
-CONSUL_CLIENT_CERT_FILE="$CONSUL_TLS_PATH/consul.crt"
-CONSUL_CLIENT_KEY_FILE="$CONSUL_TLS_PATH/consul.key"
-CONSUL_CONFIG_FILE=/etc/consul.d/consul-client.json
-NOMAD_TLS_PATH=/opt/nomad/tls
-NOMAD_CACERT_FILE="$NOMAD_TLS_PATH/ca.crt"
-NOMAD_CLIENT_CERT_FILE="$NOMAD_TLS_PATH/nomad.crt"
-NOMAD_CLIENT_KEY_FILE="$NOMAD_TLS_PATH/nomad.key"
-NOMAD_CONFIG_FILE=/etc/nomad.d/nomad-server.hcl
-
-echo "Create TLS dir for Consul certs"
-sudo mkdir -pm 0755 $CONSUL_TLS_PATH
-
-echo "Write Consul CA certificate to $CONSUL_CACERT_FILE"
-cat <<EOF | sudo tee $CONSUL_CACERT_FILE
-${consul_ca_crt}
+echo "Write certs to TLS directories"
+cat <<EOF | sudo tee $CONSUL_TLS_DIR/consul-ca.crt $NOMAD_TLS_DIR/consul-ca.crt $NOMAD_TLS_DIR/vault-ca.crt $NOMAD_TLS_DIR/nomad-ca.crt
+${ca_crt}
+EOF
+cat <<EOF | sudo tee $CONSUL_TLS_DIR/consul.crt $NOMAD_TLS_DIR/consul.crt $NOMAD_TLS_DIR/vault.crt $NOMAD_TLS_DIR/nomad.crt
+${leaf_crt}
+EOF
+cat <<EOF | sudo tee $CONSUL_TLS_DIR/consul.key $NOMAD_TLS_DIR/consul.key $NOMAD_TLS_DIR/vault.key $NOMAD_TLS_DIR/nomad.key
+${leaf_key}
 EOF
 
-echo "Write Consul certificate to $CONSUL_CLIENT_CERT_FILE"
-cat <<EOF | sudo tee $CONSUL_CLIENT_CERT_FILE
-${consul_leaf_crt}
-EOF
-
-echo "Write Consul certificate key to $CONSUL_CLIENT_KEY_FILE"
-cat <<EOF | sudo tee $CONSUL_CLIENT_KEY_FILE
-${consul_leaf_key}
-EOF
+sudo chown -R consul:consul $CONSUL_TLS_DIR $CONSUL_CONFIG_DIR
+sudo chown -R root:root $NOMAD_TLS_DIR $NOMAD_CONFIG_DIR
 
 echo "Configure Nomad Consul client"
-cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
+cat <<CONFIG | sudo tee $CONSUL_CONFIG_DIR/default.json
 {
   "datacenter": "${name}",
+  "node_name": "$NODE_NAME",
   "advertise_addr": "$LOCAL_IPV4",
   "data_dir": "/opt/consul/data",
   "client_addr": "0.0.0.0",
@@ -47,104 +38,122 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
   "ui": true,
   "retry_join": ["provider=${provider} tag_key=Consul-Auto-Join tag_value=${name}"],
   "encrypt": "${consul_encrypt}",
-  "ca_file": "$CONSUL_CACERT_FILE",
-  "cert_file": "$CONSUL_CLIENT_CERT_FILE",
-  "key_file": "$CONSUL_CLIENT_KEY_FILE",
-  "verify_incoming": true,
+  "encrypt_verify_incoming": true,
+  "encrypt_verify_outgoing": true,
+  "ca_file": "$CONSUL_TLS_DIR/consul-ca.crt",
+  "cert_file": "$CONSUL_TLS_DIR/consul.crt",
+  "key_file": "$CONSUL_TLS_DIR/consul.key",
+  "verify_incoming": false,
   "verify_outgoing": true,
-  "ports": { "https": 8080 }
+  "verify_server_hostname": true,
+  "addresses": {
+    "https": "0.0.0.0"
+  },
+  "ports": {
+    "https": 8080
+  }
 }
 CONFIG
 
-echo "Update Consul configuration & certificates file owner"
-sudo chown -R consul:consul $CONSUL_CONFIG_FILE $CONSUL_TLS_PATH
+if [ ${consul_override} == true ] || [ ${consul_override} == 1 ]; then
+  echo "Add custom Consul client override config"
+  cat <<CONFIG | sudo tee $CONSUL_CONFIG_DIR/z-override.json
+${consul_config}
+CONFIG
+fi
 
-echo "Don't start Consul in -dev mode"
-cat <<SWITCHES | sudo tee /etc/consul.d/consul.conf
-SWITCHES
+echo "Configure Consul environment variables for HTTPS API requests on login"
+cat <<PROFILE | sudo tee /etc/profile.d/consul.sh
+export CONSUL_ADDR=https://127.0.0.1:8080
+export CONSUL_CACERT=$CONSUL_TLS_DIR/consul-ca.crt
+export CONSUL_CLIENT_CERT=$CONSUL_TLS_DIR/consul.crt
+export CONSUL_CLIENT_KEY=$CONSUL_TLS_DIR/consul.key
+PROFILE
 
-echo "Restart Consul"
+echo "Don't start Consul in -dev mode and use SSL"
+cat <<ENVVARS | sudo tee $CONSUL_CONFIG_DIR/consul.conf
+CONSUL_HTTP_ADDR=https://127.0.0.1:8080
+CONSUL_HTTP_SSL=true
+CONSUL_HTTP_SSL_VERIFY=true
+ENVVARS
+
 sudo systemctl restart consul
 
-echo "Create tls dir for Nomad certs"
-sudo mkdir -pm 0755 $NOMAD_TLS_PATH
-
-echo "Write Nomad CA certificate to $NOMAD_CACERT_FILE"
-cat <<EOF | sudo tee $NOMAD_CACERT_FILE
-${nomad_ca_crt}
-EOF
-
-echo "Write Nomad certificate to $NOMAD_CLIENT_CERT_FILE"
-cat <<EOF | sudo tee $NOMAD_CLIENT_CERT_FILE
-${nomad_leaf_crt}
-EOF
-
-echo "Write Nomad certificate key to $NOMAD_CLIENT_KEY_FILE"
-cat <<EOF | sudo tee $NOMAD_CLIENT_KEY_FILE
-${nomad_leaf_key}
-EOF
-
 echo "Configure Nomad server"
-cat <<CONFIG | sudo tee $NOMAD_CONFIG_FILE
-data_dir  = "/opt/nomad/data"
-log_level = "INFO"
-enable_debug = true
+cat <<CONFIG | sudo tee $NOMAD_CONFIG_DIR/default.hcl
+# https://www.nomadproject.io/docs/agent/configuration/index.html
+region     = "global"
+name       = "$NODE_NAME"
+log_level  = "INFO"
+data_dir   = "/opt/nomad/data"
+bind_addr  = "0.0.0.0"
 
+# https://www.nomadproject.io/docs/agent/configuration/index.html#advertise
+advertise {
+  http = "$LOCAL_IPV4:4646"
+  rpc  = "$LOCAL_IPV4:4647"
+  serf = "$LOCAL_IPV4:4648"
+}
+
+# https://www.nomadproject.io/docs/agent/configuration/server.html
 server {
   enabled          = true
   bootstrap_expect = ${nomad_bootstrap}
-  heartbeat_grace  = "30s"
   encrypt          = "${nomad_encrypt}"
 }
 
-tls {
-  http = true
-  rpc  = true
-
-  ca_file   = "$NOMAD_CACERT_FILE"
-  cert_file = "$NOMAD_CLIENT_CERT_FILE"
-  key_file  = "$NOMAD_CLIENT_KEY_FILE"
-
-  verify_server_hostname = true
-  verify_https_client    = true
-}
-
+# https://www.nomadproject.io/docs/agent/configuration/consul.html
 consul {
-  address        = "127.0.0.1:8500"
-  auto_advertise = true
+  address              = "127.0.0.1:8080"
+  auto_advertise       = true
+  checks_use_advertise = true
+
+  server_service_name = "nomad"
+  server_auto_join    = true
 
   client_service_name = "nomad-client"
   client_auto_join    = true
 
-  server_service_name = "nomad-server"
-  server_auto_join    = true
-
+  ssl        = true
   verify_ssl = true
-  ca_file    = "$CONSUL_CACERT_FILE"
-  cert_file  = "$CONSUL_CLIENT_CERT_FILE"
-  key_file   = "$CONSUL_CLIENT_KEY_FILE"
+  ca_file    = "$NOMAD_TLS_DIR/consul-ca.crt"
+  cert_file  = "$NOMAD_TLS_DIR/consul.crt"
+  key_file   = "$NOMAD_TLS_DIR/consul.key"
+}
+
+# https://www.nomadproject.io/docs/agent/configuration/tls.html
+tls {
+  http = true
+  rpc  = true
+
+  ca_file   = "$NOMAD_TLS_DIR/nomad-ca.crt"
+  cert_file = "$NOMAD_TLS_DIR/nomad.crt"
+  key_file  = "$NOMAD_TLS_DIR/nomad.key"
+
+  verify_server_hostname = true
+  verify_https_client    = false
 }
 CONFIG
 
-echo "Update Nomad configuration & certificates file owner"
-sudo chown -R root:root $NOMAD_CONFIG_FILE $NOMAD_TLS_PATH
+if [ ${nomad_override} == true ] || [ ${nomad_override} == 1 ]; then
+  echo "Add custom Nomad client override config"
+  cat <<CONFIG | sudo tee $NOMAD_CONFIG_DIR/z-override.hcl
+${nomad_config}
+CONFIG
+fi
 
 echo "Configure Nomad environment variables to point Nomad client CLI to remote Nomad cluster & set TLS certs on login"
-cat <<ENVVARS | sudo tee /etc/profile.d/nomad.sh
-export NOMAD_ADDR="https://127.0.0.1:4646"
-export NOMAD_CACERT="$NOMAD_CACERT_FILE"
-export NOMAD_CLIENT_CERT="$NOMAD_CLIENT_CERT_FILE"
-export NOMAD_CLIENT_KEY="$NOMAD_CLIENT_KEY_FILE"
-ENVVARS
+cat <<PROFILE | sudo tee /etc/profile.d/nomad.sh
+export NOMAD_ADDR=https://127.0.0.1:4646
+export NOMAD_SKIP_VERIFY=false
+export NOMAD_CACERT=$NOMAD_TLS_DIR/nomad-ca.crt
+export NOMAD_CLIENT_CERT=$NOMAD_TLS_DIR/nomad.crt
+export NOMAD_CLIENT_KEY=$NOMAD_TLS_DIR/nomad.key
+PROFILE
 
 echo "Don't start Nomad in -dev mode"
-cat <<SWITCHES | sudo tee /etc/nomad.d/nomad.conf
-SWITCHES
+echo '' | sudo tee $NOMAD_CONFIG_DIR/nomad.conf
 
-echo "Restart Nomad"
 sudo systemctl restart nomad
 
-echo "Restart Docker"
-sudo systemctl restart docker
-
-echo "[---best-practices-nomad-systemd.sh Complete---]"
+echo "[---best-practices-nomad-server-systemd.sh Complete---]"

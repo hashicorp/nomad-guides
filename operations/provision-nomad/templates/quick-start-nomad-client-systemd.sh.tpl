@@ -3,78 +3,108 @@
 echo "[---Begin quick-start-nomad-client-systemd.sh---]"
 
 echo "Set variables"
+NODE_NAME=$(hostname)
 LOCAL_IPV4=$(curl -s ${local_ip_url})
-CONSUL_CONFIG_FILE=/etc/consul.d/consul-client.json
-CONSUL_CUSTOM_CONFIG_FILE=/etc/consul.d/consul-client-custom.json
-NOMAD_CONFIG_FILE=/etc/nomad.d/nomad-client.hcl
+CONSUL_CONFIG_FILE=/etc/consul.d/default.json
+CONSUL_CONFIG_OVERRIDE_FILE=/etc/consul.d/z-override.json
+NOMAD_CONFIG_FILE=/etc/nomad.d/default.hcl
+NOMAD_CONFIG_OVERRIDE_FILE=/etc/nomad.d/z-override.hcl
 
 echo "Configure Nomad Consul client"
 cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
 {
   "datacenter": "${name}",
-  "advertise_addr": "$LOCAL_IPV4",
+  "node_name": "$NODE_NAME",
   "data_dir": "/opt/consul/data",
+  "log_level": "INFO",
+  "advertise_addr": "$LOCAL_IPV4",
   "client_addr": "0.0.0.0",
+  "log_level": "DEBUG",
   "ui": true,
   "retry_join": ["provider=${provider} tag_key=Consul-Auto-Join tag_value=${name}"]
 }
 CONFIG
 
-if [[ ! -z "${consul_config}" ]]; then
-  echo "Add custom Nomad Consul client config"
-  cat <<CONFIG | sudo tee $CONSUL_CUSTOM_CONFIG_FILE
+echo "Update Consul configuration file permissions"
+sudo chown consul:consul $CONSUL_CONFIG_FILE
+
+if [ ${consul_override} == true ] || [ ${consul_override} == 1 ]; then
+  echo "Add custom Consul client override config"
+  cat <<CONFIG | sudo tee $CONSUL_CONFIG_OVERRIDE_FILE
 ${consul_config}
 CONFIG
+
+  echo "Update Consul configuration override file permissions"
+  sudo chown consul:consul $CONSUL_CONFIG_OVERRIDE_FILE
 fi
 
-echo "Update Consul configuration file permissions"
-sudo chown consul:consul $CONSUL_CONFIG_FILE $CONSUL_CUSTOM_CONFIG_FILE
-
 echo "Don't start Consul in -dev mode"
-cat <<SWITCHES | sudo tee /etc/consul.d/consul.conf
-SWITCHES
+cat <<ENVVARS | sudo tee /etc/consul.d/consul.conf
+CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+ENVVARS
 
 echo "Restart Consul"
 sudo systemctl restart consul
 
 echo "Configure Nomad client"
 cat <<CONFIG | sudo tee $NOMAD_CONFIG_FILE
-# Default Config
-data_dir = "/opt/nomad/data"
+# https://www.nomadproject.io/docs/agent/configuration/index.html
+region    = "global"
+name      = "$NODE_NAME"
+log_level = "INFO"
+data_dir  = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
 
-${nomad_config}
-client {
-  # Default client stanza
-  enabled = true
-
-${client_stanza}
+# https://www.nomadproject.io/docs/agent/configuration/index.html#advertise
+advertise {
+  http = "$LOCAL_IPV4:4646"
+  rpc  = "$LOCAL_IPV4:4647"
+  serf = "$LOCAL_IPV4:4648"
 }
 
-consul {
-  # Default Consul stanza
-  address          = "127.0.0.1:8500"
-  auto_advertise   = true
-  server_auto_join = true
-  client_auto_join = true
+# https://www.nomadproject.io/docs/agent/configuration/client.html
+client {
+  enabled = true
 
-${consul_stanza}
+  "driver.raw_exec.enable" = "1"
+}
+
+# https://www.nomadproject.io/docs/agent/configuration/consul.html
+consul {
+  address        = "127.0.0.1:8500"
+  auto_advertise = true
+
+  server_service_name = "nomad"
+  server_auto_join    = true
+
+  client_service_name = "nomad-client"
+  client_auto_join    = true
 }
 CONFIG
 
 echo "Update Nomad configuration file permissions"
-sudo chown nomad:nomad $NOMAD_CONFIG_FILE
+sudo chown root:root $NOMAD_CONFIG_FILE
+
+if [ ${nomad_override} == true ] || [ ${nomad_override} == 1 ]; then
+  echo "Add custom Nomad client override config"
+  cat <<CONFIG | sudo tee $NOMAD_CONFIG_OVERRIDE_FILE
+${nomad_config}
+CONFIG
+
+  echo "Update Nomad configuration override file permissions"
+  sudo chown root:root $NOMAD_CONFIG_OVERRIDE_FILE
+fi
 
 echo "Configure Nomad environment variables to point Nomad client CLI to local Nomad cluster and skip TLS verification on login"
-cat <<ENVVARS | sudo tee /etc/profile.d/nomad.sh
-export NOMAD_ADDR="http://127.0.0.1:4646"
-export NOMAD_SKIP_VERIFY="true"
-ENVVARS
+cat <<PROFILE | sudo tee /etc/profile.d/nomad.sh
+export NOMAD_ADDR=http://127.0.0.1:4646
+export NOMAD_SKIP_VERIFY=true
+PROFILE
 
 echo "Don't start Nomad in -dev mode"
-cat <<SWITCHES | sudo tee /etc/nomad.d/nomad.conf
-SWITCHES
+echo '' | sudo tee /etc/nomad.d/nomad.conf
 
 echo "Restart Nomad"
 sudo systemctl restart nomad
 
-echo "[---quick-start-nomadGclient-systemd.sh Complete---]"
+echo "[---quick-start-nomad-client-systemd.sh Complete---]"

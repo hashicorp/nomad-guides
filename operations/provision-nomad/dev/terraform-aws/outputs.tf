@@ -1,66 +1,73 @@
 output "zREADME" {
   value = <<README
-Your "${var.name}" Nomad cluster has been successfully provisioned!
 
-A private RSA key has been generated and downloaded locally. The file permissions have been changed to 0600 so the key can be used immediately for SSH or scp.
+Your "${var.name}" AWS Nomad dev cluster has been successfully provisioned!
 
-If you're not running Terraform locally (e.g. in TFE or Jenkins) but are using remote state and need the private key locally for SSH, run the below command to download.
+${module.network_aws.zREADME}To force the generation of a new key, the private key instance can be "tainted" using the below command.
 
-  ${format("$ echo \"$(terraform output private_key_pem)\" > %s && chmod 0600 %s", module.ssh_keypair_aws.private_key_filename, module.ssh_keypair_aws.private_key_filename)}
+  $ terraform taint -module=ssh_keypair_aws_override.tls_private_key tls_private_key.key
 
-Run the below command to add this private key to the list maintained by ssh-agent so you're not prompted for it when using SSH or scp to connect to hosts with your public key.
+# ------------------------------------------------------------------------------
+# Nomad Dev
+# ------------------------------------------------------------------------------
 
-  ${format("$ ssh-add %s", module.ssh_keypair_aws.private_key_filename)}
+${join("\n", compact(
+  list(
+    format("View the Nomad UI: %s", module.nomad_aws.nomad_lb_dns),
+    var.consul_install ? format("View the Consul UI: %s", module.consul_lb_aws.consul_lb_dns) : "",
+    var.vault_install && var.vault_url != "" ? format("View the Vault UI: %s", module.vault_lb_aws.vault_lb_dns) : "",
+  ),
+))}
 
-The public part of the key loaded into the agent ("public_key_openssh" output) has been placed on the target system in ~/.ssh/authorized_keys.
+You can SSH into the Nomad node by updating the "PUBLIC_IP" and running the
+below command.
 
-To SSH into a Nomad host using this private key, run the below command after replacing "HOST" with the public IP of one of the provisioned Nomad hosts.
+  $ ${format("ssh -A -i %s %s@%s", module.ssh_keypair_aws.private_key_filename, module.nomad_aws.nomad_username, "PUBLIC_IP")}
 
-  ${format("$ ssh -A -i %s %s@HOST", module.ssh_keypair_aws.private_key_filename, module.nomad_aws.nomad_username)}
+${module.nomad_aws.zREADME}
+${var.vault_install ?
+"# ------------------------------------------------------------------------------
+# Nomad Dev - Vault Integration
+# ------------------------------------------------------------------------------
 
-You can interact with Nomad using any of the CLI (https://www.nomadproject.io/docs/commands/index.html) or API (https://www.nomadproject.io/api/index.html) commands.
+If Vault is running in -dev mode using the in-mem storage backend (default), the
+Vault integration for Nomad can be enabled by simply uncommenting the
+\"nomad_config_override\" input variable in `terraform.auto.tfvars`.
 
-  $ nomad server-members # Check Nomad's server members
-  $ nomad node-status # Check Nomad's client nodes
-  $ nomad init # Create a skeletion job file to deploy a Redis Docker container
+Alternatively, you can run the below commands to enable the integration. This
+is the best method if you're overridding the default -dev mode configuration
+with a storage backed other than in-mem (e.g. uncommenting
+\"vault_config_override\" input variable in `terraform.auto.tfvars`).
 
-  # Use the CLI to deploy a Redis Docker container
-  $ nomad plan example.nomad # Run a nomad plan on the example job
-  $ nomad run example.nomad # Run the example job
-  $ nomad status # Check that the job is running
-  $ nomad status example # Check job details
-  $ nomad stop example # Stop the example job
-  $ nomad status # Check that the job is stopped
+\"disable_remote_exec\" must be set to `false` in Consul for remote exec to
+work, this can be achieved by uncommenting \"consul_config_override\" in
+`terraform.auto.tfvars`.
 
-  # Use the API to deploy a Redis Docker container
-  $ nomad run -output example.nomad > example.json # Convert the example Nomad HCL job file to JSON
-  $ curl \
-      -X POST \
-      -d @example.json \
-      http://127.0.0.1:4646/v1/job/example/plan | jq '.' # Run a nomad plan on the example job
-  $ curl \
-      -X POST \
-      -d @example.json \
-      http://127.0.0.1:4646/v1/job/example | jq '.' # Run the example job
-  $ curl \
-      -X GET \
-      http://127.0.0.1:4646/v1/jobs | jq '.' # Check that the job is running
-  $ curl \
-      -X GET \
-      http://127.0.0.1:4646/v1/job/example | jq '.' # Check job details
-  $ curl \
-      -X DELETE \
-      http://127.0.0.1:4646/v1/job/example | jq '.' # Stop the example job
-  $ curl \
-      -X GET \
-      http://127.0.0.1:4646/v1/jobs | jq '.' # Check that the job is stopped
+`VAULT_TOKEN` is automatically set to \"root\" for you if running in -dev mode
+with the in-mem storage backend (default), otherwise you'll need to set this
+to the root token generated during `vault operator init`.
 
-Because this is a development environment, the Nomad nodes are in a public subnet with SSH access open from the outside. WARNING - DO NOT DO THIS IN PRODUCTION!
+  $ echo $VAULT_TOKEN
+  $ export VAULT_TOKEN=<ROOT_TOKEN>
+  $ consul exec -service nomad - <<EOF
+echo \"VAULT_TOKEN=$VAULT_TOKEN\" | sudo tee -a /etc/nomad.d/nomad.conf
+
+cat <<CONFIG | sudo tee /etc/nomad.d/z-vault.hcl
+vault {
+  enabled = true
+  address = \"http://127.0.0.1:8200\"
+
+  tls_skip_verify = true
+}
+CONFIG
+
+sudo systemctl restart nomad
+EOF" : ""}
 README
 }
 
-output "vpc_cidr_block" {
-  value = "${module.network_aws.vpc_cidr_block}"
+output "vpc_cidr" {
+  value = "${module.network_aws.vpc_cidr}"
 }
 
 output "vpc_id" {
@@ -105,4 +112,52 @@ output "nomad_asg_id" {
 
 output "nomad_sg_id" {
   value = "${module.nomad_aws.nomad_sg_id}"
+}
+
+output "nomad_lb_sg_id" {
+  value = "${module.nomad_aws.nomad_lb_sg_id}"
+}
+
+output "nomad_tg_http_4646_arn" {
+  value = "${module.nomad_aws.nomad_tg_http_4646_arn}"
+}
+
+output "nomad_tg_https_4646_arn" {
+  value = "${module.nomad_aws.nomad_tg_https_4646_arn}"
+}
+
+output "nomad_lb_dns" {
+  value = "${module.nomad_aws.nomad_lb_dns}"
+}
+
+output "consul_lb_sg_id" {
+  value = "${module.consul_lb_aws.consul_lb_sg_id}"
+}
+
+output "consul_tg_http_8500_arn" {
+  value = "${module.consul_lb_aws.consul_tg_http_8500_arn}"
+}
+
+output "consul_tg_https_8500_arn" {
+  value = "${module.consul_lb_aws.consul_tg_https_8500_arn}"
+}
+
+output "consul_lb_dns" {
+  value = "${module.consul_lb_aws.consul_lb_dns}"
+}
+
+output "vault_lb_sg_id" {
+  value = "${module.vault_lb_aws.vault_lb_sg_id}"
+}
+
+output "vault_tg_http_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_http_8200_arn}"
+}
+
+output "vault_tg_https_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_https_8200_arn}"
+}
+
+output "vault_lb_dns" {
+  value = "${module.vault_lb_aws.vault_lb_dns}"
 }
