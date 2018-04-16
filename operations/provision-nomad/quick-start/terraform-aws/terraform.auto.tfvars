@@ -37,7 +37,7 @@
 #   "disable_remote_exec": false
 # }
 # EOF
-#
+
 # consul_client_config_override = <<EOF
 # {
 #   "log_level": "DEBUG",
@@ -56,7 +56,7 @@
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 # vault_provision = true # Provision Vault
-# vault_version   = "0.9.6" # Vault Version for runtime install, defaults to 0.9.6
+# vault_version   = "0.10.0" # Vault Version for runtime install, defaults to 0.10.0
 # vault_url       = "" # Vault Enterprise download URL for runtime install, defaults to Vault OSS
 # vault_servers   = 1 # Number of Vault servers, defaults to subnet count
 # vault_instance  = "t2.micro"
@@ -69,10 +69,11 @@
 # vault_server_config_override = <<EOF
 # # These values will override the defaults
 # cluster_name = "dc1"
+# ui           = true
 # EOF
 
 # vault_tags = {"owner" = "hashicorp", "TTL" = "24"}
-
+#
 # vault_tags_list = [
 #   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
 #   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}
@@ -81,7 +82,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-# nomad_version  = "0.7.1" # Nomad Version for runtime install, defaults to 0.7.1
+# nomad_version  = "0.8.0" # Nomad Version for runtime install, defaults to 0.8.0
 # nomad_url      = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_servers  = 3 # Number of Nomad servers, defaults to subnet count
 # nomad_clients  = 3 # Nomad clients count
@@ -102,7 +103,7 @@
 #   heartbeat_grace = "30s"
 # }
 # EOF
-#
+
 # nomad_client_config_override = <<EOF
 # # These values will override the defaults
 # datacenter   = "dc1"

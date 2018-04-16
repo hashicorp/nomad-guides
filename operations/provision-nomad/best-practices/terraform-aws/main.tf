@@ -19,8 +19,7 @@ resource "random_id" "nomad_encrypt" {
 }
 
 module "root_tls_self_signed_ca" {
-  # source = "github.com/hashicorp-modules/tls-self-signed-cert?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/tls-self-signed-cert"
+   source = "github.com/hashicorp-modules/tls-self-signed-cert?ref=f-refactor"
 
   name              = "${var.name}-root"
   ca_common_name    = "${var.common_name}"
@@ -29,29 +28,6 @@ module "root_tls_self_signed_ca" {
   download_certs    = "${var.download_certs}"
 
   validity_period_hours = "8760"
-
-  dns_names = [
-    "localhost",
-    "*.node.consul",
-    "*.service.consul",
-    "server.dc1.consul",
-    "*.dc1.consul",
-    "server.${var.name}.consul",
-    "*.${var.name}.consul",
-    "server.global.nomad",
-    "*.global.nomad",
-    "server.${var.name}.nomad",
-    "*.${var.name}.nomad",
-    "client.global.nomad",
-    "*.global.nomad",
-    "client.${var.name}.nomad",
-    "*.${var.name}.nomad",
-  ]
-
-  ip_addresses = [
-    "0.0.0.0",
-    "127.0.0.1",
-  ]
 
   ca_allowed_uses = [
     "cert_signing",
@@ -63,8 +39,7 @@ module "root_tls_self_signed_ca" {
 }
 
 module "leaf_tls_self_signed_cert" {
-  # source = "github.com/hashicorp-modules/tls-self-signed-cert?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/tls-self-signed-cert"
+  source = "github.com/hashicorp-modules/tls-self-signed-cert?ref=f-refactor"
 
   name              = "${var.name}-leaf"
   organization_name = "${var.organization_name}"
@@ -125,8 +100,7 @@ data "template_file" "bastion_user_data" {
 }
 
 module "network_aws" {
-  # source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/network-aws"
+  source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
 
   name              = "${var.name}"
   vpc_cidr          = "${var.vpc_cidr}"
@@ -168,8 +142,7 @@ data "template_file" "consul_user_data" {
 }
 
 module "consul_aws" {
-  # source = "github.com/hashicorp-modules/consul-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/consul-aws"
+  source = "github.com/hashicorp-modules/consul-aws?ref=f-refactor"
 
   name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -214,8 +187,7 @@ data "template_file" "vault_user_data" {
 }
 
 module "vault_aws" {
-  # source = "github.com/hashicorp-modules/vault-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/vault-aws"
+  source = "github.com/hashicorp-modules/vault-aws?ref=f-refactor"
 
   create           = "${var.vault_provision}" # Provision Vault cluster
   name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
@@ -263,8 +235,7 @@ data "template_file" "nomad_server_best_practices" {
 }
 
 module "nomad_server_aws" {
-  # source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/nomad-aws"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
 
   name             = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
@@ -310,8 +281,7 @@ data "template_file" "nomad_client_best_practices" {
 }
 
 module "nomad_client_aws" {
-  # source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/nomad-aws"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
 
   name             = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"

@@ -1,11 +1,14 @@
 output "zREADME" {
   value = <<README
 
-Your "${var.name}" AWS Nomad dev cluster has been successfully provisioned!
+Your "${var.name}" AWS Nomad dev cluster has been
+successfully provisioned!
 
-${module.network_aws.zREADME}To force the generation of a new key, the private key instance can be "tainted" using the below command.
+${module.network_aws.zREADME}To force the generation of a new key, the private key instance can be
+"tainted" using the below command.
 
-  $ terraform taint -module=ssh_keypair_aws_override.tls_private_key tls_private_key.key
+  $ terraform taint -module=ssh_keypair_aws_override.tls_private_key \
+      tls_private_key.key
 
 # ------------------------------------------------------------------------------
 # Nomad Dev
@@ -13,9 +16,9 @@ ${module.network_aws.zREADME}To force the generation of a new key, the private k
 
 ${join("\n", compact(
   list(
-    format("View the Nomad UI: %s", module.nomad_aws.nomad_lb_dns),
-    var.consul_install ? format("View the Consul UI: %s", module.consul_lb_aws.consul_lb_dns) : "",
-    var.vault_install && var.vault_url != "" ? format("View the Vault UI: %s", module.vault_lb_aws.vault_lb_dns) : "",
+    format("Nomad UI: http://%s %s", module.nomad_aws.nomad_lb_dns, var.nomad_public ? "(Public)" : "(Internal)"),
+    var.consul_install ? format("Consul UI: http://%s %s", module.consul_lb_aws.consul_lb_dns, var.nomad_public ? "(Public)" : "(Internal)") : "",
+    var.vault_install && (__builtin_StringToFloat(replace(var.vault_version, ".", "")) >= 0100 || var.vault_url != "") ? format("Vault UI: http://%s %s", module.vault_lb_aws.vault_lb_dns, var.nomad_public ? "(Public)" : "(Internal)") : "",
   ),
 ))}
 
@@ -138,8 +141,8 @@ output "consul_tg_http_8500_arn" {
   value = "${module.consul_lb_aws.consul_tg_http_8500_arn}"
 }
 
-output "consul_tg_https_8500_arn" {
-  value = "${module.consul_lb_aws.consul_tg_https_8500_arn}"
+output "consul_tg_https_8080_arn" {
+  value = "${module.consul_lb_aws.consul_tg_https_8080_arn}"
 }
 
 output "consul_lb_dns" {

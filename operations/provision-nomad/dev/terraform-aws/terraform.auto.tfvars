@@ -21,22 +21,22 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Consul Variables
 # ---------------------------------------------------------------------------------------------------------------------
-consul_install = true # Install Consul
+# consul_install = true # Install Consul
 # consul_version = "1.0.6" # Consul Version for runtime install, defaults to 1.0.6
 # consul_url     = "" # Consul Enterprise download URL for runtime install, defaults to Consul OSS
 
-consul_config_override = <<EOF
-{
-  "log_level": "DEBUG",
-  "disable_remote_exec": false
-}
-EOF
+# consul_config_override = <<EOF
+# {
+#   "log_level": "DEBUG",
+#   "disable_remote_exec": false
+# }
+# EOF
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
-vault_install = true # Install Vault
-# vault_version = "0.9.6" # Vault Version for runtime install, defaults to 0.9.6
+# vault_install = true # Install Vault
+# vault_version = "0.10.0" # Vault Version for runtime install, defaults to 0.10.0
 # vault_url     = "" # Vault Enterprise download URL for runtime install, defaults to Vault OSS
 
 # If Vault config is overridden, Vault will no longer run in -dev mode
@@ -58,7 +58,7 @@ vault_install = true # Install Vault
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-# nomad_version = "0.7.1" # Nomad Version for runtime install, defaults to 0.7.1
+# nomad_version = "0.8.0" # Nomad Version for runtime install, defaults to 0.8.0
 # nomad_url     = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 
 # nomad_config_override = <<EOF

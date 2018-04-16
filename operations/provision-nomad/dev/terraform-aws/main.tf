@@ -84,8 +84,7 @@ data "template_file" "java_install" {
 }
 
 module "network_aws" {
-  # source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/network-aws"
+  source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
 
   name              = "${var.name}"
   vpc_cidr          = "${var.vpc_cidr}"
@@ -123,8 +122,7 @@ module "vault_lb_aws" {
 }
 
 module "nomad_aws" {
-  # source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/nomad-aws"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
 
   name          = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id        = "${module.network_aws.vpc_id}"
@@ -149,7 +147,7 @@ EOF
 
   target_groups = [
   "${module.consul_lb_aws.consul_tg_http_8500_arn}",
-  "${module.consul_lb_aws.consul_tg_https_8500_arn}",
+  "${module.consul_lb_aws.consul_tg_https_8080_arn}",
   "${module.vault_lb_aws.vault_tg_http_8200_arn}",
   "${module.vault_lb_aws.vault_tg_https_8200_arn}",
   ]

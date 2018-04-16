@@ -63,7 +63,7 @@ variable "consul_tags_list" {
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_provision" { default = false }
-variable "vault_version"   { default = "0.9.6" }
+variable "vault_version"   { default = "0.10.0" }
 variable "vault_url"       { default = "" }
 variable "vault_servers"   { default = -1 }
 variable "vault_instance"  { default = "t2.micro" }
@@ -89,7 +89,7 @@ variable "vault_tags_list" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "nomad_version"  { default = "0.7.1" }
+variable "nomad_version"  { default = "0.8.0" }
 variable "nomad_url"      { default = "" }
 variable "nomad_servers"  { default = -1 }
 variable "nomad_clients"  { default = 1 }

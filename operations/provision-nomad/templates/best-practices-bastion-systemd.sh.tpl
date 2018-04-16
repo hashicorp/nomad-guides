@@ -48,13 +48,15 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_DIR/default.json
   "cert_file": "$CONSUL_TLS_DIR/consul.crt",
   "key_file": "$CONSUL_TLS_DIR/consul.key",
   "verify_incoming": false,
+  "verify_incoming_https": false,
+  "verify_incoming_rpc": true,
   "verify_outgoing": true,
   "verify_server_hostname": true,
-  "addresses": {
-    "https": "0.0.0.0"
-  },
   "ports": {
     "https": 8080
+  },
+  "addresses": {
+    "https": "0.0.0.0"
   }
 }
 CONFIG
@@ -76,9 +78,9 @@ PROFILE
 
 echo "Don't start Consul in -dev mode and use SSL"
 cat <<ENVVARS | sudo tee $CONSUL_CONFIG_DIR/consul.conf
-CONSUL_HTTP_ADDR=https://127.0.0.1:8080
+CONSUL_HTTP_ADDR=127.0.0.1:8080
 CONSUL_HTTP_SSL=true
-CONSUL_HTTP_SSL_VERIFY=true
+CONSUL_HTTP_SSL_VERIFY=false
 ENVVARS
 
 sudo systemctl restart consul

@@ -1,28 +1,24 @@
 output "zREADME" {
   value = <<README
 
-Your "${var.name}" AWS Nomad Quick Start cluster has been successfully provisioned!
+Your "${var.name}" AWS Nomad Quick Start cluster has been
+successfully provisioned!
 
-${module.network_aws.zREADME}# ------------------------------------------------------------------------------
+${module.network_aws.zREADME}
+# ------------------------------------------------------------------------------
 # Nomad Quick Start
 # ------------------------------------------------------------------------------
 
-${join("\n", compact(
-  list(
-    format("View the Nomad UI: %s", module.nomad_server_aws.nomad_lb_dns),
-    format("View the Consul UI: %s", module.consul_aws.consul_lb_dns),
-    var.vault_provision && var.vault_url != "" ? format("View the Vault UI: %s", module.vault_aws.vault_lb_dns) : "",
-  ),
-))}
-
-Once on the Bastion host, you can use Consul's DNS functionality to seemlessly
+Once on the Bastion host, you can use Consul's DNS functionality to seamlessly
 SSH into other Consul or Nomad nodes if they exist.
 
-  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad-server.service.consul
+  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad.service.consul
   $ ssh -A ${module.nomad_client_aws.nomad_username}@nomad-client.service.consul
   $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
-  ${var.vault_provision ? "$ ssh -A ${module.vault_aws.vault_username}@vault.service.consul\n" : ""}
-${module.nomad_server_aws.zREADME}${module.consul_aws.zREADME}${var.vault_provision ?
+  ${var.vault_provision ? "# Vault must be initialized & unsealed for this command to work\n  $ ssh -A ${module.vault_aws.vault_username}@vault.service.consul\n" : ""}
+${module.nomad_server_aws.zREADME}
+${module.consul_aws.zREADME}
+${var.vault_provision ?
 "${module.vault_aws.zREADME}
 # ------------------------------------------------------------------------------
 # Nomad Quick Start - Vault Integration
@@ -32,7 +28,7 @@ The Vault integration for Nomad can be enabled by initializing Vault
 and running the below commands.
 
   $ export VAULT_TOKEN=<ROOT_TOKEN>
-  $ consul exec -service nomad - <<EOF
+  $ consul exec -node ${var.name}-server-nomad - <<EOF
 echo \"VAULT_TOKEN=$VAULT_TOKEN\" | sudo tee -a /etc/nomad.d/nomad.conf
 
 cat <<CONFIG | sudo tee /etc/nomad.d/z-vault.hcl
@@ -47,7 +43,7 @@ CONFIG
 sudo systemctl restart nomad
 EOF
 
-  $ consul exec -service nomad-client - <<EOF
+  $ consul exec -node ${var.name}-client-nomad - <<EOF
 cat <<CONFIG | sudo tee /etc/nomad.d/z-vault.hcl
 vault {
   enabled = true

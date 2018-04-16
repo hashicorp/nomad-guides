@@ -43,7 +43,7 @@ variable "consul_config_override" { default = "" }
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_install" { default = false }
-variable "vault_version" { default = "0.9.6" }
+variable "vault_version" { default = "0.10.0" }
 variable "vault_url"     { default = "" }
 
 variable "vault_config_override" { default = "" }
@@ -51,7 +51,7 @@ variable "vault_config_override" { default = "" }
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "nomad_version" { default = "0.7.1" }
+variable "nomad_version" { default = "0.8.0" }
 variable "nomad_url"     { default = "" }
 
 variable "nomad_config_override" { default = "" }

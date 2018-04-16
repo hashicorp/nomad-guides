@@ -40,8 +40,15 @@ fi
 
 echo "Don't start Consul in -dev mode"
 cat <<ENVVARS | sudo tee /etc/consul.d/consul.conf
-CONSUL_HTTP_ADDR=http://127.0.0.1:8500
+CONSUL_HTTP_ADDR=127.0.0.1:8500
+CONSUL_HTTP_SSL=false
+CONSUL_HTTP_SSL_VERIFY=false
 ENVVARS
+
+echo "Configure Consul environment variables for HTTP API requests on login"
+cat <<PROFILE | sudo tee /etc/profile.d/consul.sh
+export CONSUL_ADDR=http://127.0.0.1:8500
+PROFILE
 
 echo "Restart Consul"
 sudo systemctl restart consul
@@ -50,11 +57,14 @@ echo "Configure Vault server"
 cat <<CONFIG | sudo tee $VAULT_CONFIG_FILE
 # https://www.vaultproject.io/docs/configuration/index.html
 cluster_name = "${name}"
+ui           = true
 
 # https://www.vaultproject.io/docs/configuration/storage/consul.html
 backend "consul" {
+  scheme  = "http"
   address = "127.0.0.1:8500"
   path    = "vault/"
+  service = "vault"
 }
 
 # https://www.vaultproject.io/docs/configuration/listener/tcp.html

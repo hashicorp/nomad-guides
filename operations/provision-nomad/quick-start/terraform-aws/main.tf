@@ -77,8 +77,7 @@ data "template_file" "bastion_quick_start" {
 }
 
 module "network_aws" {
-  # source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/network-aws"
+  source = "github.com/hashicorp-modules/network-aws?ref=f-refactor"
 
   name              = "${var.name}"
   vpc_cidr          = "${var.vpc_cidr}"
@@ -92,7 +91,7 @@ module "network_aws" {
   user_data         = <<EOF
 ${data.template_file.base_install.rendered} # Runtime install base tools
 ${data.template_file.consul_install.rendered} # Runtime install Consul in -dev mod
-${data.template_file.vault_install.rendered} # Runtime install Vault in -dev mode
+${var.vault_provision ? data.template_file.vault_install.rendered : "echo \"Don't provision Vault\""} # Runtime install Vault in -dev mode
 ${data.template_file.nomad_install.rendered} # Runtime install Nomad in -dev mod
 ${data.template_file.bastion_quick_start.rendered} # Configure Bastion quick start
 EOF
@@ -112,8 +111,7 @@ data "template_file" "consul_quick_start" {
 }
 
 module "consul_aws" {
-  # source = "github.com/hashicorp-modules/consul-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/consul-aws"
+  source = "github.com/hashicorp-modules/consul-aws?ref=f-refactor"
 
   name          = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id        = "${module.network_aws.vpc_id}"
@@ -148,8 +146,7 @@ data "template_file" "vault_quick_start" {
 }
 
 module "vault_aws" {
-  # source = "github.com/hashicorp-modules/vault-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/vault-aws"
+  source = "github.com/hashicorp-modules/vault-aws?ref=f-refactor"
 
   create        = "${var.vault_provision}" # Provision Vault cluster
   name          = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
@@ -187,8 +184,7 @@ data "template_file" "nomad_server_quick_start" {
 }
 
 module "nomad_server_aws" {
-  # source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/nomad-aws"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
 
   name          = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id        = "${module.network_aws.vpc_id}"
@@ -240,8 +236,7 @@ data "template_file" "java_install" {
 }
 
 module "nomad_client_aws" {
-  # source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
-  source = "../../../../../../hashicorp-modules/nomad-aws"
+  source = "github.com/hashicorp-modules/nomad-aws?ref=f-refactor"
 
   name          = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
   vpc_id        = "${module.network_aws.vpc_id}"
