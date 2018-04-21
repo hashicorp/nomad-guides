@@ -24,7 +24,7 @@ variable "vpc_cidrs_private" {
 }
 
 variable "nat_count"              { default = 1 }
-variable "bastion_release"        { default = "0.1.0-dev1" }
+variable "bastion_release"        { default = "0.1.0" }
 variable "bastion_consul_version" { default = "1.0.6" }
 variable "bastion_vault_version"  { default = "0.10.0" }
 variable "bastion_nomad_version"  { default = "0.8.0" }
@@ -42,7 +42,7 @@ variable "network_tags" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Consul Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "consul_release"    { default = "0.1.0-dev1" }
+variable "consul_release"    { default = "0.1.0" }
 variable "consul_version"    { default = "1.0.6" }
 variable "consul_os"         { default = "RHEL" }
 variable "consul_os_version" { default = "7.3" }
@@ -72,7 +72,7 @@ variable "consul_tags_list" {
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_provision"  { default = false }
-variable "vault_release"    { default = "0.1.0-dev1" }
+variable "vault_release"    { default = "0.1.0" }
 variable "vault_version"    { default = "0.10.0" }
 variable "vault_os"         { default = "RHEL" }
 variable "vault_os_version" { default = "7.3" }
@@ -100,7 +100,7 @@ variable "vault_tags_list" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "nomad_release"    { default = "0.1.0-dev1" }
+variable "nomad_release"    { default = "0.1.0" }
 variable "nomad_version"    { default = "0.8.0" }
 variable "nomad_os"         { default = "RHEL" }
 variable "nomad_os_version" { default = "7.3" }
