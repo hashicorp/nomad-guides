@@ -3,12 +3,12 @@
 *.tfstate.backup
 *.tfstate.lock.info
 
-# Module directory
+# Directories
 .terraform/
+.vagrant/
 
-# SSH Keys
-*.pem
 .vagrant
 nomad
 vault
 consul
+*.pem
