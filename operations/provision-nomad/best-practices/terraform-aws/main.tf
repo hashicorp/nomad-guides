@@ -113,7 +113,7 @@ module "network_aws" {
   nomad_version     = "${var.bastion_nomad_version}"
   os                = "${var.bastion_os}"
   os_version        = "${var.bastion_os_version}"
-  bastion_count     = "${var.bastion_count}"
+  bastion_count     = "${var.bastion_servers}"
   instance_profile  = "${module.consul_auto_join_instance_role.instance_profile_id}" # Override instance_profile
   instance_type     = "${var.bastion_instance}"
   image_id          = "${var.bastion_image_id}"
@@ -147,7 +147,7 @@ module "consul_aws" {
   name             = "${var.name}" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
   vpc_cidr         = "${module.network_aws.vpc_cidr}"
-  subnet_ids       = "${split(",", var.vault_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
+  subnet_ids       = "${split(",", var.consul_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
   release_version  = "${var.consul_release}"
   consul_version   = "${var.consul_version}"
   os               = "${var.consul_os}"
@@ -240,7 +240,7 @@ module "nomad_server_aws" {
   name             = "${var.name}-server" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
   vpc_cidr         = "${module.network_aws.vpc_cidr}"
-  subnet_ids       = "${split(",", var.vault_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
+  subnet_ids       = "${split(",", var.nomad_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
   release_version  = "${var.nomad_release}"
   nomad_version    = "${var.nomad_version}"
   consul_version   = "${var.consul_version}"
@@ -286,7 +286,7 @@ module "nomad_client_aws" {
   name             = "${var.name}-client" # Must match network_aws module name for Consul Auto Join to work
   vpc_id           = "${module.network_aws.vpc_id}"
   vpc_cidr         = "${module.network_aws.vpc_cidr}"
-  subnet_ids       = "${split(",", var.vault_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
+  subnet_ids       = "${split(",", var.nomad_public ? join(",", module.network_aws.subnet_public_ids) : join(",", module.network_aws.subnet_private_ids))}"
   release_version  = "${var.nomad_release}"
   nomad_version    = "${var.nomad_version}"
   consul_version   = "${var.consul_version}"

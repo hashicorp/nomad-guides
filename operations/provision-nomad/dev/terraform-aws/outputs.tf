@@ -11,6 +11,19 @@ ${module.network_aws.zREADME}To force the generation of a new key, the private k
       tls_private_key.key
 
 # ------------------------------------------------------------------------------
+# Local HTTP API Requests
+# ------------------------------------------------------------------------------
+
+If you're making HTTP API requests outside the Bastion (locally), set
+the below env vars.
+
+The `nomad_public` variable must be set to true for requests to work.
+
+`nomad_public`: ${var.nomad_public}
+
+  ${format("$ export NOMAD_ADDR=http://%s:4646", module.nomad_aws.nomad_lb_dns)}${var.vault_install ? format("\n  $ export VAULT_ADDR=http://%s:8200", module.vault_lb_aws.vault_lb_dns) : ""}${var.consul_install ? format("\n  $ export CONSUL_ADDR=http://%s:8500", module.consul_lb_aws.consul_lb_dns) : ""}
+
+# ------------------------------------------------------------------------------
 # Nomad Dev
 # ------------------------------------------------------------------------------
 
@@ -109,6 +122,30 @@ output "ssh_key_name" {
   value = "${module.ssh_keypair_aws.name}"
 }
 
+output "consul_lb_sg_id" {
+  value = "${module.consul_lb_aws.consul_lb_sg_id}"
+}
+
+output "consul_tg_http_8500_arn" {
+  value = "${module.consul_lb_aws.consul_tg_http_8500_arn}"
+}
+
+output "consul_lb_dns" {
+  value = "${module.consul_lb_aws.consul_lb_dns}"
+}
+
+output "vault_lb_sg_id" {
+  value = "${module.vault_lb_aws.vault_lb_sg_id}"
+}
+
+output "vault_tg_http_8200_arn" {
+  value = "${module.vault_lb_aws.vault_tg_http_8200_arn}"
+}
+
+output "vault_lb_dns" {
+  value = "${module.vault_lb_aws.vault_lb_dns}"
+}
+
 output "nomad_asg_id" {
   value = "${module.nomad_aws.nomad_asg_id}"
 }
@@ -125,42 +162,6 @@ output "nomad_tg_http_4646_arn" {
   value = "${module.nomad_aws.nomad_tg_http_4646_arn}"
 }
 
-output "nomad_tg_https_4646_arn" {
-  value = "${module.nomad_aws.nomad_tg_https_4646_arn}"
-}
-
 output "nomad_lb_dns" {
   value = "${module.nomad_aws.nomad_lb_dns}"
-}
-
-output "consul_lb_sg_id" {
-  value = "${module.consul_lb_aws.consul_lb_sg_id}"
-}
-
-output "consul_tg_http_8500_arn" {
-  value = "${module.consul_lb_aws.consul_tg_http_8500_arn}"
-}
-
-output "consul_tg_https_8080_arn" {
-  value = "${module.consul_lb_aws.consul_tg_https_8080_arn}"
-}
-
-output "consul_lb_dns" {
-  value = "${module.consul_lb_aws.consul_lb_dns}"
-}
-
-output "vault_lb_sg_id" {
-  value = "${module.vault_lb_aws.vault_lb_sg_id}"
-}
-
-output "vault_tg_http_8200_arn" {
-  value = "${module.vault_lb_aws.vault_tg_http_8200_arn}"
-}
-
-output "vault_tg_https_8200_arn" {
-  value = "${module.vault_lb_aws.vault_tg_https_8200_arn}"
-}
-
-output "vault_lb_dns" {
-  value = "${module.vault_lb_aws.vault_lb_dns}"
 }

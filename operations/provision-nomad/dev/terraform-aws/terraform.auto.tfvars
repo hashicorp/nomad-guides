@@ -13,7 +13,7 @@
 # vpc_cidrs_private = ["172.19.48.0/20", "172.19.64.0/20", "172.19.80.0/20",]
 
 # nat_count        = 1 # Defaults to 1
-# bastion_count    = 0 # Defaults to 0
+# bastion_servers  = 0 # Defaults to 0
 # bastion_image_id = "" # AMI ID override, defaults to base RHEL AMI
 
 # network_tags = {"owner" = "hashicorp", "TTL" = "24"}
@@ -43,6 +43,7 @@
 # vault_config_override = <<EOF
 # # These values will override the defaults
 # cluster_name = "dc1"
+# ui           = true
 #
 # storage "file_transactional" {
 #   path          = "/opt/vault/data"
@@ -50,7 +51,7 @@
 # }
 #
 # listener "tcp" {
-#   address     = "127.0.0.1:8200"
+#   address     = "0.0.0.0:8200"
 #   tls_disable = "true"
 # }
 # EOF
@@ -58,8 +59,15 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-# nomad_version = "0.8.0" # Nomad Version for runtime install, defaults to 0.8.0
-# nomad_url     = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
+# nomad_servers  = 3
+# nomad_instance = "t2.micro"
+# nomad_version  = "0.8.0" # Nomad Version for runtime install, defaults to 0.8.0
+# nomad_url      = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
+# nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
+
+# If 'nomad_public' is true, assign a public IP, open port 22 for public access, & provision into public subnets
+# to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD
+# nomad_public = true
 
 # nomad_config_override = <<EOF
 # datacenter   = "dc1"
@@ -102,19 +110,11 @@
 # }
 # EOF
 
-# nomad_count    = 3
-# nomad_instance = "t2.micro"
-# nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
+# nomad_docker_install = false # Install Docker on host
+# nomad_java_install   = false # Install Java on host
 
-# If 'nomad_public' is true, assign a public IP, open port 22 for public access, & provision into public subnets
-# to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD
-# nomad_public = false
-
-# nomad_docker_install = true # Install Docker on host
-# nomad_java_install   = true # Install Java on host
-#
 # nomad_tags = {"owner" = "hashicorp", "TTL" = "24"}
-#
+
 # nomad_tags_list = [
 #   {"key" = "owner", "value" = "hashicorp", "propagate_at_launch" = true},
 #   {"key" = "TTL", "value" = "24", "propagate_at_launch" = true}

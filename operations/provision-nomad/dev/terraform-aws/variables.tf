@@ -22,7 +22,7 @@ variable "vpc_cidrs_private" {
 }
 
 variable "nat_count"        { default = 1 }
-variable "bastion_count"    { default = 0 }
+variable "bastion_servers"  { default = 0 }
 variable "bastion_image_id" { default = "" }
 
 variable "network_tags" {
@@ -51,19 +51,18 @@ variable "vault_config_override" { default = "" }
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "nomad_version" { default = "0.8.0" }
-variable "nomad_url"     { default = "" }
-
-variable "nomad_config_override" { default = "" }
-
-variable "nomad_count"    { default = 1 }
+variable "nomad_servers"  { default = 1 }
 variable "nomad_instance" { default = "t2.micro" }
+variable "nomad_version"  { default = "0.8.0" }
+variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 
 variable "nomad_public" {
   description = "Assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
   default     = true
 }
+
+variable "nomad_config_override" { default = "" }
 
 variable "nomad_docker_install" { default = true }
 variable "nomad_java_install"   { default = true }

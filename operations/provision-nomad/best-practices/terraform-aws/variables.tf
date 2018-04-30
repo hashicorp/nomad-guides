@@ -2,8 +2,8 @@
 # General Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "name"              { default = "nomad-best-practices" }
-variable "common_name"       { default = "hashicorp.com" }
-variable "organization_name" { default = "HashiCorp Inc." }
+variable "common_name"       { default = "example.com" }
+variable "organization_name" { default = "Example Inc." }
 variable "provider"          { default = "aws" }
 variable "local_ip_url"      { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
 variable "download_certs"    { default = false }
@@ -24,14 +24,14 @@ variable "vpc_cidrs_private" {
 }
 
 variable "nat_count"              { default = 1 }
+variable "bastion_servers"        { default = 1 }
+variable "bastion_instance"       { default = "t2.small" }
 variable "bastion_release"        { default = "0.1.0" }
 variable "bastion_consul_version" { default = "1.0.6" }
 variable "bastion_vault_version"  { default = "0.10.0" }
 variable "bastion_nomad_version"  { default = "0.8.0" }
 variable "bastion_os"             { default = "RHEL" }
 variable "bastion_os_version"     { default = "7.3" }
-variable "bastion_count"          { default = 1 }
-variable "bastion_instance"       { default = "t2.small" }
 variable "bastion_image_id"       { default = "" }
 
 variable "network_tags" {
@@ -42,12 +42,12 @@ variable "network_tags" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Consul Variables
 # ---------------------------------------------------------------------------------------------------------------------
+variable "consul_servers"    { default = -1 }
+variable "consul_instance"   { default = "t2.small" }
 variable "consul_release"    { default = "0.1.0" }
 variable "consul_version"    { default = "1.0.6" }
 variable "consul_os"         { default = "RHEL" }
 variable "consul_os_version" { default = "7.3" }
-variable "consul_servers"    { default = -1 }
-variable "consul_instance"   { default = "t2.small" }
 variable "consul_image_id"   { default = "" }
 
 variable "consul_public" {
@@ -72,12 +72,12 @@ variable "consul_tags_list" {
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_provision"  { default = false }
+variable "vault_servers"    { default = -1 }
+variable "vault_instance"   { default = "t2.small" }
 variable "vault_release"    { default = "0.1.0" }
 variable "vault_version"    { default = "0.10.0" }
 variable "vault_os"         { default = "RHEL" }
 variable "vault_os_version" { default = "7.3" }
-variable "vault_servers"    { default = -1 }
-variable "vault_instance"   { default = "t2.small" }
 variable "vault_image_id"   { default = "" }
 
 variable "vault_public" {
@@ -100,13 +100,13 @@ variable "vault_tags_list" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
+variable "nomad_servers"    { default = -1 }
+variable "nomad_clients"    { default = 1 }
+variable "nomad_instance"   { default = "t2.small" }
 variable "nomad_release"    { default = "0.1.0" }
 variable "nomad_version"    { default = "0.8.0" }
 variable "nomad_os"         { default = "RHEL" }
 variable "nomad_os_version" { default = "7.3" }
-variable "nomad_servers"    { default = -1 }
-variable "nomad_clients"    { default = 1 }
-variable "nomad_instance"   { default = "t2.small" }
 variable "nomad_image_id"   { default = "" }
 
 variable "nomad_public" {

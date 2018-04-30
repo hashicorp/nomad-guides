@@ -19,7 +19,6 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
   "log_level": "INFO",
   "advertise_addr": "$LOCAL_IPV4",
   "client_addr": "0.0.0.0",
-  "log_level": "DEBUG",
   "ui": true,
   "retry_join": ["provider=${provider} tag_key=Consul-Auto-Join tag_value=${name}"]
 }

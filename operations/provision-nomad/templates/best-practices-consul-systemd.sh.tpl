@@ -28,10 +28,10 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_DIR/default.json
 {
   "datacenter": "${name}",
   "node_name": "$NODE_NAME",
-  "advertise_addr": "$LOCAL_IPV4",
   "data_dir": "/opt/consul/data",
-  "client_addr": "0.0.0.0",
   "log_level": "INFO",
+  "advertise_addr": "$LOCAL_IPV4",
+  "client_addr": "0.0.0.0",
   "ui": true,
   "server": true,
   "bootstrap_expect": ${consul_bootstrap},

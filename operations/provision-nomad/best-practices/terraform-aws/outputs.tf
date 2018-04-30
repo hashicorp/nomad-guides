@@ -11,22 +11,21 @@ using the below command.
       tls_private_key.key
 ${var.download_certs ?
 "\n${module.root_tls_self_signed_ca.zREADME}
-${module.leaf_tls_self_signed_cert.zREADME}"
-: ""}
+${module.leaf_tls_self_signed_cert.zREADME}
 # ------------------------------------------------------------------------------
-# Nomad Best Practices
+# Local HTTP API Requests
 # ------------------------------------------------------------------------------
 
-Once on the Bastion host, you can use Consul's DNS functionality to seamlessly
-SSH into other Consul or Nomad nodes if they exist.
-
-  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad.service.consul
-  $ ssh -A ${module.nomad_client_aws.nomad_username}@nomad-client.service.consul
-  $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
-
-  ${var.vault_provision ? "# Vault must be initialized & unsealed for this command to work\n  $ ssh -A ${module.vault_aws.vault_username}@vault.service.consul\n" : ""}
 If you're making HTTPS API requests outside the Bastion (locally), set
 the below env vars.
+
+The `nomad_public`, `consul_public`, and `vault_public` variables must be set
+to true for requests to work.
+
+`nomad_public`: ${var.nomad_public}
+`consul_public`: ${var.consul_public}
+`vault_provision`: ${var.vault_provision}
+`vault_public`: ${var.vault_public}
 
   $ export NOMAD_ADDR=https://${module.nomad_server_aws.nomad_lb_dns}:4646
   $ export NOMAD_CACERT=./${module.leaf_tls_self_signed_cert.ca_cert_filename}
@@ -38,12 +37,22 @@ the below env vars.
   $ export CONSUL_CACERT=./${module.leaf_tls_self_signed_cert.ca_cert_filename}
   $ export CONSUL_CLIENT_CERT=./${module.leaf_tls_self_signed_cert.leaf_cert_filename}
   $ export CONSUL_CLIENT_KEY=./${module.leaf_tls_self_signed_cert.leaf_private_key_filename}
-${var.vault_provision ?
-"  \n  $ export VAULT_ADDR=https://${module.vault_aws.vault_lb_dns}:8200
+
+  $ export VAULT_ADDR=https://${module.vault_aws.vault_lb_dns}:8200
   $ export VAULT_CACERT=./${module.leaf_tls_self_signed_cert.ca_cert_filename}
   $ export VAULT_CLIENT_CERT=./${module.leaf_tls_self_signed_cert.leaf_cert_filename}
-  $ export VAULT_CLIENT_KEY=./${module.leaf_tls_self_signed_cert.leaf_private_key_filename}
-" : ""}
+  $ export VAULT_CLIENT_KEY=./${module.leaf_tls_self_signed_cert.leaf_private_key_filename}\n" : ""}
+# ------------------------------------------------------------------------------
+# Nomad Best Practices
+# ------------------------------------------------------------------------------
+
+Once on the Bastion host, you can use Consul's DNS functionality to seamlessly
+SSH into other Consul or Nomad nodes if they exist.
+
+  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad.service.consul
+  $ ssh -A ${module.nomad_client_aws.nomad_username}@nomad-client.service.consul
+  $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
+${var.vault_provision ? "\n  # Vault must be initialized & unsealed for this command to work\n  $ ssh -A ${module.vault_aws.vault_username}@vault.service.consul\n" : ""}
 ${module.nomad_server_aws.zREADME}
 ${module.consul_aws.zREADME}
 ${var.vault_provision ?
@@ -150,6 +159,46 @@ output "consul_sg_id" {
   value = "${module.consul_aws.consul_sg_id}"
 }
 
+output "consul_lb_sg_id" {
+  value = "${module.consul_aws.consul_lb_sg_id}"
+}
+
+output "consul_tg_http_8500_arn" {
+  value = "${module.consul_aws.consul_tg_http_8500_arn}"
+}
+
+output "consul_tg_https_8080_arn" {
+  value = "${module.consul_aws.consul_tg_https_8080_arn}"
+}
+
+output "consul_lb_dns" {
+  value = "${module.consul_aws.consul_lb_dns}"
+}
+
+output "vault_asg_id" {
+  value = "${module.vault_aws.vault_asg_id}"
+}
+
+output "vault_sg_id" {
+  value = "${module.vault_aws.vault_sg_id}"
+}
+
+output "vault_lb_sg_id" {
+  value = "${module.vault_aws.vault_lb_sg_id}"
+}
+
+output "vault_tg_http_8200_arn" {
+  value = "${module.vault_aws.vault_tg_http_8200_arn}"
+}
+
+output "vault_tg_https_8200_arn" {
+  value = "${module.vault_aws.vault_tg_https_8200_arn}"
+}
+
+output "vault_lb_dns" {
+  value = "${module.vault_aws.vault_lb_dns}"
+}
+
 output "nomad_server_asg_id" {
   value = "${module.nomad_server_aws.nomad_asg_id}"
 }
@@ -158,10 +207,42 @@ output "nomad_server_sg_id" {
   value = "${module.nomad_server_aws.nomad_sg_id}"
 }
 
+output "nomad_server_lb_sg_id" {
+  value = "${module.nomad_server_aws.nomad_lb_sg_id}"
+}
+
+output "nomad_server_tg_http_4646_arn" {
+  value = "${module.nomad_server_aws.nomad_tg_http_4646_arn}"
+}
+
+output "nomad_server_tg_https_4646_arn" {
+  value = "${module.nomad_server_aws.nomad_tg_https_4646_arn}"
+}
+
+output "nomad_server_lb_dns" {
+  value = "${module.nomad_server_aws.nomad_lb_dns}"
+}
+
 output "nomad_client_asg_id" {
   value = "${module.nomad_client_aws.nomad_asg_id}"
 }
 
 output "nomad_client_sg_id" {
   value = "${module.nomad_client_aws.nomad_sg_id}"
+}
+
+output "nomad_client_lb_sg_id" {
+  value = "${module.nomad_client_aws.nomad_lb_sg_id}"
+}
+
+output "nomad_client_tg_http_4646_arn" {
+  value = "${module.nomad_client_aws.nomad_tg_http_4646_arn}"
+}
+
+output "nomad_client_tg_https_4646_arn" {
+  value = "${module.nomad_client_aws.nomad_tg_https_4646_arn}"
+}
+
+output "nomad_client_lb_dns" {
+  value = "${module.nomad_client_aws.nomad_lb_dns}"
 }

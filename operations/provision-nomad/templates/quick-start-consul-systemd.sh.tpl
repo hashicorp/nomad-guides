@@ -13,14 +13,13 @@ cat <<CONFIG | sudo tee $CONSUL_CONFIG_FILE
 {
   "datacenter": "${name}",
   "node_name": "$NODE_NAME",
-  "advertise_addr": "$LOCAL_IPV4",
   "data_dir": "/opt/consul/data",
+  "log_level": "INFO",
+  "advertise_addr": "$LOCAL_IPV4",
   "client_addr": "0.0.0.0",
-  "log_level": "DEBUG",
   "ui": true,
   "server": true,
   "bootstrap_expect": ${consul_bootstrap},
-  "leave_on_terminate": true,
   "retry_join": ["provider=${provider} tag_key=Consul-Auto-Join tag_value=${name}"]
 }
 CONFIG

@@ -23,7 +23,7 @@ variable "vpc_cidrs_private" {
 }
 
 variable "nat_count"        { default = 1 }
-variable "bastion_count"    { default = 1 }
+variable "bastion_servers"  { default = 1 }
 variable "bastion_instance" { default = "t2.micro" }
 variable "bastion_image_id" { default = "" }
 
@@ -35,15 +35,15 @@ variable "network_tags" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Consul Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "consul_version"  { default = "1.0.6" }
-variable "consul_url"      { default = "" }
 variable "consul_servers"  { default = -1 }
 variable "consul_instance" { default = "t2.micro" }
+variable "consul_version"  { default = "1.0.6" }
+variable "consul_url"      { default = "" }
 variable "consul_image_id" { default = "" }
 
 variable "consul_public" {
   description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
-  default     = false
+  default     = true
 }
 
 variable "consul_server_config_override" { default = "" }
@@ -63,15 +63,15 @@ variable "consul_tags_list" {
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_provision" { default = false }
-variable "vault_version"   { default = "0.10.0" }
-variable "vault_url"       { default = "" }
 variable "vault_servers"   { default = -1 }
 variable "vault_instance"  { default = "t2.micro" }
+variable "vault_version"   { default = "0.10.0" }
+variable "vault_url"       { default = "" }
 variable "vault_image_id"  { default = "" }
 
 variable "vault_public" {
   description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
-  default     = false
+  default     = true
 }
 
 variable "vault_server_config_override" { default = "" }
@@ -89,16 +89,16 @@ variable "vault_tags_list" {
 # ---------------------------------------------------------------------------------------------------------------------
 # Nomad Variables
 # ---------------------------------------------------------------------------------------------------------------------
-variable "nomad_version"  { default = "0.8.0" }
-variable "nomad_url"      { default = "" }
 variable "nomad_servers"  { default = -1 }
 variable "nomad_clients"  { default = 1 }
 variable "nomad_instance" { default = "t2.micro" }
+variable "nomad_version"  { default = "0.8.0" }
+variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 
 variable "nomad_public" {
   description = "If true, assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
-  default     = false
+  default     = true
 }
 
 variable "nomad_server_config_override" { default = "" }
