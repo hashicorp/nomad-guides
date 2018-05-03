@@ -207,8 +207,8 @@ You can interact with Nomad using any of the CLI (https://www.nomadproject.io/do
   $ curl -X GET http://127.0.0.1:4646/v1/jobs | jq '.' # Check that the job is stopped
 
 Visit the Nomad UI: http://#{private_ip}:#{nomad_host_port}
-#{consul_install ? 'Visit the Consul UI: http://'+ private_ip + ':' + consul_host_port : ''}
-#{vault_install ? 'Visit the Vault UI: http://' + private_ip + ':' + vault_host_port : ''}
+#{consul_install ? 'Visit the Consul UI: http://'+ private_ip + ':' + consul_host_port.to_s : ''}
+#{vault_install ? 'Visit the Vault UI: http://' + private_ip + ':' + vault_host_port.to_s : ''}
 
 Don't forget to tear your VM down after.
 
