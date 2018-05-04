@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+region=$1
+sleep 15
+echo "{ \"region\": \"$region\" }"
