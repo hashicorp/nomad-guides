@@ -112,7 +112,7 @@ If you want to use open source Terraform instead of TFE, you can clone this repo
 1. Fork this repository by clicking the Fork button in the upper right corner of the screen and selecting your own personal GitHub account or organization.
 1. Create a workspace in your TFE organization called microservices-demo.
 1. Configure the workspace to connect to the fork of this repository in your own Github account.
-1. Set the Terraform Working Directory to "application-deployment/microservices".
+1. Set the Terraform Working Directory to "application-deployment/microservices/aws".
 1. On the Variables tab of your workspace, add Terraform variables as described below.
 1. If you used Packer to build a new AMI, set the ami variable to the AMI ID of the new AMI; otherwise, you can use the default value. If you built your AMI in a region different from us-east-1, then set the region variable to that region and set the subnet_az variable to an availability zone in that region.
 1. Set the key_name variable to the name of your private key and set the private_key_data variable to the contents of the private key. Be sure to mark the private_key_data variable as sensitive.
