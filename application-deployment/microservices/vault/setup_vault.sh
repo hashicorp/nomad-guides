@@ -20,7 +20,7 @@ vault write aws-tf/roles/deploy policy=@aws-policy.json
 vault policy write sockshop-read sockshop-read.hcl
 
 # Write the cataloguedb and userdb passwords to Vault
-vault write secret/sockshop/databases/catalougedb pwd=dioe93kdo931
+vault write secret/sockshop/databases/cataloguedb pwd=dioe93kdo931
 vault write secret/sockshop/databases/userdb pwd=wo39c5h2sl4r
 
 # Setup Vault policy/role for Nomad
