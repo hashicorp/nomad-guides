@@ -4,7 +4,7 @@ resource "aws_vpc" "sockshop" {
   enable_dns_hostnames = true
 
   tags {
-    Name = "${var.name_tag_prefix} Sock Shop VPC"
+    Name = "${var.name_tag_prefix} VPC"
   }
 }
 
@@ -13,7 +13,7 @@ resource "aws_internet_gateway" "sockshop" {
   vpc_id = "${aws_vpc.sockshop.id}"
 
   tags {
-    Name = "${var.name_tag_prefix} Sock Shop IGW"
+    Name = "${var.name_tag_prefix} IGW"
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_subnet" "public-subnet" {
   depends_on = ["aws_internet_gateway.sockshop"]
 
   tags {
-    Name = "${var.name_tag_prefix} Sock Shop Public Subnet"
+    Name = "${var.name_tag_prefix} Public Subnet"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_route_table" "public" {
   }
 
   tags {
-    Name = "${var.name_tag_prefix} Sock Shop Public Route Table"
+    Name = "${var.name_tag_prefix} Public Route Table"
   }
 }
 
