@@ -15,7 +15,7 @@ variable "vpc_id" {}
 variable "subnet_id" {}
 
 resource "aws_security_group" "primary" {
-  name   = "nomad-consul-demo"
+  name   = "${var.name_tag_prefix}-sg"
   vpc_id = "${var.vpc_id}"
 
   # SSH
@@ -147,7 +147,7 @@ resource "aws_security_group" "primary" {
   }
 
   tags {
-    Name = "nomad-consul-demo"
+    Name = "${var.name_tag_prefix}-sg"
   }
 }
 
@@ -218,12 +218,12 @@ resource "aws_instance" "client" {
 }
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  name_prefix = "nomadconsul"
+  name_prefix = "${var.name_tag_prefix}-profile"
   role        = "${aws_iam_role.instance_role.name}"
 }
 
 resource "aws_iam_role" "instance_role" {
-  name_prefix        = "nomadconsul"
+  name_prefix        = "${var.name_tag_prefix}-role"
   assume_role_policy = "${data.aws_iam_policy_document.instance_role.json}"
 }
 
@@ -240,7 +240,7 @@ data "aws_iam_policy_document" "instance_role" {
 }
 
 resource "aws_iam_role_policy" "auto_discover_cluster" {
-  name   = "auto-discover-cluster"
+  name   = "${var.name_tag_prefix}-auto-discover-cluster"
   role   = "${aws_iam_role.instance_role.id}"
   policy = "${data.aws_iam_policy_document.auto_discover_cluster.json}"
 }
