@@ -53,7 +53,7 @@ Part 1 is optional and not required for part 2.
 # Part 1 (Fabio Dynamic Routing)
 
 ## Challenge
-Orchestrators and microservice architectures enable operatores and developers to more efficiently utilize their compute resources and manage the lifecycles of their applicaitons. However, the highly ephemeral nature of these technologies makes configuration, load balancing, and service discovery difficult.
+Orchestrators and microservice architectures enable operators and developers to more efficiently utilize their compute resources and manage the lifecycles of their applications. However, the highly ephemeral nature of these technologies makes configuration, load balancing, and service discovery difficult.
 
 ## Solution
 We can leverage Nomad, Consul, and load balancers like Fabio to automtically create routes to our containers. This removes the need for hardcoded configurations and enables our microservices to locate one another.

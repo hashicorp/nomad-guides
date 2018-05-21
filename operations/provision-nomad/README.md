@@ -72,4 +72,4 @@ $ cd operations/provision-nomad/best-practices/terraform-aws
 
 ## Next Steps
 
-Now that you've provisioned and configured Nomad, start walking through the [Nomad Guides](https://www.vaultproject.io/guides/index.html).
+Now that you've provisioned and configured Nomad, start walking through the [Nomad Guides](https://www.nomadproject.io/guides/index.html).
