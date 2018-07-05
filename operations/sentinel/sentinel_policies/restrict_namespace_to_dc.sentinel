@@ -1,0 +1,12 @@
+main = rule { task_datacenter() }
+task_datacenter = func() {
+  allowed_datacenter = "dc1"
+  ns = job.namespace
+  for job.datacenters as datacenter {
+    if ns == "unit1" and datacenter in allowed_datacenter {
+      return true
+    } else {
+    return false
+    }
+  }
+}
