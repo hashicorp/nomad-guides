@@ -61,7 +61,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # nomad_servers  = 3
 # nomad_instance = "t2.micro"
-# nomad_version  = "0.8.0" # Nomad Version for runtime install, defaults to 0.8.0
+# nomad_version  = "0.8.4" # Nomad Version for runtime install, defaults to 0.8.4
 # nomad_url      = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
 

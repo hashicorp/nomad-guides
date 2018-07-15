@@ -53,7 +53,7 @@ variable "vault_config_override" { default = "" }
 # ---------------------------------------------------------------------------------------------------------------------
 variable "nomad_servers"  { default = 1 }
 variable "nomad_instance" { default = "t2.micro" }
-variable "nomad_version"  { default = "0.8.0" }
+variable "nomad_version"  { default = "0.8.4" }
 variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 
