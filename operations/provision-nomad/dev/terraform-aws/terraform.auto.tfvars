@@ -36,7 +36,7 @@
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 # vault_install = true # Install Vault
-# vault_version = "0.10.0" # Vault Version for runtime install, defaults to 0.10.0
+# vault_version = "0.10.3" # Vault Version for runtime install, defaults to 0.10.3
 # vault_url     = "" # Vault Enterprise download URL for runtime install, defaults to Vault OSS
 
 # If Vault config is overridden, Vault will no longer run in -dev mode
