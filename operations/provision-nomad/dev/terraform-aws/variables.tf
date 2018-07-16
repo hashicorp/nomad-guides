@@ -34,7 +34,7 @@ variable "network_tags" {
 # Consul Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "consul_install" { default = false }
-variable "consul_version" { default = "1.0.6" }
+variable "consul_version" { default = "1.2.0" }
 variable "consul_url"     { default = "" }
 
 variable "consul_config_override" { default = "" }
@@ -43,7 +43,7 @@ variable "consul_config_override" { default = "" }
 # Vault Variables
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_install" { default = false }
-variable "vault_version" { default = "0.10.0" }
+variable "vault_version" { default = "0.10.3" }
 variable "vault_url"     { default = "" }
 
 variable "vault_config_override" { default = "" }
@@ -53,7 +53,7 @@ variable "vault_config_override" { default = "" }
 # ---------------------------------------------------------------------------------------------------------------------
 variable "nomad_servers"  { default = 1 }
 variable "nomad_instance" { default = "t2.micro" }
-variable "nomad_version"  { default = "0.8.0" }
+variable "nomad_version"  { default = "0.8.4" }
 variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 

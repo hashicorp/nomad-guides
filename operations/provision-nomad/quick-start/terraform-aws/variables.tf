@@ -37,7 +37,7 @@ variable "network_tags" {
 # ---------------------------------------------------------------------------------------------------------------------
 variable "consul_servers"  { default = -1 }
 variable "consul_instance" { default = "t2.micro" }
-variable "consul_version"  { default = "1.0.6" }
+variable "consul_version"  { default = "1.2.0" }
 variable "consul_url"      { default = "" }
 variable "consul_image_id" { default = "" }
 
@@ -65,7 +65,7 @@ variable "consul_tags_list" {
 variable "vault_provision" { default = false }
 variable "vault_servers"   { default = -1 }
 variable "vault_instance"  { default = "t2.micro" }
-variable "vault_version"   { default = "0.10.0" }
+variable "vault_version"   { default = "0.10.3" }
 variable "vault_url"       { default = "" }
 variable "vault_image_id"  { default = "" }
 
@@ -92,7 +92,7 @@ variable "vault_tags_list" {
 variable "nomad_servers"  { default = -1 }
 variable "nomad_clients"  { default = 1 }
 variable "nomad_instance" { default = "t2.micro" }
-variable "nomad_version"  { default = "0.8.0" }
+variable "nomad_version"  { default = "0.8.4" }
 variable "nomad_url"      { default = "" }
 variable "nomad_image_id" { default = "" }
 

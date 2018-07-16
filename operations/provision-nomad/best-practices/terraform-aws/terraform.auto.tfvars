@@ -15,9 +15,9 @@
 # bastion_servers        = 1 # Number of bastion hosts to provision across public subnets, defaults to public subnet count.
 # bastion_instance       = "t2.micro"
 # bastion_release        = "0.1.0" # Release version tag (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1)
-# bastion_consul_version = "1.0.6" # Consul version tag (e.g. 1.0.6 or 1.0.6-ent) - https://releases.hashicorp.com/consul/
-# bastion_vault_version  = "0.10.0" # Vault version tag (e.g. 0.10.0 or 0.10.0-ent) - https://releases.hashicorp.com/vault/
-# bastion_nomad_version  = "0.8.0" # Nomad version tag (e.g. 0.8.0 or 0.8.0-ent) - https://releases.hashicorp.com/nomad/
+# bastion_consul_version = "1.2.0" # Consul version tag (e.g. 1.2.0 or 1.2.0-ent) - https://releases.hashicorp.com/consul/
+# bastion_vault_version  = "0.10.3" # Vault version tag (e.g. 0.10.3 or 0.10.3-ent) - https://releases.hashicorp.com/vault/
+# bastion_nomad_version  = "0.8.4" # Nomad version tag (e.g. 0.8.4 or 0.8.4-ent) - https://releases.hashicorp.com/nomad/
 # bastion_os             = "Ubuntu" # OS (e.g. RHEL, Ubuntu), defaults to RHEL
 # bastion_os_version     = "16.04" # OS Version (e.g. 7.3 for RHEL, 16.04 for Ubuntu), defaults to 7.3
 # bastion_image_id       = "" # AMI ID override, defaults to base RHEL AMI
@@ -30,7 +30,7 @@
 # consul_servers    = 3 # Number of Consul servers to provision across public subnets, defaults to public subnet count.
 # consul_instance   = "t2.micro"
 # consul_release    = "0.1.0" # Release version tag (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1)
-# consul_version    = "1.0.6" # Consul version tag (e.g. 1.0.6 or 1.0.6-ent) - https://releases.hashicorp.com/consul/
+# consul_version    = "1.2.0" # Consul version tag (e.g. 1.2.0 or 1.2.0-ent) - https://releases.hashicorp.com/consul/
 # consul_os         = "RHEL" # OS (e.g. RHEL, Ubuntu)
 # consul_os_version = "7.3" # OS Version (e.g. 7.3 for RHEL, 16.04 for Ubuntu)
 # consul_image_id   = "" # AMI ID override, defaults to base RHEL AMI
@@ -67,7 +67,7 @@
 # vault_servers    = 3 # Number of Vault servers, defaults to public count
 # vault_instance   = "t2.micro"
 # vault_release    = "0.1.0" # Release version tag (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1)
-# vault_version    = "0.10.0" #  Version tag (e.g. 0.10.0 or 0.10.0-ent) - https://releases.hashicorp.com/vault/
+# vault_version    = "0.10.3" #  Version tag (e.g. 0.10.3 or 0.10.3-ent) - https://releases.hashicorp.com/vault/
 # vault_os         = "RHEL" # OS (e.g. RHEL, Ubuntu)
 # vault_os_version = "7.3" # OS Version (e.g. 7.3 for RHEL, 16.04 for Ubuntu)
 # vault_image_id   = "" # AMI ID override, defaults to base RHEL AMI
@@ -95,7 +95,7 @@
 # nomad_clients    = 1 # Number of Nomad client nodes to provision across public subnets, defaults to public subnet count.
 # nomad_instance   = "t2.micro"
 # nomad_release    = "0.1.0" # Release version tag (e.g. 0.1.0, 0.1.0-rc1, 0.1.0-beta1, 0.1.0-dev1)
-# nomad_version    = "0.8.0" # Nomad version tag (e.g. 0.8.0 or 0.8.0-ent) - https://releases.hashicorp.com/nomad/
+# nomad_version    = "0.8.4" # Nomad version tag (e.g. 0.8.4 or 0.8.4-ent) - https://releases.hashicorp.com/nomad/
 # nomad_os         = "RHEL" # OS (e.g. RHEL, Ubuntu)
 # nomad_os_version = "7.3" # OS Version (e.g. 7.3 for RHEL, 16.04 for Ubuntu)
 # nomad_image_id   = "" # AMI ID override, defaults to base RHEL AMI
