@@ -7,6 +7,9 @@
 .terraform/
 .vagrant/
 
+# Ignored Terraform files
+gitignore.tf
+
 .vagrant
 nomad
 vault
