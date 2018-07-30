@@ -76,4 +76,7 @@ echo '' | sudo tee /etc/nomad.d/nomad.conf
 echo "Stop Nomad now that the CLI is pointing to a live Nomad cluster"
 sudo systemctl stop nomad
 
+echo "Install Wetty"
+sudo curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/shared/scripts/web-terminal.sh | bash
+
 echo "[---quick-start-bastion-systemd.sh Complete---]"
