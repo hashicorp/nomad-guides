@@ -51,7 +51,4 @@ fi
 echo "Restart Nomad"
 sudo systemctl restart nomad
 
-echo "Install Wetty"
-sudo curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/shared/scripts/web-terminal.sh | bash
-
 echo "[---install-nomad-systemd.sh Complete---]"
