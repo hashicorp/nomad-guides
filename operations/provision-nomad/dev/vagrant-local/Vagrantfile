@@ -36,6 +36,14 @@ nomad_user = "root"
 docker_install = ["true", "1"].include?((ENV['DOCKER_INSTALL'] || true).to_s.downcase)
 java_install = ["true", "1"].include?((ENV['JAVA_INSTALL'] || true).to_s.downcase)
 
+# Wetty variables
+wetty_host_port = ENV['WETTY_HOST_PORT'] || 3030
+wetty_install = ["true", "1"].include?((ENV['WETTY_INSTALL'] || true).to_s.downcase)
+wetty_group = ENV['WETTY_GROUP'] || "wetty"
+wetty_user = ENV['WETTY_USER'] || "wetty"
+wetty_password = ENV['WETTY_PASSWORD'] || "wetty"
+wetty_comment = "Wetty Web Terminal SSH user"
+
 $nomad_setup = <<SCRIPT
 echo "Minimal configuration for Nomad UI"
 cat <<CONFIG | sudo tee /etc/nomad.d/default.hcl
@@ -139,6 +147,21 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/nomad/scripts/install-java.sh | bash"
   end
 
+  if (wetty_install)
+    # Forward Wetty port
+    config.vm.network :forwarded_port, guest: 3030, host: wetty_host_port, auto_correct: true
+
+    # Install Wetty
+    config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/shared/scripts/web-terminal.sh"
+    config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/shared/scripts/setup-ssh-user.sh",
+      env: {
+        "GROUP" => wetty_group,
+        "USER" => wetty_user,
+        "PASSWORD" => wetty_password,
+        "COMMENT" => wetty_comment,
+      }
+  end
+
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
     p.memory = "1024"
@@ -190,6 +213,7 @@ or API (https://www.nomadproject.io/api/index.html) commands.
 Visit the Nomad UI: http://#{private_ip}:#{nomad_host_port}
 #{consul_install ? 'Visit the Consul UI: http://'+ private_ip + ':' + consul_host_port.to_s : ''}
 #{vault_install ? 'Visit the Vault UI: http://' + private_ip + ':' + vault_host_port.to_s : ''}
+#{wetty_install ? 'Visit the Web Terminal (u: ' + wetty_user + '/p: ' + wetty_password + '): http://' + private_ip + ':' + wetty_host_port.to_s : ''}
 
 Don't forget to tear your VM down after.
 

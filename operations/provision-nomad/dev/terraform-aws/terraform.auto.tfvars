@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # General Variables
 # ---------------------------------------------------------------------------------------------------------------------
+# create    = true
 # name      = "nomad-dev"
 # ami_owner = "099720109477" # Base image owner, defaults to RHEL
 # ami_name  = "*ubuntu-xenial-16.04-amd64-server-*" # Base image name, defaults to RHEL
@@ -12,8 +13,14 @@
 # vpc_cidrs_public  = ["172.19.0.0/20", "172.19.16.0/20", "172.19.32.0/20",]
 # vpc_cidrs_private = ["172.19.48.0/20", "172.19.64.0/20", "172.19.80.0/20",]
 
+# CIDRs to be given external access if the '*_public' variable is true; Terraform will
+# automatically add the CIDR of the machine it is being run on to this list, or
+# you can alternatively discover your IP by googling "what is my ip"
+# public_cidrs = ["0.0.0.0/0",] # Open cluster to the public internet (NOT ADVISED!)
+
 # nat_count        = 1 # Defaults to 1
 # bastion_servers  = 0 # Defaults to 0
+# bastion_instance = "t2.micro"
 # bastion_image_id = "" # AMI ID override, defaults to base RHEL AMI
 
 # network_tags = {"owner" = "hashicorp", "TTL" = "24"}
@@ -65,8 +72,9 @@
 # nomad_url      = "" # Nomad Enterprise download URL for runtime install, defaults to Nomad OSS
 # nomad_image_id = "" # AMI ID override, defaults to base RHEL AMI
 
-# If 'nomad_public' is true, assign a public IP, open port 22 for public access, & provision into public subnets
-# to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD
+# If 'nomad_public' is true, assign a public IP, open port 22 for public access,
+# & provision into public subnets to provide easier accessibility from the
+# 'public_cidrs' without going through a Bastion host - DO NOT DO THIS IN PROD
 # nomad_public = true
 
 # nomad_config_override = <<EOF

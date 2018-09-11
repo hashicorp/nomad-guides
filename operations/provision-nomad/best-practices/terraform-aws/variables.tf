@@ -1,12 +1,14 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # General Variables
 # ---------------------------------------------------------------------------------------------------------------------
+variable "create"            { default = true }
 variable "name"              { default = "nomad-best-practices" }
 variable "common_name"       { default = "example.com" }
 variable "organization_name" { default = "Example Inc." }
 variable "provider"          { default = "aws" }
 variable "local_ip_url"      { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
-variable "download_certs"    { default = false }
+variable "download_certs"    { default = true }
+variable "override"          { default = "@#%*-_=+[]{}:?"}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Network Variables
@@ -23,6 +25,12 @@ variable "vpc_cidrs_private" {
   default = ["10.139.11.0/24", "10.139.12.0/24", "10.139.13.0/24",]
 }
 
+variable "public_cidrs" {
+  description = "Optional list of public cidrs to set on resources when the \"*_public\" variable is `true`, defaults to the local workstation IP"
+  type        = "list"
+  default     = []
+}
+
 variable "nat_count"              { default = 1 }
 variable "bastion_servers"        { default = 1 }
 variable "bastion_instance"       { default = "t2.small" }
@@ -36,7 +44,7 @@ variable "bastion_image_id"       { default = "" }
 
 variable "network_tags" {
   type    = "map"
-  default = { }
+  default = {}
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -60,12 +68,12 @@ variable "consul_client_config_override" { default = "" }
 
 variable "consul_tags" {
   type    = "map"
-  default = { }
+  default = {}
 }
 
 variable "consul_tags_list" {
   type    = "list"
-  default = [ ]
+  default = []
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -89,12 +97,12 @@ variable "vault_server_config_override" { default = "" }
 
 variable "vault_tags" {
   type    = "map"
-  default = { }
+  default = {}
 }
 
 variable "vault_tags_list" {
   type    = "list"
-  default = [ ]
+  default = []
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -121,10 +129,10 @@ variable "nomad_client_java_install"    { default = true }
 
 variable "nomad_tags" {
   type    = "map"
-  default = { }
+  default = {}
 }
 
 variable "nomad_tags_list" {
   type    = "list"
-  default = [ ]
+  default = []
 }

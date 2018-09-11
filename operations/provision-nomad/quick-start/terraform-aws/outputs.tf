@@ -1,78 +1,55 @@
 output "zREADME" {
   value = <<README
 
-Your "${var.name}" AWS Nomad Quick Start cluster has been
+Your "${var.name}" AWS Consul Quick Start cluster has been
 successfully provisioned!
 
 ${module.network_aws.zREADME}
 # ------------------------------------------------------------------------------
-# Local HTTP API Requests
+# External Cluster Access
 # ------------------------------------------------------------------------------
 
-If you're making HTTP API requests outside the Bastion (locally), set
-the below env vars.
+If you'd like to interact with your cluster externally, use one of the below
+options.
 
-The `nomad_public`, `consul_public`, and `vault_public` variables must be set
-to true for requests to work.
+The `consul_public` variable must be set to true for any of these options to work.
 
-`nomad_public`: ${var.nomad_public}
 `consul_public`: ${var.consul_public}
-`vault_provision`: ${var.vault_provision}
-`vault_public`: ${var.vault_public}
 
-  $ export NOMAD_ADDR=http://${module.nomad_server_aws.nomad_lb_dns}:4646
-  $ export CONSUL_ADDR=http://${module.consul_aws.consul_lb_dns}:8500${var.vault_provision ? format("\n  $ export VAULT_ADDR=http://%s:8200", module.vault_aws.vault_lb_dns) : ""}
+Below are the list of CIDRs that are whitelisted to have external access. This
+list is populated from the "public_cidrs" variable merged with the external cidr
+of the local workstation running Terraform for ease of use. If your CIDR does not
+appear in the list, you can find it by googling "What is my ip" and add it to the
+"public_cidrs" Terraform variable.
+
+`public_cidrs`:
+  ${join("\n  ", compact(concat(list(local.workstation_external_cidr), var.public_cidrs)))}
+
+1.) Use Wetty (Web + tty), a web terminal for the cluster over HTTP and HTTPS
+
+  ${join("\n  ", formatlist("%s Wetty Url: http://%s:3030/wetty", list("Bastion", "Consul"), list(element(concat(module.network_aws.bastion_ips_public, list("")), 0), module.consul_aws.consul_lb_dns)))}
+  Wetty Username: wetty-${var.name}
+  Wetty Password: ${element(concat(random_string.wetty_password.*.result, list("")), 0)}
+
+2.) Set the below env var(s) and use Consul's CLI or HTTP API
+
+  ${format("$ export CONSUL_ADDR=http://%s:8500", module.consul_aws.consul_lb_dns)}
+  ${format("$ export CONSUL_HTTP_ADDR=http://%s:8500", module.consul_aws.consul_lb_dns)}
 
 # ------------------------------------------------------------------------------
-# Nomad Quick Start
+# Consul Quick Start
 # ------------------------------------------------------------------------------
 
 Once on the Bastion host, you can use Consul's DNS functionality to seamlessly
 SSH into other Consul or Nomad nodes if they exist.
 
-  $ ssh -A ${module.nomad_server_aws.nomad_username}@nomad.service.consul
-  $ ssh -A ${module.nomad_client_aws.nomad_username}@nomad-client.service.consul
   $ ssh -A ${module.consul_aws.consul_username}@consul.service.consul
-  ${var.vault_provision ? "\n  # Vault must be initialized & unsealed for this command to work\n  $ ssh -A ${module.vault_aws.vault_username}@vault.service.consul\n" : ""}
-${module.nomad_server_aws.zREADME}
+
+If public, you can SSH into the Consul nodes directly through the LB.
+
+  $ ${format("ssh -A -i %s %s@%s", module.network_aws.private_key_filename, module.consul_aws.consul_username, module.consul_aws.consul_lb_dns)}
+
 ${module.consul_aws.zREADME}
-${var.vault_provision ?
-"${module.vault_aws.zREADME}
-# ------------------------------------------------------------------------------
-# Nomad Quick Start - Vault Integration
-# ------------------------------------------------------------------------------
-
-The Vault integration for Nomad can be enabled by initializing Vault
-and running the below commands.
-
-  $ export VAULT_TOKEN=<ROOT_TOKEN>
-  $ consul exec -node ${var.name}-server-nomad - <<EOF
-echo \"VAULT_TOKEN=$VAULT_TOKEN\" | sudo tee -a /etc/nomad.d/nomad.conf
-
-cat <<CONFIG | sudo tee /etc/nomad.d/z-vault.hcl
-vault {
-  enabled = true
-  address = \"http://vault.service.consul:8200\"
-
-  tls_skip_verify = true
-}
-CONFIG
-
-sudo systemctl restart nomad
-EOF
-
-  $ consul exec -node ${var.name}-client-nomad - <<EOF
-cat <<CONFIG | sudo tee /etc/nomad.d/z-vault.hcl
-vault {
-  enabled = true
-  address = \"http://vault.service.consul:8200\"
-
-  tls_skip_verify = true
-}
-CONFIG
-
-sudo systemctl restart nomad
-EOF" : ""}
 README
 }
 
@@ -92,8 +69,8 @@ output "subnet_private_ids" {
   value = "${module.network_aws.subnet_private_ids}"
 }
 
-output "bastion_security_group" {
-  value = "${module.network_aws.bastion_security_group}"
+output "bastion_sg_id" {
+  value = "${module.network_aws.bastion_sg_id}"
 }
 
 output "bastion_ips_public" {
@@ -146,68 +123,4 @@ output "consul_tg_http_8500_arn" {
 
 output "consul_lb_dns" {
   value = "${module.consul_aws.consul_lb_dns}"
-}
-
-output "vault_asg_id" {
-  value = "${module.vault_aws.vault_asg_id}"
-}
-
-output "vault_sg_id" {
-  value = "${module.vault_aws.vault_sg_id}"
-}
-
-output "vault_lb_sg_id" {
-  value = "${module.vault_aws.vault_lb_sg_id}"
-}
-
-output "vault_tg_http_8200_arn" {
-  value = "${module.vault_aws.vault_tg_http_8200_arn}"
-}
-
-output "vault_lb_dns" {
-  value = "${module.vault_aws.vault_lb_dns}"
-}
-
-output "nomad_server_asg_id" {
-  value = "${module.nomad_server_aws.nomad_asg_id}"
-}
-
-output "nomad_server_sg_id" {
-  value = "${module.nomad_server_aws.nomad_sg_id}"
-}
-
-output "nomad_server_lb_sg_id" {
-  value = "${module.nomad_server_aws.nomad_lb_sg_id}"
-}
-
-output "nomad_server_tg_http_4646_arn" {
-  value = "${module.nomad_server_aws.nomad_tg_http_4646_arn}"
-}
-
-output "nomad_server_lb_dns" {
-  value = "${module.nomad_server_aws.nomad_lb_dns}"
-}
-
-output "nomad_client_asg_id" {
-  value = "${module.nomad_client_aws.nomad_asg_id}"
-}
-
-output "nomad_client_sg_id" {
-  value = "${module.nomad_client_aws.nomad_sg_id}"
-}
-
-output "nomad_client_lb_sg_id" {
-  value = "${module.nomad_client_aws.nomad_lb_sg_id}"
-}
-
-output "nomad_client_tg_http_4646_arn" {
-  value = "${module.nomad_client_aws.nomad_tg_http_4646_arn}"
-}
-
-output "nomad_client_tg_https_4646_arn" {
-  value = "${module.nomad_client_aws.nomad_tg_https_4646_arn}"
-}
-
-output "nomad_client_lb_dns" {
-  value = "${module.nomad_client_aws.nomad_lb_dns}"
 }
