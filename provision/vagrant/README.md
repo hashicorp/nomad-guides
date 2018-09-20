@@ -1,8 +1,11 @@
-# Vagrant: Nomad Cluster (Single Vault server on node3)
+vagrant@node1:~$ cd /vagrant/application-deployment/
+vagrant@node1:/vagrant/application-deployment$ ls
+fabio          go-vault-dynamic-mysql-creds  http-echo  nginx           nginx-vault-pki  redis
+go-blue-green  haproxy                       jenkins    nginx-vault-kv  README.md# Vagrant: Nomad Cluster (Single Vault server on node3)
 Spins up 3 virtual machines with Nomad installed as both Client and Server mode. Node3 also has Vault installed to show Nomad-Vault integration as well as MySQL server. WARNING: Nomad severs are configured with the root-token. A Nomad token role should be used in production as shown here: https://www.nomadproject.io/docs/vault-integration/index.html.
 
 # Usage
-If you would like to use the enterprise binaries download and place the unzipped binaries in the root directory of nomad-guides
+(OPTIONAL) If you would like to use the enterprise binaries download and place the unzipped binaries in the root directory of nomad-guides
 
 ```bash
 $ pwd
@@ -45,23 +48,8 @@ $ vagrant up
 vagrant ssh node1
 ```
 
-3. Generate Nomad's bootstrap token
-```bash
-vagrant@node1:~$ nomad acl bootstrap
-Accessor ID  = b1c4417e-411c-0fd8-4c29-7a51fc89ec79
-Secret ID    = e133205b-439c-f67d-7b58-96a87d68d7b2
-Name         = Bootstrap Token
-Type         = management
-Global       = true
-Policies     = n/a
-Create Time  = 2017-12-19 18:33:53.024032646 +0000 UTC
-Create Index = 23
-Modify Index = 23
 
-vagrant@node1:~$ export NOMAD_TOKEN=e133205b-439c-f67d-7b58-96a87d68d7b2
-```
-
-4. Check Nomad cluster health
+3. Check Nomad cluster health
 ```bash
 vagrant@node1:~$ nomad server-members
 Name          Address         Port  Status  Leader  Protocol  Build      Datacenter  Region
@@ -75,7 +63,7 @@ fb792a08  dc1  node3  <none>  false  ready
 1a3bf4ca  dc1  node1  <none>  false  ready
 ```
 
-5. If you want to use Vault from the CLI, Grab the root-token from Consul (NOT BEST PRACTICE: FOR DEMO USE ONLY)
+4. If you want to use Vault from the CLI, Grab the root-token from Consul (NOT BEST PRACTICE: FOR DEMO USE ONLY)
 ```bash
 vagrant@node1:~$ consul kv get service/vault/root-token
 6389c4e7-9f0a-f5f2-9c71-d5cec294c99a
@@ -97,4 +85,13 @@ High-Availability Enabled: true
 	Mode: active
 	Leader Cluster Address: https://192.168.50.152:8201
 
+```
+
+5. Change directory to "/vagrant/application-deployment" and start deploying jobs
+
+```
+vagrant@node1:~$ cd /vagrant/application-deployment/
+vagrant@node1:/vagrant/application-deployment$ ls
+fabio          go-vault-dynamic-mysql-creds  http-echo  nginx           nginx-vault-pki  redis
+go-blue-green  haproxy                       jenkins    nginx-vault-kv  README.md
 ```

@@ -65,7 +65,7 @@ DNSMASQ
 
 
 $nomad_download = <<NOMAD_DOWNLOAD
-NOMAD_VERSION="0.7.1"
+NOMAD_VERSION="0.8.3"
 
 echo "Fetching Nomad..."
 if [[ ! -f /vagrant/nomad ]] ; then
@@ -76,7 +76,7 @@ fi
 NOMAD_DOWNLOAD
 
 $consul_download = <<CONSUL_DOWNLOAD 
-CONSUL_VERSION="1.0.0"
+CONSUL_VERSION="1.0.7"
 
  echo "Fetching Consul..."
 if [[ ! -f /vagrant/consul ]] ; then
@@ -87,7 +87,7 @@ fi
 CONSUL_DOWNLOAD
 
 $vault_download = <<VAULT_DOWNLOAD
-VAULT_VERSION="0.9.3"
+VAULT_VERSION="0.10.1"
 
 if [[ ! -f /vagrant/vault ]] ; then
     cd /vagrant/
@@ -235,7 +235,7 @@ consul {
   address = "127.0.0.1:8500"
 }
 acl {
-  enabled = true
+  enabled = false
   token_ttl = "30s"
   policy_ttl = "60s"
 }
