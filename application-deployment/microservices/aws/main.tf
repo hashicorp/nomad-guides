@@ -47,7 +47,8 @@ resource "null_resource" "start_sock_shop" {
   provisioner "remote-exec" {
     inline = [
       "sleep 180",
-      "nomad run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/sockshop.nomad"
+      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/sockshop.nomad",
+      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/sockshopui.nomad"
     ]
 
     connection {

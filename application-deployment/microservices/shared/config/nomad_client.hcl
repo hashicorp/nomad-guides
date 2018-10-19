@@ -6,7 +6,6 @@ name = "nomad@IP_ADDRESS"
 client {
   enabled = true
   options = {
-    driver.raw_exec.enable = "1"
     driver.java.enable = "1"
     docker.cleanup.image = false
   }

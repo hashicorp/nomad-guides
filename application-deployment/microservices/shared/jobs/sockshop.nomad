@@ -11,55 +11,6 @@ job "sockshop" {
     max_parallel = 1
   }
 
-  # - frontend #
-  group "frontend" {
-    count = 3
-
-    constraint {
-      distinct_hosts = true
-    }
-
-    restart {
-      attempts = 10
-      interval = "5m"
-      delay = "25s"
-      mode = "delay"
-    }
-
-    # - frontend app - #
-    task "front-end" {
-      driver = "docker"
-
-      config {
-        image = "weaveworksdemos/front-end:master-ac9ca707"
-        command = "/usr/local/bin/node"
-        args = ["server.js", "--domain=service.consul"]
-        hostname = "front-end.service.consul"
-        network_mode = "sockshop"
-        port_map = {
-          http = 8079
-        }
-      }
-
-      service {
-        name = "front-end"
-        tags = ["app", "frontend", "front-end"]
-        port = "http"
-      }
-
-      resources {
-        cpu = 100 # 100 Mhz
-        memory = 128 # 128MB
-        network {
-          mbits = 10
-          port "http" {
-            static = 80
-          }
-        }
-      }
-    } # - end frontend app - #
-  } # - end frontend - #
-
   # - user - #
   group "user" {
     count = 1
@@ -436,7 +387,6 @@ job "sockshop" {
     } # - end app - #
   } # - end payment - #
 
-
   # - backoffice - #
   group "backoffice" {
     count = 1
@@ -519,7 +469,7 @@ job "sockshop" {
       }
 
       artifact {
-        source = "https://s3.amazonaws.com/nomad-consul-demo/queue-master.jar"
+        source = "https://s3.amazonaws.com/nomad-consul-microservices-demo/queue-master.jar"
       }
 
 

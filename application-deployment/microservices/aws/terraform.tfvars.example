@@ -1,5 +1,5 @@
 region            = "us-east-1"
-ami               = "ami-0773061edb0eb6550"
+ami               = "ami-009feb0e09775afc6"
 server_instance_type = "t2.medium"
 client_instance_type = "t2.medium"
 key_name          = ""
