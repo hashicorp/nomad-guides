@@ -67,7 +67,7 @@ Nomad will fetch the cataloguedb and userdb passwords from Vault. We first creat
 
 ```
 vault policy write sockshop-read sockshop-read.hcl
-vault write secret/sockshop/databases/catalougedb pwd=dioe93kdo931
+vault write secret/sockshop/databases/cataloguedb pwd=dioe93kdo931
 vault write secret/sockshop/databases/userdb pwd=wo39c5h2sl4r
 ```
 
