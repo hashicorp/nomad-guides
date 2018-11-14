@@ -22,7 +22,7 @@ This guide illustrates how Nomad can schedule Docker and non-Docker apps in a si
 ## Prerequisites
 In order to deploy the Sock Shop demo to AWS, you will need an AWS account. You will also need to know your AWS access and secret access [keys](http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys). You'll also need a [key pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2-key-pairs.html) from your AWS account.
 
-If you want to customize the AMI used by the demo, you will need to download and install Packer locally from [Packer Downloads](https://www.packer.io/downloads.html). You can use Terraform Enterprise or open source Terraform to provision the AWS infrastructure the demo runs on. If you want to use open source Terraform, install it from [Terraform Downloads](https://www.terraform.io/downloads.html). This demo was built and tested with Packer 1.2.1 and Terraform 0.11.7.
+If you want to customize the AMI used by the demo, you will need to download and install Packer locally from [Packer Downloads](https://www.packer.io/downloads.html). You can use Terraform Enterprise or open source Terraform to provision the AWS infrastructure the demo runs on. If you want to use open source Terraform, install it from [Terraform Downloads](https://www.terraform.io/downloads.html). This demo was built and tested with Packer 1.3.1 and Terraform 0.11.8.
 
 You will also need a Vault server that is accessible from your AWS account.  Ideally, you would run it in your AWS account. You can download Vault from [Vault Downloads](https://www.vaultproject.io/downloads.html). This demo was built and tested with Vault 0.10.1.
 
@@ -67,7 +67,7 @@ Nomad will fetch the cataloguedb and userdb passwords from Vault. We first creat
 
 ```
 vault policy write sockshop-read sockshop-read.hcl
-vault write secret/sockshop/databases/catalougedb pwd=dioe93kdo931
+vault write secret/sockshop/databases/cataloguedb pwd=dioe93kdo931
 vault write secret/sockshop/databases/userdb pwd=wo39c5h2sl4r
 ```
 
@@ -86,7 +86,7 @@ You also need to generate a Vault token for Nomad by running
 ## Step 2: Create a New AMI with Packer (optional)
 You can now use Packer and Terraform to provision your AWS EC2 instances along with other AWS infrastructure. Terraform has already been configured to retrieve dynamically generated short-lived AWS keys from your Vault server.
 
-We have already used Packer to create Amazon Machine Image ami-0773061edb0eb6550 which uses Nomad 0.8.1 and Consul 1.0.7. You can use this as the basis for your EC2 instances. This AMI only exists in the AWS us-east-1 region. If you want to create a similar AMI in a different region or if you make any changes to any of the files in the shared directory, you will need to create your own AMI with Packer. This is very simple. Starting from the home directory, do the following (being sure to specify the region and a vaid source_ami for that region in packer.json if the region is different from us-east-1):
+We have already used Packer to create Amazon Machine Image ami-009feb0e09775afc6 which uses Nomad 0.8.6 and Consul 1.3.0. You can use this as the basis for your EC2 instances. This AMI only exists in the AWS us-east-1 region. If you want to create a similar AMI in a different region or if you make any changes to any of the files in the shared directory, you will need to create your own AMI with Packer. This is very simple. Starting from the home directory, do the following (being sure to specify the region and a vaid source_ami for that region in packer.json if the region is different from us-east-1):
 
 ```
 export AWS_ACCESS_KEY_ID=<your_aws_key>
@@ -112,7 +112,7 @@ If you want to use open source Terraform instead of TFE, you can clone this repo
 1. Fork this repository by clicking the Fork button in the upper right corner of the screen and selecting your own personal GitHub account or organization.
 1. Create a workspace in your TFE organization called microservices-demo.
 1. Configure the workspace to connect to the fork of this repository in your own Github account.
-1. Set the Terraform Working Directory to "application-deployment/microservices/aws".
+1. Set the Terraform Working Directory to "application-deployment/microservices".
 1. On the Variables tab of your workspace, add Terraform variables as described below.
 1. If you used Packer to build a new AMI, set the ami variable to the AMI ID of the new AMI; otherwise, you can use the default value. If you built your AMI in a region different from us-east-1, then set the region variable to that region and set the subnet_az variable to an availability zone in that region.
 1. Set the key_name variable to the name of your private key and set the private_key_data variable to the contents of the private key. Be sure to mark the private_key_data variable as sensitive.
@@ -135,7 +135,7 @@ If desired, you can set the vpc_cidr and subnet_cidr to valid CIDR ranges. The d
 
 When the apply finishes, you should see a message giving the public and private IP addresses for all your server and client instances along with a command to ssh to one of your servers and URLs to access the Nomad and Consul UIs.  In your AWS console, you should be able to see all your instances under EC2 Instances. If you were already on that screen, you'll need to refresh it.
 
-Note that Nomad and Consul will automatically be started and that Nomad will run the sockshop job.
+Note that Nomad and Consul will automatically be started and that Nomad will run the sockshop and sockshopui jobs. The latter runs the frontend node.js app on all client nodes.
 
 ## Step 7: Verification that Consul and Nomad are Running
 From a directory containing your private EC2 key pair, you can connect to one of your Nomad servers with `ssh -i <key> ubuntu@<server_public_ip>`, replacing \<key\> with your actual private key file (ending in ".pem") and \<server_public_ip\> with the public IP of your server instance. The exact command should have been in the outputs of the apply.
@@ -144,16 +144,16 @@ After connecting, if you run the `pwd` command, you will see that you are in the
 
 If you run `consul members`, you should see all of the server and client instances.
 
-Verify that Nomad is running with `ps -ef | grep nomad`. You should see "/usr/local/bin/nomad agent -config=/etc/nomad.d/nomad.hcl". If you run `nomad status`, you should see that the sockshop job is running.
+Verify that Nomad is running with `ps -ef | grep nomad`. You should see "/usr/local/bin/nomad agent -config=/etc/nomad.d/nomad.hcl". If you run `nomad status`, you should see that the sockshop and sockshopui jobs are running.
 
 You can verify that the sockshop Docker network was created with `docker network ls`. If you ssh-ed to one of your client instances, run this there too.
 
 ## Step 8: Verify Sock Shop Deployment
-The demo will automatically launch the Sock Shop microservices with Nomad using the command `nomad run sockshop.nomad`.  You do not need to run this yourself.
+The demo will automatically launch the Sock Shop microservices with Nomad using the commands `nomad job run sockshop.nomad` and `nomad job run sockshopui.nomad`.  You do not need to run these yourself.
 
 Note that the queue-master task is launched with the Java driver and that the queue-master.jar file is downloaded from a public S3 bucket.
 
-You can check the status of the sockshop job on any of the servers or clients by running `nomad status sockshop`.  All tasks should be running.
+You can check the status of the sockshop jobs on any of the servers or clients by running `nomad job status sockshop` and `nomad job status sockshopui`.  All tasks should be running. You can also see job status in the Nomad UI.
 
 ## Step 9: Using the Sock Shop application
 You should now be able to access the Sock Shop UI with a browser on your laptop.  Just point your browser against http://<client_ip>, replacing \<client_ip\> with any of the client public IP addresses.

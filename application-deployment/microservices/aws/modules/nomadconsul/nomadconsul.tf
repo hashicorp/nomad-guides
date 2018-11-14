@@ -14,143 +14,279 @@ variable "vault_url" {}
 variable "vpc_id" {}
 variable "subnet_id" {}
 
+# Security Group
 resource "aws_security_group" "primary" {
   name   = "${var.name_tag_prefix}-sg"
   vpc_id = "${var.vpc_id}"
-
-  # SSH
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Ping
-  ingress {
-    from_port   = 8
-    to_port     = 8
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Nomad TCP
-  ingress {
-    from_port = 4646
-    to_port   = 4648
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Nomad UDP
-  ingress {
-    from_port = 4648
-    to_port   = 4648
-    protocol  = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul UI/HTTP
-  ingress {
-    from_port   = 8500
-    to_port     = 8500
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul RPC
-  ingress {
-    from_port   = 8300
-    to_port     = 8300
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul Serf TCP
-  ingress {
-    from_port   = 8301
-    to_port     = 8302
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul Serf UDP
-  ingress {
-    from_port   = 8301
-    to_port     = 8302
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul DNS TCP
-  ingress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Consul DNS UDP
-  ingress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP for Sock Shop UI
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # TCP for Docker cluster management
-  ingress {
-    from_port = 2375
-    to_port   = 2377
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # TCP for Docker overlay network
-  ingress {
-    from_port = 7946
-    to_port   = 7946
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # UDP for Docker overlay network
-  ingress {
-    from_port = 7946
-    to_port   = 7946
-    protocol  = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # UDP for Docker overlay network
-  ingress {
-    from_port = 4789
-    to_port   = 4789
-    protocol  = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Any egress
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   tags {
     Name = "${var.name_tag_prefix}-sg"
   }
 }
 
+# Security Group Rules
+resource "aws_security_group_rule" "ssh" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "nomad_http_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 4646
+    to_port = 4646
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sockshop_http_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "nomad_rpc_serf_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 4647
+    to_port = 4648
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "nomad_rpc_serf_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 4647
+    to_port = 4648
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "nomad_serf_udp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 4648
+    to_port = 4648
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "nomad_serf_udp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 4648
+    to_port = 4648
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_http" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 8500
+    to_port = 8500
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "consul_rpc_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 8300
+    to_port = 8300
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_rpc_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 8300
+    to_port = 8300
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_lan_tcp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 8301
+    to_port = 8302
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_lan_tcp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 8301
+    to_port = 8302
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_lan_udp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 8301
+    to_port = 8302
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_lan_udp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 8301
+    to_port = 8302
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_dns_tcp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 53
+    to_port = 53
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_dns_tcp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 53
+    to_port = 53
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_dns_udp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 53
+    to_port = 53
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "consul_dns_udp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 53
+    to_port = 53
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_cluster_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 2375
+    to_port = 2377
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_cluster_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 2375
+    to_port = 2377
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_tcp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 7946
+    to_port = 7946
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_tcp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 7946
+    to_port = 7946
+    protocol = "tcp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_udp_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 7946
+    to_port = 7946
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_udp_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 7946
+    to_port = 7946
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_udp_4789_ingress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "ingress"
+    from_port = 4789
+    to_port = 4789
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "docker_overlay_udp_4789_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 4789
+    to_port = 4789
+    protocol = "udp"
+    source_security_group_id = "${aws_security_group.primary.id}"
+}
+
+resource "aws_security_group_rule" "https_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "http_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "vault_egress" {
+    security_group_id = "${aws_security_group.primary.id}"
+    type = "egress"
+    from_port = 8200
+    to_port = 8200
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+# Template File for Server
 data "template_file" "user_data_server_primary" {
   template = "${file("${path.root}/user-data-server.sh")}"
 
@@ -163,6 +299,7 @@ data "template_file" "user_data_server_primary" {
   }
 }
 
+# Template File for Client
 data "template_file" "user_data_client" {
   template = "${file("${path.root}/user-data-client.sh")}"
 
@@ -174,6 +311,7 @@ data "template_file" "user_data_client" {
   }
 }
 
+# Server EC2 Instances
 resource "aws_instance" "primary" {
   ami                    = "${var.ami}"
   instance_type          = "${var.server_instance_type}"
@@ -195,6 +333,7 @@ resource "aws_instance" "primary" {
   iam_instance_profile = "${aws_iam_instance_profile.instance_profile.name}"
 }
 
+# Client EC2 Instances
 resource "aws_instance" "client" {
   ami                    = "${var.ami}"
   instance_type          = "${var.client_instance_type}"
@@ -217,16 +356,19 @@ resource "aws_instance" "client" {
   iam_instance_profile = "${aws_iam_instance_profile.instance_profile.name}"
 }
 
+# IAM Instance Profile
 resource "aws_iam_instance_profile" "instance_profile" {
   name_prefix = "${var.name_tag_prefix}-profile"
   role        = "${aws_iam_role.instance_role.name}"
 }
 
+# IAM Instance Role
 resource "aws_iam_role" "instance_role" {
   name_prefix        = "${var.name_tag_prefix}-role"
   assume_role_policy = "${data.aws_iam_policy_document.instance_role.json}"
 }
 
+# IAM Policy
 data "aws_iam_policy_document" "instance_role" {
   statement {
     effect  = "Allow"
@@ -239,12 +381,14 @@ data "aws_iam_policy_document" "instance_role" {
   }
 }
 
+# IAM Policy
 resource "aws_iam_role_policy" "auto_discover_cluster" {
   name   = "${var.name_tag_prefix}-auto-discover-cluster"
   role   = "${aws_iam_role.instance_role.id}"
   policy = "${data.aws_iam_policy_document.auto_discover_cluster.json}"
 }
 
+# IAM Policy
 data "aws_iam_policy_document" "auto_discover_cluster" {
   statement {
     effect = "Allow"
@@ -259,6 +403,7 @@ data "aws_iam_policy_document" "auto_discover_cluster" {
   }
 }
 
+# Outputs
 output "primary_server_private_ips" {
   value = ["${aws_instance.primary.*.private_ip}"]
 }

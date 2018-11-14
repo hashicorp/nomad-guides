@@ -7,7 +7,12 @@
     "ssh_username": "ubuntu",
     "ami_name": "sockshop-on-nomad {{timestamp}}",
     "ami_description": "Sockshop with Nomad and Consul",
-    "ami_groups": ["all"]
+    "ami_groups": ["all"],
+    "tags": {
+      "owner": "HashiCorp",
+      "Base_AMI_ID": "{{ .SourceAMI }}",
+      "Base_AMI_Name": "{{ .SourceAMIName }}"
+    }
   }],
   "provisioners":  [
   {
