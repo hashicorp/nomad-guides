@@ -1,0 +1,17 @@
+{
+  "log_level": "INFO",
+  "server": true,
+  "ui": true,
+  "data_dir": "/opt/consul/data",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "advertise_addr": "IP_ADDRESS",
+  "recursors": ["10.0.0.2"],
+  "bootstrap_expect": SERVER_COUNT,
+  "service": {
+    "name": "consul"
+  },
+  "connect": {
+    "enabled": true
+  }
+}
