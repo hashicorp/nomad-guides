@@ -14,7 +14,7 @@ Please note the following facts related to communications :
 Together, all the above points guarantee that the catalogue app can only talk to the catalogue-db database through the Consul Connect proxies, but only if there is no Deny intention prohibiting this.
 
 ## Reference Material
-You can learn more about the Sock Shop demo at the [Sock Shop](https://catalogue-connect-demo.github.io/).  This repository contains a complete version of the demo in the [microservices](../microservices) directory. A modified version of the [original catalogue repository](https://github.com/catalogue-connect-demo/catalogue) is in this [fork](https://github.com/rberlind/catalogue).
+You can learn more about the Sock Shop demo at the [Sock Shop](https://catalogue-connect-demo.github.io/) website.  This repository contains a complete version of the demo in the [microservices](../microservices) directory. A modified version of the [original catalogue repository](https://github.com/catalogue-connect-demo/catalogue) is in this [fork](https://github.com/rberlind/catalogue).
 
 The instructions below describe how you can run and connect the Sock Shop catalogue and catalogue-db microservices in AWS using [Nomad](https://www.nomadproject.io/) and [Consul](https://www.consul.io). Additionally, [Packer](https://www.packer.io) was used to build the AWS AMI that runs Nomad, Consul, and the microservices, while [Terraform](https://www.terraform.io) is used to provision the AWS infrastructure (including a VPC and public subnet and EC2 instances).
 
@@ -32,7 +32,7 @@ Microservices such as the Sock Shop microservices can be deployed to multiple pl
 This guide illustrates how Nomad can schedule Docker apps and Consul Connect proxies for them in a single deployment. The catalogue app and catalogue-db database are launched using Nomad's Docker Driver. Consul is used for service discovery and segmentation, the latter referring to the imposition of rules that control which services can talk to each other. This is delivered by Consul Connect.
 
 ## Prerequisites
-In order to deploy the Sock Shop demo to AWS, you will need an AWS account. You will also need to know your AWS access and secret access [keys](http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys). You'll also need a [key pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2-key-pairs.html) from your AWS account.
+In order to deploy the demo to AWS, you will need an AWS account. You will also need to know your AWS access and secret access [keys](http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys). You'll also need a [key pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2-key-pairs.html) from your AWS account.
 
 If you want to customize the AMI used by the demo, you will need to download and install Packer locally from [Packer Downloads](https://www.packer.io/downloads.html). You can use Terraform Enterprise or open source Terraform to provision the AWS infrastructure the demo runs on. If you want to use open source Terraform, install it from [Terraform Downloads](https://www.terraform.io/downloads.html). This demo was built and tested with Packer 1.3.1 and Terraform 0.11.10.
 
