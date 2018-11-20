@@ -32,7 +32,15 @@ The Vagrant Development Nomad guide is for **educational purposes only**. It's d
 
 We will now provision the development Nomad cluster in Vagrant.
 
-### Step 1: Start Vagrant
+### Step 1 (OPTIONAL): Copy over enterprise binaries
+
+If you want to override the OSS binaries with Enterprise ones, you can copy a Linux version of the enterprise binaries into the enterprise-binaries directory.   You are responsible for downloading and verifying validity of these binaries.   
+
+DO NOT CHECK BINARIES INTO GIT!!!!
+DO NOT CHECK BINARIES INTO GIT!!!!
+DO NOT CHECK BINARIES INTO GIT!!!!
+
+### Step 2: Start Vagrant
 
 Run `vagrant up` to start the VM and configure Nomad. That's it! Once provisioned, view the Vagrant ouput for next steps.
 
