@@ -121,6 +121,12 @@ In the Consul UI (http://<server_ip>:8500), do the following:
 1. For now, create an "Allow" intention.
 1. Click the Save button to save the intention.
 
+Alternatively, you may create and check this intention using the consul CLI by issuing the following commands on the server:
+```
+consul intention create -allow 'catalogue' 'catalogue-db'
+consul intention check catalogue catalogue-db
+```
+
 ## Step 11: Testing the Catalogue Application and Consul Connect
 You can now test the catalogue application using the curl commands below. First test with the intention you created set to Allow.  Then test with the intention set to Deny. You can run these curl commands from the Nomad server or the Nomad clients. Note that Consul is doing service discovery in addition to service segmentation, resolving "catalogue" to "catalogue.service.consul" and determining which host the app is running on.
 
@@ -148,7 +154,14 @@ In the Consul UI, select the intention you created and change the intention from
 
 ![Screenshot](ConsulIntention.png)
 
-Repeat the above curl command.  You should see the error below which proves that Consul Connect is now blocking the communication between the catalogue app and the catalogue-db database:
+Alternatively, you may delete the previous intention, re-create and check the deny intention using the consul CLI by issuing the following commands on the server:
+```
+consul intention delete 'catalogue' 'catalogue-db'
+consul intention create -deny 'catalogue' 'catalogue-db'
+consul intention check catalogue catalogue-db
+```
+
+Repeat the previous curl command: `curl -H "Content-Type: application/json" http://catalogue:8080/catalogue/3395a43e-2d88-40de-b95f-e00e1502085b | jq`. You should see the error below which proves that Consul Connect is now blocking the communication between the catalogue app and the catalogue-db database:
 
 ```
 {
