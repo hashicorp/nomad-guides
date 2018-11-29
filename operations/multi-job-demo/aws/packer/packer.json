@@ -1,0 +1,39 @@
+{
+  "variables": {
+  "s3_aws_access_key": "{{env `S3_AWS_ACCESS_KEY_ID`}}",
+  "s3_aws_secret_key": "{{env `S3_AWS_SECRET_ACCESS_KEY`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-east-1",
+    "source_ami": "ami-80861296",
+    "instance_type": "t2.medium",
+    "ssh_username": "ubuntu",
+    "ami_name": "nomad-multi-job {{timestamp}}",
+    "ami_description": "Nomad Enterprise Multi-Job Demo",
+    "tags": {
+      "owner": "HashiCorp",
+      "Base_AMI_ID": "{{ .SourceAMI }}",
+      "Base_AMI_Name": "{{ .SourceAMIName }}"
+    }
+  }],
+  "provisioners":  [
+  {
+    "type": "shell",
+    "inline": [
+      "sudo mkdir /ops",
+      "sudo chmod 777 /ops"
+    ]
+  },
+  {
+    "type": "file",
+    "source": "../../shared",
+    "destination": "/ops"
+  },
+  {
+    "type": "shell",
+    "environment_vars": ["AWS_ACCESS_KEY_ID={{user `s3_aws_access_key`}}", "AWS_SECRET_ACCESS_KEY={{user `s3_aws_secret_key`}}"],
+    "script": "../../shared/scripts/setup.sh"
+  }
+  ]
+}
