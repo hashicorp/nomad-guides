@@ -8,8 +8,8 @@ provider "aws" {
 
 provider "nomad" {
   address = "http://${element(module.nomadconsul.primary_server_public_ips, 0)}:4646"
-  #secret_id = "${module.nomadconsul.bootstrap_token}"
-  secret_id = "${var.bootstrap_token}"
+  secret_id = "${module.nomadconsul.bootstrap_token}"
+  #secret_id = "${var.bootstrap_token}"
 }
 
 module "network" {
