@@ -8,7 +8,7 @@ output "primary_server_public_ips" {
 }
 
 output "bootstrap_token" {
-  value = "${chomp(data.null_data_source.get_bootstrap_token.outputs["bootstrap_token"])}"
+  value = "${data.external.get_bootstrap_token.result["bootstrap_token"]}"
 }
 
 output "client_private_ips" {

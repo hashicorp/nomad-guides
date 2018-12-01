@@ -68,8 +68,3 @@ variable "ttl" {
   description = "Adds TTL tag to EC2 instances for reaping purposes. Reaping is only done for instances deployed by HashiCorp SEs. In any case, -1 means no reaping."
   default = "24"
 }
-
-variable "bootstrap_token" {
-  description = "Nomad bootstrap token which must be set in order to destroy"
-  default = ""
-}

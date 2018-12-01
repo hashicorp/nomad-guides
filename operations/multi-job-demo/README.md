@@ -65,7 +65,7 @@ If you want to use open source Terraform instead of TFE, you can fork this repos
 1. Fork this repository by clicking the Fork button in the upper right corner of the screen and selecting your own personal GitHub account or organization.
 1. Create a workspace in your TFE organization called nomad-multi-job-demo.
 1. Configure the workspace to connect to the fork of this repository in your own Github account.
-1. Set the Terraform Working Directory to "aws".
+1. Set the Terraform Working Directory to "operations/multi-job-demo/aws".
 1. On the Variables tab of your workspace, add Terraform variables as described below.
 1. If you used Packer to build a new AMI, set the ami variable to the AMI ID of the new AMI; otherwise, you can use the default value. If you built your AMI in a region different from us-east-1, then set the region variable to that region and set the subnet_az variable to an availability zone in that region.
 1. Set the key_name variable to the name of your private key and set the private_key_data variable to the contents of the private key. Be sure to mark the private_key_data variable as sensitive.
@@ -94,7 +94,7 @@ After connecting, if you run the `pwd` command, you will see that you are in the
 Verify that Nomad is running with `ps -ef | grep nomad`. You should see "/usr/local/bin/nomad agent -config=/etc/nomad.d/nomad.hcl".
 
 ## Step 7: Access the Nomad UI
-You can connect to the Nomad UI with a browser using the URL included in the Terraform outputs. Initially, there will not be any jobs running, but you should be able to see Clients and Servers even without entering an ACK token. That is because Terraform created an [anonymous](./aws/acls/anonymous.hcl) ACL policy that allows users without tokens to list jobs and read agents and nodes. Terraform also created [dev](./aws/acls/dev.hcl) and [qa](./aws/acls/qa.hcl) ACL policies. If you select one of the clients, you will see information about it including that it has cpu.totalcompute of 4600 and memory.totalbytes of 4142092288 (representing close to 4GB), that the exec, java, and docker drivers are all enabled, and that Java and Docker are installed.
+You can connect to the Nomad UI with a browser using the URL included in the Terraform outputs. Initially, there will not be any jobs running, but you should be able to see Clients and Servers even without entering an ACL token. That is because Terraform created an [anonymous](./aws/acls/anonymous.hcl) ACL policy that allows users without tokens to list jobs and read agents and nodes. Terraform also created [dev](./aws/acls/dev.hcl) and [qa](./aws/acls/qa.hcl) ACL policies. If you select one of the clients, you will see information about it including that it has cpu.totalcompute of 4600 and memory.totalbytes of 4142092288 (representing close to 4GB), that the exec, java, and docker drivers are all enabled, and that Java and Docker are installed.
 
 ## Step 8: Set Nomad ACL Tokens
 You will want to set Nomad ACL tokens both in the Nomad UI and in your SSH session. In the Nomad UI, click on the "ACL Tokens" link in the upper right corner, copy the Nomad bootstrap token from the Terraform outputs into the Secret ID field, and click the "Set Token" button. You will now be able to see everything in the Nomad UI in all namespaces.
@@ -327,22 +327,12 @@ Note that the QA team could do either of the following if it wanted to use more 
 ## Cleanup
 Before destroying your resources with Terraform, stop all Nomad jobs in all namespaces. (You can do this in the Nomad UI by selecting the jobs and then clicking the "Stop" button and then the "Yes, Stop" button to confirm.)
 
-The Nomad provider seems to have trouble reading `${module.nomadconsul.bootstrap_token}` after the initial apply. However, the workaround for this is different for Terraform OSS and TFE.
 
 If you are using Terraform OSS, please do the following:
-1. Edit terraform.tfvars in your fork, set bootstrap_token to your bootstrap token, and save the file.
-1. Edit main.tf in your fork by commenting out the line that sets secret_id in the Nomad provider to `${module.nomadconsul.bootstrap_token}` and uncommenting the line that sets it to `${var.bootstrap_token}`.  Then save main.tf and commit the change to the master branch.
 1. Run `export TF_WARN_OUTPUT_ERRORS=1` to suppress errors related to outputs for the nomadconsul module during the destroy.
-1. Run `terraform init` to update the Nomad provider.
 1. Run `terraform destroy` to destroy the provisioned infrastructure.
 
 If you are using Terraform Enterprise, do the following instead:
-1. Add the Terraform variable, bootstrap_token, to your workspace with value set to your bootstrap token.
 1. Add the environment variable CONFIRM_DESTROY=1 (which is needed to destroy infrastructure in TFE) to your workspace.
 1. Add the environment variable TF_WARN_OUTPUT_ERRORS=1 to your workspace to suppress errors related to outputs for the nomadconsul module during the destroy.
-1. Edit main.tf in your fork to comment out the line that sets secret_id in the Nomad provider to `${module.nomadconsul.bootstrap_token}`, and uncomment the line that sets secret_id to `${var.bootstrap_token}`.
-1. Then save main.tf and commit the change to to your fork.
-1. This will trigger a run, but you **should** discard it.
 1. In the TFE UI, go to the Settings tab of your workspace and then click the "Queue destroy Plan" button.  Then confirm that you want to destroy when the run reaches the Apply stage of the run.
-
-If you plan on running through this guide again, be sure to switch secret_id in the Nomad provider back to `${module.nomadconsul.bootstrap_token}` in main.tf and commit that change to your fork.  This will trigger a run against your workspace, but you should discard it unless you made the change just prior to running through the guide again.

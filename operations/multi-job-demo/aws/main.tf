@@ -9,7 +9,6 @@ provider "aws" {
 provider "nomad" {
   address = "http://${element(module.nomadconsul.primary_server_public_ips, 0)}:4646"
   secret_id = "${module.nomadconsul.bootstrap_token}"
-  #secret_id = "${var.bootstrap_token}"
 }
 
 module "network" {
@@ -146,15 +145,6 @@ resource "null_resource" "attach_quotas" {
     ]
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '{\"Name\":\"fake\",\"Limits\":[{\"Region\":\"global\",\"RegionLimit\": {\"CPU\":2500,\"MemoryMB\":1000}}]}' > ~/fake.hcl",
-      "nomad quota apply -token=${var.bootstrap_token} -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 -json ~/fake.hcl",
-      "nomad namespace apply -token=${var.bootstrap_token} -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 -quota fake default",
-    ]
-    when = "destroy"
-  }
-
   connection {
     host = "${module.nomadconsul.primary_server_public_ips[0]}"
     type = "ssh"
@@ -168,6 +158,29 @@ resource "null_resource" "attach_quotas" {
   }
 
   depends_on = ["module.nomadconsul", "nomad_quota_specification.default"]
+
+}
+
+resource "null_resource" "detach_quotas" {
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo '{\"Name\":\"fake\",\"Limits\":[{\"Region\":\"global\",\"RegionLimit\": {\"CPU\":2500,\"MemoryMB\":1000}}]}' > ~/fake.hcl",
+      "nomad quota apply -token=${module.nomadconsul.bootstrap_token} -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 -json ~/fake.hcl",
+      "nomad namespace apply -token=${module.nomadconsul.bootstrap_token} -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 -quota fake default",
+    ]
+    when = "destroy"
+  }
+
+  connection {
+    host = "${module.nomadconsul.primary_server_public_ips[0]}"
+    type = "ssh"
+    agent = false
+    user = "ubuntu"
+    private_key = "${var.private_key_data}"
+  }
+
+  depends_on = ["null_resource.attach_quotas"]
 
 }
 

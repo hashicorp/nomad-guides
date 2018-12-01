@@ -286,41 +286,9 @@ resource "null_resource" "bootstrap_acls" {
   }
 }
 
-resource "null_resource" "extract_bootstrap_token" {
-
-  provisioner "local-exec" {
-    command = "echo \"${var.private_key_data}\" > private-key.pem"
-  }
-
-  provisioner "local-exec" {
-    command = "chmod 600 private-key.pem"
-  }
-
-  provisioner "local-exec" {
-     command = "scp -o StrictHostKeyChecking=no -i private-key.pem  ubuntu@${aws_instance.primary.0.public_ip}:~/bootstrap.txt bootstrap.txt"
-  }
-
-  provisioner "local-exec" {
-    command = "sed -n 2,2p bootstrap.txt | cut -d '=' -f 2 | sed 's/ //' > bootstrap_token"
-  }
-
-  triggers {
-      uuid = "${uuid()}"
-  }
-
-  depends_on = ["null_resource.bootstrap_acls"]
-
+data "external" "get_bootstrap_token" {
+  program = ["${path.root}/get_bootstrap_token.sh", "${var.private_key_data}", "${aws_instance.primary.0.public_ip}"]
 }
-
-data "null_data_source" "get_bootstrap_token" {
-  inputs = {
-    bootstrap_token = "${file("bootstrap_token")}"
-  }
-
-  depends_on = ["null_resource.extract_bootstrap_token"]
-
-}
-
 
 # Client EC2 Instances
 resource "aws_instance" "client" {
