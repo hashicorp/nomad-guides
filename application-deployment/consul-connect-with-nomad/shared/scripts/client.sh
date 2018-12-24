@@ -54,3 +54,8 @@ echo "export NOMAD_ADDR=http://$IP_ADDRESS:4646" | tee --append /home/$HOME_DIR/
 
 # Start Docker
 service docker restart
+
+## Deploy run-catalogue-proxy.sh
+sudo cp /ops/shared/scripts/run-proxy.sh /usr/local/bin/run-proxy.sh
+sudo chown root:root /usr/local/bin/run-proxy.sh
+chmod  755 /usr/local/bin/run-proxy.sh

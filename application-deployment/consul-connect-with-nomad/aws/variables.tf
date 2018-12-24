@@ -5,7 +5,7 @@ variable "region" {
 
 variable "ami" {
   description = "AMI ID"
-  default = "ami-003ed29221ce4a111"
+  default = "ami-01d821506cee7b2c4"
 }
 
 variable "vpc_cidr" {

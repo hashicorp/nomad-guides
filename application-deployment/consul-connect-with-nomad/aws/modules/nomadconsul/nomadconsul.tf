@@ -41,15 +41,6 @@ resource "aws_security_group_rule" "nomad_http_ingress" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "sockshop_http_ingress" {
-    security_group_id = "${aws_security_group.primary.id}"
-    type = "ingress"
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-}
-
 resource "aws_security_group_rule" "nomad_rpc_serf_ingress" {
     security_group_id = "${aws_security_group.primary.id}"
     type = "ingress"

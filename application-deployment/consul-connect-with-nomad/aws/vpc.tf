@@ -1,5 +1,5 @@
 # Define the VPC.
-resource "aws_vpc" "sockshop" {
+resource "aws_vpc" "catalogue" {
   cidr_block = "${var.vpc_cidr}"
   enable_dns_hostnames = true
 
@@ -9,8 +9,8 @@ resource "aws_vpc" "sockshop" {
 }
 
 # Create an Internet Gateway for the VPC.
-resource "aws_internet_gateway" "sockshop" {
-  vpc_id = "${aws_vpc.sockshop.id}"
+resource "aws_internet_gateway" "catalogue" {
+  vpc_id = "${aws_vpc.catalogue.id}"
 
   tags {
     Name = "${var.name_tag_prefix} IGW"
@@ -19,11 +19,11 @@ resource "aws_internet_gateway" "sockshop" {
 
 # Create a public subnet.
 resource "aws_subnet" "public-subnet" {
-  vpc_id = "${aws_vpc.sockshop.id}"
+  vpc_id = "${aws_vpc.catalogue.id}"
   cidr_block = "${var.subnet_cidr}"
   availability_zone = "${var.subnet_az}"
   map_public_ip_on_launch = true
-  depends_on = ["aws_internet_gateway.sockshop"]
+  depends_on = ["aws_internet_gateway.catalogue"]
 
   tags {
     Name = "${var.name_tag_prefix} Public Subnet"
@@ -32,11 +32,11 @@ resource "aws_subnet" "public-subnet" {
 
 # Create a route table allowing all addresses access to the IGW.
 resource "aws_route_table" "public" {
-  vpc_id = "${aws_vpc.sockshop.id}"
+  vpc_id = "${aws_vpc.catalogue.id}"
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.sockshop.id}"
+    gateway_id = "${aws_internet_gateway.catalogue.id}"
   }
 
   tags {
