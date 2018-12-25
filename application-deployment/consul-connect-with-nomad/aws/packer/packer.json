@@ -5,8 +5,8 @@
     "source_ami": "ami-80861296",
     "instance_type": "t2.medium",
     "ssh_username": "ubuntu",
-    "ami_name": "sockshop-on-nomad {{timestamp}}",
-    "ami_description": "Sockshop with Nomad and Consul",
+    "ami_name": "catalogue-nomad-consul-connect {{timestamp}}",
+    "ami_description": "Catalogue services with Nomad and Consul Connect",
     "ami_groups": ["all"],
     "tags": {
       "owner": "HashiCorp",

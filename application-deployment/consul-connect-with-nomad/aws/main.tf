@@ -11,7 +11,7 @@ module "nomadconsul" {
 
   region            = "${var.region}"
   ami               = "${var.ami}"
-  vpc_id            = "${aws_vpc.sockshop.id}"
+  vpc_id            = "${aws_vpc.catalogue.id}"
   subnet_id         = "${aws_subnet.public-subnet.id}"
   server_instance_type     = "${var.server_instance_type}"
   client_instance_type     = "${var.client_instance_type}"
@@ -24,7 +24,7 @@ module "nomadconsul" {
   ttl     = "${var.ttl}"
 }
 
-resource "null_resource" "start_sock_shop" {
+resource "null_resource" "start_catalogue" {
   provisioner "remote-exec" {
     inline = [
       "sleep 180",

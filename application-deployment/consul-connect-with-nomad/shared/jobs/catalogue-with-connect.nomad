@@ -35,9 +35,9 @@ job "catalogue-with-connect" {
       config {
         image = "rberlind/catalogue:latest"
         command = "/app"
-        args = ["-port", "8080", "-DSN", "catalogue_user:default_password@tcp(127.0.0.1:${NOMAD_PORT_catalogueproxy_tcp})/socksdb"]
+        args = ["-port", "8080", "-DSN", "catalogue_user:default_password@tcp(${NOMAD_ADDR_catalogueproxy_upstream})/socksdb"]
         hostname = "catalogue.service.consul"
-        network_mode = "host"
+        network_mode = "bridge"
         port_map = {
           http = 8080
         }
@@ -66,19 +66,43 @@ job "catalogue-with-connect" {
       driver = "exec"
 
       config {
-        command = "/usr/local/bin/consul"
-        args    = [
-          "connect", "proxy",
-          "-http-addr", "${NOMAD_IP_tcp}:8500",
-          "-log-level", "trace",
-          "-service", "catalogue",
-          "-upstream", "catalogue-db:${NOMAD_PORT_tcp}",
-        ]
+        command = "/usr/local/bin/run-proxy.sh"
+        args    = ["${NOMAD_IP_proxy}", "${NOMAD_TASK_DIR}", "catalogue"]
       }
+
+      meta {
+        proxy_name = "catalogue"
+        proxy_target = "catalogue-db"
+      }
+
+      template {
+        data = <<EOH
+{
+    "name": "{{ env "NOMAD_META_proxy_name" }}-proxy",
+    "port": {{ env "NOMAD_PORT_proxy" }},
+    "kind": "connect-proxy",
+    "proxy": {
+      "destination_service_name": "{{ env "NOMAD_META_proxy_name" }}",
+      "destination_service_id": "{{ env "NOMAD_META_proxy_name" }}",
+      "upstreams": [
+        {
+          "destination_name": "{{ env "NOMAD_META_proxy_target" }}",
+          "local_bind_address": "{{ env "NOMAD_IP_upstream" }}",
+          "local_bind_port": {{ env "NOMAD_PORT_upstream" }}
+        }
+      ]
+    }
+}
+EOH
+
+        destination = "local/${NOMAD_META_proxy_name}-proxy.json"
+      }
+
 
       resources {
         network {
-          port "tcp" {}
+          port "proxy" {}
+          port "upstream" {}
         }
       }
     } # - end catalogue upstream proxy - #
@@ -102,11 +126,9 @@ job "catalogue-with-connect" {
       config {
         image = "rberlind/catalogue-db:latest"
         hostname = "catalogue-db.service.consul"
-        command = "docker-entrypoint.sh"
-        args = ["mysqld", "--bind-address", "127.0.0.1"]
-        network_mode = "host"
+        network_mode = "bridge"
         port_map = {
-          http = 3306
+          db  = 3306
         }
       }
 
@@ -118,7 +140,7 @@ job "catalogue-with-connect" {
       service {
         name = "catalogue-db"
         tags = ["db", "catalogue", "catalogue-db"]
-        port = "http"
+        port = "db"
       }
 
       resources {
@@ -126,9 +148,7 @@ job "catalogue-with-connect" {
         memory = 256 # 256MB
         network {
           mbits = 10
-	        port "http" {
-            static = 3306
-          }
+        port "db" {}
         }
       }
 
@@ -142,18 +162,18 @@ job "catalogue-with-connect" {
         command = "/usr/local/bin/consul"
         args    = [
           "connect", "proxy",
-          "-http-addr", "${NOMAD_IP_tcp}:8500",
+          "-http-addr", "${NOMAD_IP_proxy}:8500",
           "-log-level", "trace",
           "-service", "catalogue-db",
-          "-service-addr", "127.0.0.1:${NOMAD_PORT_cataloguedb_http}",
-          "-listen", ":${NOMAD_PORT_tcp}",
+          "-service-addr", "${NOMAD_ADDR_cataloguedb_db}",
+          "-listen", ":${NOMAD_PORT_proxy}",
           "-register",
         ]
       }
 
       resources {
         network {
-          port "tcp" {}
+          port "proxy" {}
         }
       }
     } # - end cataloguedbproxy - #
