@@ -102,7 +102,7 @@ After connecting, if you run the `pwd` command, you will see that you are in the
 
 If you run `consul members`, you should see the server and client instances.
 
-Verify that Nomad is running with `ps -ef | grep nomad`. You should see "/usr/local/bin/nomad agent -config=/etc/nomad.d/nomad.hcl". If you run `nomad status`, you should see that the sockshop and sockshopui jobs are running.
+Verify that Nomad is running with `ps -ef | grep nomad`. You should see "/usr/local/bin/nomad agent -config=/etc/nomad.d/nomad.hcl". If you run `nomad status`, you should see that the catalogue-with-connect service is running.
 
 ## Step 7: Verify the Deployment
 The demo will automatically launch the catalogue app and Catalogue-db database and associated Consul Connect proxies using the command `nomad job run catalogue-with-connect.nomad`. You do not need to run these yourself.
