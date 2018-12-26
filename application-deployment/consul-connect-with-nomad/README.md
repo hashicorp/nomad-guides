@@ -13,7 +13,7 @@ Please note the following facts related to communications:
 Together, all the above points guarantee that the catalogue app can only talk to the catalogue-db database through the Consul Connect proxies, but only if there is no Deny intention prohibiting this.
 
 ## How the catalogue-proxy is Run
-The Consul Connect proxy, catalogue-proxy, is run by the Nomad task, catalogueproxy, which launches the [run-proxy.sh](application-deployment/consul-connect-with-nomad/shared/scripts/run-proxy.sh) script. This script first registers the catalogue-proxy service definition with Consul using the Consul agent/service/register API endpoint. The service definition is generated from a template contained inside the catalogue-with-connect.nomad job specification file and uses ports dynamically selected by Nomad. The script then runs the proxy with that service definition using the `consul connect proxy -sidecar-for catalogue` CLI command.
+The Consul Connect proxy, catalogue-proxy, is run by the Nomad task, catalogueproxy, which launches the [run-proxy.sh](shared/scripts/run-proxy.sh) script. This script first registers the catalogue-proxy service definition with Consul using the Consul agent/service/register API endpoint. The service definition is generated from a template contained inside the catalogue-with-connect.nomad job specification file and uses ports dynamically selected by Nomad. The script then runs the proxy with that service definition using the `consul connect proxy -sidecar-for catalogue` CLI command.
 
 Note that the run-proxy.sh script could be used to run multiple proxies within a single Nomad job since the proxy name is passed in with an argument.
 
