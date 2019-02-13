@@ -33,7 +33,9 @@ variable "client_instance_type" {
   default     = "t2.medium"
 }
 
-variable "key_name" {}
+variable "key_name" {
+  description = "name of pre-existing SSH key to be used for provisioner auth"
+}
 
 variable "private_key_data" {
   description = "contents of the private key"
