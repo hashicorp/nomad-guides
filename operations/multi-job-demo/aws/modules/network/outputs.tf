@@ -7,3 +7,7 @@ output "vpc_id" {
 output "subnet_id" {
   value = "${aws_subnet.public_subnet.id}"
 }
+
+output "route_table_association_id" {
+  value = "${aws_route_table_association.public_subnet.id}"
+}

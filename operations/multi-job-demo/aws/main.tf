@@ -37,6 +37,9 @@ module "nomadconsul" {
   owner   = "${var.owner}"
   ttl     = "${var.ttl}"
   private_key_data = "${var.private_key_data}"
+  # We don't actually use the following
+  # but want the aws_instance.primary in the module to depend on it
+  route_table_association_id = "${module.network.route_table_association_id}"
 }
 
 # Nomad namespace: dev
@@ -82,7 +85,7 @@ resource "nomad_acl_token" "alice" {
   name = "alice"
   type = "client"
   policies = ["dev"]
-  depends_on = ["module.nomadconsul", "module.network"]
+  depends_on = ["module.nomadconsul"]
 }
 
 # Nomad ACL token: bob (qa)
@@ -90,7 +93,7 @@ resource "nomad_acl_token" "bob" {
   name = "bob"
   type = "client"
   policies = ["qa"]
-  depends_on = ["module.nomadconsul", "module.network"]
+  depends_on = ["module.nomadconsul"]
 }
 
 # Nomad quota: default
@@ -125,7 +128,7 @@ resource "nomad_quota_specification" "dev" {
 # Nomad quota: qa
 resource "nomad_quota_specification" "qa" {
   name = "qa"
-  description = "dev quota"
+  description = "qa quota"
   limits {
     region = "global"
     region_limit {
@@ -157,12 +160,64 @@ resource "null_resource" "attach_quotas" {
       uuid = "${uuid()}"
   }
 
-  depends_on = ["module.nomadconsul", "nomad_quota_specification.default"]
+  depends_on = ["module.nomadconsul"]
+}
+
+# Template File for stop_all_jobs.sh script
+data "template_file" "stop_all_jobs" {
+  template = "${file("${path.module}/stop_all_jobs.sh")}"
+
+  vars {
+    bootstrap_token = "${module.nomadconsul.bootstrap_token}"
+    address = "http://${module.nomadconsul.primary_server_private_ips[0]}:4646"
+  }
+}
+
+resource "null_resource" "stop_all_jobs" {
+
+  # We stop all jobs because not doing so causes
+  # problems when running `terraform destroy`
+  # Note that is this a destroy provisioner only run
+  # when we run `terraform destroy`
+
+  provisioner "file" {
+    content = "${data.template_file.stop_all_jobs.rendered}"
+    destination = "~/stop_all_jobs.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x ~/stop_all_jobs.sh"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "~/stop_all_jobs.sh",
+    ]
+    when = "destroy"
+  }
+
+  connection {
+    host = "${module.nomadconsul.primary_server_public_ips[0]}"
+    type = "ssh"
+    agent = false
+    user = "ubuntu"
+    private_key = "${var.private_key_data}"
+  }
+
+  depends_on = ["null_resource.attach_quotas"]
 
 }
 
-resource "null_resource" "detach_quotas" {
-
+resource "null_resource" "apply_fake_quota" {
+  # We create and apply a fake resource quota to the
+  # default namespace because Nomad does not like it
+  # if when the default quota Terrafrom created and
+  # attached to the default namespace is removed
+  # unless another quota is attached.
+  # Note that is this a destroy provisioner only run
+  # when we run `terraform destroy`
   provisioner "remote-exec" {
     inline = [
       "echo '{\"Name\":\"fake\",\"Limits\":[{\"Region\":\"global\",\"RegionLimit\": {\"CPU\":2500,\"MemoryMB\":1000}}]}' > ~/fake.hcl",
