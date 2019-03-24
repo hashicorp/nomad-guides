@@ -325,9 +325,6 @@ Note that the QA team could do either of the following if it wanted to use more 
 1. Ask a Nomad administrator to temporarily increase the qa quota.
 
 ## Cleanup
-Before destroying your resources with Terraform, you **must stop** all Nomad jobs in all namespaces. (You can do this in the Nomad UI by selecting the jobs and then clicking the "Stop" button and then the "Yes, Stop" button to confirm.) Failure to do this will cause the `terraform destroy` command to fail and leave your AWS infrastructure only partially destroyed.  If you do forget this step, the way to recover is to find your subnet in the AWS console, then navigate to its route table, and then add the internet gateway with destination "0.0.0.0/0".  When adding the route, selecting "Internet Gateway" for the target should show the right one that was previously associated with your subnet. After saving the new route, you should be able to stop the Nomad jobs and then re-run `terraform destroy`.
-
-
 If you are using Terraform OSS, please do the following:
 1. Run `export TF_WARN_OUTPUT_ERRORS=1` to suppress errors related to outputs for the nomadconsul module during the destroy.
 1. Run `terraform destroy` to destroy the provisioned infrastructure.

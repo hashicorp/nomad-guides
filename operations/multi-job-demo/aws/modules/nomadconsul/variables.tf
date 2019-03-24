@@ -12,3 +12,4 @@ variable "ttl" {}
 variable "vpc_id" {}
 variable "subnet_id" {}
 variable "private_key_data" {}
+variable "route_table_association_id" {}

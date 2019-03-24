@@ -263,6 +263,9 @@ resource "aws_instance" "primary" {
     owner = "${var.owner}"
     TTL = "${var.ttl}"
     created-by = "Terraform"
+    # We add this tag to make the Nomad server dependent on the route_table_association
+    # So that the latter won't be destroyed before the Nomad server
+    route_table_association_id = "${var.route_table_association_id}"
   }
 
   user_data            = "${data.template_file.user_data_server_primary.rendered}"
@@ -298,7 +301,8 @@ resource "aws_instance" "client" {
   vpc_security_group_ids = ["${aws_security_group.primary.id}"]
   subnet_id              = "${var.subnet_id}"
   count                  = "${var.client_count}"
-  depends_on             = ["aws_instance.primary"]
+
+  #depends_on             = ["aws_instance.primary"]
 
   #Instance tags
   tags {
@@ -312,7 +316,7 @@ resource "aws_instance" "client" {
   user_data = "${data.template_file.user_data_client.rendered}"
   iam_instance_profile = "${aws_iam_instance_profile.instance_profile.name}"
 
-  depends_on = ["data.null_data_source.get_bootstrap_token"]
+  depends_on = ["data.external.get_bootstrap_token"]
 }
 
 # IAM Instance Profile
