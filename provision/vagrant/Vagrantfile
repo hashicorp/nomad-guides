@@ -394,7 +394,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "node1" do |node1|
     node1.vm.network :private_network, ip: "192.168.50.150"
-    node1.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node1.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node1.vm.hostname = "node1"
     node1.vm.network "private_network", type: "dhcp"
     
@@ -425,7 +425,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "node2" do |node2|
     node2.vm.network :private_network, ip: "192.168.50.151"
-    node2.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node2.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node2.vm.hostname = "node2"
     node2.vm.network "private_network", type: "dhcp"
     node2.vm.network :forwarded_port, guest: 8500, host: 8501, auto_correct: true
@@ -435,7 +435,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "node3" do |node3|
     node3.vm.network :private_network, ip: "192.168.50.152"
-    node3.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node3.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node3.vm.hostname = "node3"
     node3.vm.network "private_network", type: "dhcp"
     node3.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
