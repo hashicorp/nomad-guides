@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-
 $base = <<BASE
 # Update apt and get dependencies
 sudo apt-get update
@@ -11,8 +9,6 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq netcat 
     ca-certificates \
     software-properties-common
 BASE
-
-
 
 $docker_install = <<DOCKER_INSTALL
 echo "Installing Docker..."
@@ -32,14 +28,10 @@ sudo service docker restart
 sudo usermod -aG docker vagrant
 DOCKER_INSTALL
 
-
-
 $java_install = <<JAVA_INSTALL 
 sudo apt-get update -y
 sudo apt-get install -y default-jdk
 JAVA_INSTALL
-
-
 
 $dnsmasq = <<DNSMASQ
 YUM=$(which yum 2>/dev/null)
@@ -61,8 +53,6 @@ sudo sh -c 'echo "server=/consul/127.0.0.1#8600" >> /etc/dnsmasq.d/consul'
 sudo systemctl enable dnsmasq
 sudo systemctl restart dnsmasq
 DNSMASQ
-
-
 
 $nomad_download = <<NOMAD_DOWNLOAD
 NOMAD_VERSION="0.9.5"
@@ -96,8 +86,6 @@ if [[ ! -f /vagrant/vault ]] ; then
 fi
 VAULT_DOWNLOAD
 
-
-
 $nomad_install = <<NOMAD_INSTALL
 echo "Installing Nomad..."
 sudo install /vagrant/nomad /usr/bin/nomad
@@ -129,7 +117,6 @@ nomad -autocomplete-install
 sudo rm -f /vagrant/nomad.zip
 NOMAD_INSTALL
 
-
 $consul_install = <<CONSUL_INSTALL
 echo "Installing Consul..."
 sudo install /vagrant/consul /usr/bin/consul
@@ -154,7 +141,6 @@ sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
 sudo rm -f /vagrant/consul.zip
 CONSUL_INSTALL
-
 
 $vault_install = <<VAULT_INST
 echo "Installing Vault..."
@@ -204,8 +190,6 @@ export VAULT_ADDR="http://active.vault.service.consul:8200"
 export VAULT_SKIP_VERIFY=true
 EOF
 VAULT_ENV
-
-
 
 $nomad_config = <<NOMAD_CONFIG
 INSTANCE_IP="$(/sbin/ifconfig eth1 | grep 'inet addr:' | awk '{print substr($2,6)}')"
@@ -272,8 +256,6 @@ sudo cat << EOF > /etc/consul.d/config.json
 EOF
 CONSUL_CONFIG
 
-
-
 $consul_online_target = <<CONSUL_ONLINE_TARGET
 sudo cat << EOF > /etc/systemd/system/consul-online.target
 [Unit]
@@ -318,8 +300,6 @@ function waitForConsulToBeAvailable() {
 waitForConsulToBeAvailable "${CONSUL_ADDRESS}"
 EOF
 CONSUL_ONLINE_SCRIPT
-
-
 
 $consul_template_install = <<CONSUL_TEMPLATE_INSTALL 
 CONSUL_TEMPLATE_VERSION=${VERSION:-"0.19.4"}
@@ -370,8 +350,6 @@ vault {
 EOF
 CONSUL_TEMPLATE_CONFIG
 
-
-
 $mysql_install = <<MYSQL_INSTALL
 sudo apt-get install -y mariadb-server
 sudo mysqladmin -u root password R00tPassword
@@ -387,8 +365,6 @@ sudo service mysql restart;
 echo '{"service": {"name": "db", "tags": ["mysql"], "port":3306}}' | sudo tee /etc/consul.d/mysql.json
 sudo service consul restart
 MYSQL_INSTALL
-
-
 
 Vagrant.configure(2) do |config|
 
