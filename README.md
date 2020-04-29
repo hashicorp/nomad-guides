@@ -6,7 +6,7 @@
 -	Discussion list: [Google Groups](https://groups.google.com/group/nomad-tool)
 -	Resources: https://www.nomadproject.io/resources.html
 
-<img src="https://cdn.rawgit.com/hashicorp/nomad/master/website/source/assets/images/logo-text.svg" width="500" />
+<img src="assets/NomadLogo.png" width="500" />
 
 ----
 
