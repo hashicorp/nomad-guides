@@ -18,7 +18,7 @@ job "jenkins" {
        migrate = true
        size    = "500"
        sticky  = true
-       
+
      }
     task "frontend" {
       env {
@@ -33,11 +33,11 @@ job "jenkins" {
         args        = ["--httpPort=8080"]
       }
       artifact {
-        source = "http://ftp-chi.osuosl.org/pub/jenkins/war-stable/2.46.2/jenkins.war"
+        source = "http://mirrors.jenkins.io/war-stable/2.150.3/jenkins.war"
 
         options {
           # Checksum will change depending on the Jenkins Version.
-          checksum = "sha256:aa7f243a4c84d3d6cfb99a218950b8f7b926af7aa2570b0e1707279d464472c7"
+          checksum = "sha256:4fc2700a27a6ccc53da9d45cc8b2abd41951b361e562e1a1ead851bea61630fd"
         }
       }
       service {
@@ -45,14 +45,13 @@ job "jenkins" {
         # labeled "http".
         port = "http"
         name = "jenkins"
-
         check {
           type     = "http"
           path     = "/login"
           interval = "10s"
           timeout  = "2s"
         }
-    }
+      }
 
       resources {
           cpu    = 2400 # MHz
