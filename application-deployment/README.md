@@ -15,7 +15,7 @@ no batch job type examples
 
 ### system
 
-* Fabio Load Balancer - last update 2017-01-29
+* Fabio Load Balancer - In this example we will deploy fabio load balancers across our worker nodes. Fabio is a loadbalancer that natively integrates with Consul to dynamically create routes for our other deployed Nomad services. - last update 2017-01-29
 
 ### unknown (hashi-stacks)
 * consul-connect-with-nomad (service???) - last update 2019-01-24
