@@ -19,7 +19,9 @@ This area will contain instructions to provision Nomad and Consul as a first ste
 These may include use cases installing Nomad in cloud services via Terraform, or within virtual environments using Vagrant, or running Nomad in a local development mode.
 
 ## application-deployment
-This area will contain instructions and gudies for deploying applications on Nomad. This area contains examples and guides for deploying secrets (from Vault) into your Nomad applications.
+This [section](https://github.com/hashicorp/nomad-guides/tree/master/application-deployment) of the repository contains instructions and gudies for deploying multiple types of application workloads with Nomad.  These examples are not to be considered production ready but used as a means for understanding the various scheduling methods available to the Nomad scheduler.
+
+These examples will also examine scenarios and workloads that can benifit from integration with other HashiCorp tools and Nomad to provide a complete distributed scheduling solution.
 
 ## operations
 This area will contain instructions for operating Nomad. This includes topics such as configuring Sentinel policies, namespaces, ACLs etc.
