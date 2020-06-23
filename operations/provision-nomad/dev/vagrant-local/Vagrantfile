@@ -10,7 +10,7 @@ base_box = ENV['BASE_BOX'] || "bento/ubuntu-16.04"
 # Consul variables
 consul_install = ["true", "1"].include?((ENV['CONSUL_INSTALL'] || true).to_s.downcase)
 consul_host_port = ENV['CONSUL_HOST_PORT'] || 8500
-consul_version = ENV['CONSUL_VERSION'] || "1.4.0"
+consul_version = ENV['CONSUL_VERSION'] || "1.4.1"
 consul_ent_url = ENV['CONSUL_ENT_URL']
 consul_group = "consul"
 consul_user = "consul"
@@ -20,7 +20,7 @@ consul_home = "/srv/consul"
 # Vault variables
 vault_install = ["true", "1"].include?((ENV['VAULT_INSTALL'] || true).to_s.downcase)
 vault_host_port = ENV['VAULT_HOST_PORT'] || 8200
-vault_version = ENV['VAULT_VERSION'] || "0.11.4"
+vault_version = ENV['VAULT_VERSION'] || "1.0.2"
 vault_ent_url = ENV['VAULT_ENT_URL']
 vault_group = "vault"
 vault_user = "vault"
@@ -29,7 +29,7 @@ vault_home = "/srv/vault"
 
 # Nomad variables
 nomad_host_port = ENV['NOMAD_HOST_PORT'] || 4646
-nomad_version = ENV['NOMAD_VERSION'] || "0.8.6"
+nomad_version = ENV['NOMAD_VERSION'] || "0.8.7"
 nomad_ent_url = ENV['NOMAD_ENT_URL']
 nomad_group = "root"
 nomad_user = "root"
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = base_box
   config.vm.hostname = "nomad"
 
-  # Map the enterprise binaries folder to allow overrides of individual OSS binaries with enterprise ones
+  # # Map the enterprise binaries folder to allow overrides of individual OSS binaries with enterprise ones
   config.vm.synced_folder "enterprise-binaries/", "/var/tmp/enterprise-binaries"
   # Bootstrap the vm
   config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/shared/scripts/base.sh | bash"
@@ -90,7 +90,7 @@ Vagrant.configure("2") do |config|
         "GROUP" => consul_group,
       }
 
-    config.vm.provision "shell", inline: "[[ -f /var/tmp/enterprise-binaries/consul ]] && cp /var/tmp/enterprise-binaries/consul /usr/local/bin"
+    config.vm.provision "shell", inline: "[ -e /var/tmp/enterprise-binaries/consul ] && cp /var/tmp/enterprise-binaries/consul /usr/local/bin || echo 'No Consul Enterprise Binary'"
 
     config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/consul/scripts/install-consul-systemd.sh | bash"
   end
@@ -117,7 +117,7 @@ Vagrant.configure("2") do |config|
         "GROUP" => vault_group,
       }
 
-    config.vm.provision "shell", inline: "[[ -f /var/tmp/enterprise-binaries/vault ]] && cp /var/tmp/enterprise-binaries/vault /usr/local/bin"
+    config.vm.provision "shell", inline: "[ -e /var/tmp/enterprise-binaries/vault ] && cp /var/tmp/enterprise-binaries/vault /usr/local/bin || echo 'No Vault Enterprise Binary'"
 
     config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/vault/scripts/install-vault-systemd.sh | bash"
   end
@@ -134,7 +134,7 @@ Vagrant.configure("2") do |config|
       "GROUP" => nomad_group,
     }
 
-  config.vm.provision "shell", inline: "[[ -f /var/tmp/enterprise-binaries/nomad ]] && cp /var/tmp/enterprise-binaries/nomad /usr/local/bin"
+  config.vm.provision "shell", inline: "[ -e /var/tmp/enterprise-binaries/nomad ] && cp /var/tmp/enterprise-binaries/nomad /usr/local/bin || echo 'No Nomad Enterprise Binary'"
 
   config.vm.provision "shell", inline: "curl https://raw.githubusercontent.com/hashicorp/guides-configuration/master/nomad/scripts/install-nomad-systemd.sh | bash"
   config.vm.provision "shell", inline: $nomad_setup, privileged: false

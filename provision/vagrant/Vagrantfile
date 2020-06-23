@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-
 $base = <<BASE
 # Update apt and get dependencies
 sudo apt-get update
@@ -11,8 +9,6 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y unzip curl vim jq netcat 
     ca-certificates \
     software-properties-common
 BASE
-
-
 
 $docker_install = <<DOCKER_INSTALL
 echo "Installing Docker..."
@@ -32,14 +28,10 @@ sudo service docker restart
 sudo usermod -aG docker vagrant
 DOCKER_INSTALL
 
-
-
 $java_install = <<JAVA_INSTALL 
 sudo apt-get update -y
 sudo apt-get install -y default-jdk
 JAVA_INSTALL
-
-
 
 $dnsmasq = <<DNSMASQ
 YUM=$(which yum 2>/dev/null)
@@ -62,10 +54,8 @@ sudo systemctl enable dnsmasq
 sudo systemctl restart dnsmasq
 DNSMASQ
 
-
-
 $nomad_download = <<NOMAD_DOWNLOAD
-NOMAD_VERSION="0.7.1"
+NOMAD_VERSION="0.9.5"
 
 echo "Fetching Nomad..."
 if [[ ! -f /vagrant/nomad ]] ; then
@@ -76,7 +66,7 @@ fi
 NOMAD_DOWNLOAD
 
 $consul_download = <<CONSUL_DOWNLOAD 
-CONSUL_VERSION="1.0.0"
+CONSUL_VERSION="1.6.0"
 
  echo "Fetching Consul..."
 if [[ ! -f /vagrant/consul ]] ; then
@@ -87,7 +77,7 @@ fi
 CONSUL_DOWNLOAD
 
 $vault_download = <<VAULT_DOWNLOAD
-VAULT_VERSION="0.9.3"
+VAULT_VERSION="1.2.2"
 
 if [[ ! -f /vagrant/vault ]] ; then
     cd /vagrant/
@@ -95,8 +85,6 @@ if [[ ! -f /vagrant/vault ]] ; then
     sudo unzip vault.zip
 fi
 VAULT_DOWNLOAD
-
-
 
 $nomad_install = <<NOMAD_INSTALL
 echo "Installing Nomad..."
@@ -129,7 +117,6 @@ nomad -autocomplete-install
 sudo rm -f /vagrant/nomad.zip
 NOMAD_INSTALL
 
-
 $consul_install = <<CONSUL_INSTALL
 echo "Installing Consul..."
 sudo install /vagrant/consul /usr/bin/consul
@@ -154,7 +141,6 @@ sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
 sudo rm -f /vagrant/consul.zip
 CONSUL_INSTALL
-
 
 $vault_install = <<VAULT_INST
 echo "Installing Vault..."
@@ -204,8 +190,6 @@ export VAULT_ADDR="http://active.vault.service.consul:8200"
 export VAULT_SKIP_VERIFY=true
 EOF
 VAULT_ENV
-
-
 
 $nomad_config = <<NOMAD_CONFIG
 INSTANCE_IP="$(/sbin/ifconfig eth1 | grep 'inet addr:' | awk '{print substr($2,6)}')"
@@ -272,8 +256,6 @@ sudo cat << EOF > /etc/consul.d/config.json
 EOF
 CONSUL_CONFIG
 
-
-
 $consul_online_target = <<CONSUL_ONLINE_TARGET
 sudo cat << EOF > /etc/systemd/system/consul-online.target
 [Unit]
@@ -318,8 +300,6 @@ function waitForConsulToBeAvailable() {
 waitForConsulToBeAvailable "${CONSUL_ADDRESS}"
 EOF
 CONSUL_ONLINE_SCRIPT
-
-
 
 $consul_template_install = <<CONSUL_TEMPLATE_INSTALL 
 CONSUL_TEMPLATE_VERSION=${VERSION:-"0.19.4"}
@@ -370,8 +350,6 @@ vault {
 EOF
 CONSUL_TEMPLATE_CONFIG
 
-
-
 $mysql_install = <<MYSQL_INSTALL
 sudo apt-get install -y mariadb-server
 sudo mysqladmin -u root password R00tPassword
@@ -388,13 +366,11 @@ echo '{"service": {"name": "db", "tags": ["mysql"], "port":3306}}' | sudo tee /e
 sudo service consul restart
 MYSQL_INSTALL
 
-
-
 Vagrant.configure(2) do |config|
 
   config.vm.define "node1" do |node1|
     node1.vm.network :private_network, ip: "192.168.50.150"
-    node1.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node1.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node1.vm.hostname = "node1"
     node1.vm.network "private_network", type: "dhcp"
     
@@ -425,7 +401,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "node2" do |node2|
     node2.vm.network :private_network, ip: "192.168.50.151"
-    node2.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node2.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node2.vm.hostname = "node2"
     node2.vm.network "private_network", type: "dhcp"
     node2.vm.network :forwarded_port, guest: 8500, host: 8501, auto_correct: true
@@ -435,7 +411,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "node3" do |node3|
     node3.vm.network :private_network, ip: "192.168.50.152"
-    node3.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+    node3.vm.box = "bento/ubuntu-18.04" # 18.04 LTS
     node3.vm.hostname = "node3"
     node3.vm.network "private_network", type: "dhcp"
     node3.vm.network :forwarded_port, guest: 8200, host: 8200, auto_correct: true
