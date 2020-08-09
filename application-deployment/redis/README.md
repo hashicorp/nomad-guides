@@ -1,5 +1,5 @@
 # Redis Service Deployment (introduction)
-The goal of this guide is to help users get started with deplying jobs on Nomad. In this Guide we will walk through some simple operational commands in Nomad and deploy some Redis Docker containers.
+The goal of this guide is to help users get started with deploying jobs on Nomad. In this Guide we will walk through some simple operational commands in Nomad and deploy some Redis Docker containers.
 
 ## Estimated Time to Complete
 20 minutes
@@ -12,7 +12,7 @@ Containerization improved developer workflows but also enabled an immutable appl
 
 ## Solution
 
-Nomad is operationally simlpe to setup, supports several workload types (driver, exec, qemu, lxc, etc.), supports multi-region out of the box, and is easy to use by both oeprators and developers through job files.
+Nomad is operationally simple to setup, supports several workload types (driver, exec, qemu, lxc, etc.), supports multi-region out of the box, and is easy to use by both operators and developers through job files.
 
 Jobs are the primary configuration that users interact with when using Nomad. A job is an easy to write, declarative specification of tasks that Nomad should run. Jobs have a globally unique name, one or many task groups, which are themselves collections of one or many tasks.
 
