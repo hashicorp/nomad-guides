@@ -1,0 +1,46 @@
+# Force deployment of jobs to clients with namespace meta tag equal to the
+# namespace specified by the job
+
+# Each Nomad client should have a client stanza like this:
+# client {
+#   enabled = true
+#   meta {
+#     namespace = "<namespace"
+#   }
+# }
+# where namespace is set to some namespace, <namespace>
+
+# The policy ensures that every job has a suitable constraint.
+# The constraint then ensures that jobs can only be deployed to suitable clients.
+
+# validate_namespace_isolation function
+validate_namespace_isolation = func() {
+  validated = false
+
+  # Check constraints until we find one with attribute (l_target) set to
+  # ${meta.namespace}. Then verify that the constraint's value (r_target) is
+  # set to the job's namespace.
+  for job.constraints as c {
+    if c.l_target is "${meta.namespace}" and c.r_target is job.namespace {
+      validated = true
+      break
+    }
+  }
+
+  # Print violation message if a suitable constraint was not found
+  if not validated {
+    print("You tried to run a job in the", job.namespace, "namespace.")
+    print("Each job must include a constraint with attribute set to",
+          "${meta.namespace} and value set to the namespace of the job.")
+  }
+
+  return validated
+}
+
+# Call the validate_namespace_isolation function
+validated = validate_namespace_isolation()
+
+# Main rule
+main = rule {
+  validated
+}

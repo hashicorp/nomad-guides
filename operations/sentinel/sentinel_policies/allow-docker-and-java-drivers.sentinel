@@ -1,0 +1,15 @@
+# Only allow the Docker and Java drivers
+
+# Allow Docker and Java rule
+allow_docker_and_java = rule {
+  all job.task_groups as tg {
+    all tg.tasks as task {
+      task.driver in ["docker", "java"]
+    }
+  }
+}
+
+# Main rule
+main = rule {
+  allow_docker_and_java
+}

@@ -1,4 +1,4 @@
-# Nomad + Sentinel 
+# Nomad + Sentinel
 The goal of this guide is to help users learn how to enable and write Sentinel policies for Nomad.
 
 ## Estimated Time to Complete
@@ -128,7 +128,7 @@ allowed_docker_images = rule {
 	}
 }
 ```
-If job job's image name does not match the 'allowed_images' regex then the job submission will fail. 
+If job job's image name does not match the 'allowed_images' regex then the job submission will fail.
 
 Now apply the sentinel policy:
 ```bash
@@ -411,3 +411,14 @@ $ nomad inspect example
     }
 }
 ```
+
+### Some Additional Sentinel Policies
+Several years after this guide was written, Roger Berlind added the following Sentinel policies:
+  * [allow-docker-and-java-drivers.sentinel](./sentinel_policies/allow-docker-and-java-drivers.sentinel)
+  * [prevent-docker-host-network.sentinel](./sentinel_policies/prevent-docker-host-network.sentinel)
+  * [restrict-docker-images-and-prevent-latest-tag.sentinel](./sentinel_policies/restrict-docker-images-and-prevent-latest-tag.sentinel)
+  * [bind-namespaces-to-clients.sentinel](./sentinel_policies/bind-namespaces-to-clients.sentinel)
+
+Variants of the first three of these were already in the [multi-job-demo](../multi-job-demo) section of this repository.
+
+The fourth was brand-new and can be used to restrict Nomad jobs to specific Nomad clients using a `meta` tag called "namespace" on some or all Nomad clients. See the comment at the top of the policy for an example client configuration stanza.
