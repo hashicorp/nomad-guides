@@ -1,0 +1,15 @@
+# Prevent Docker containers from running with host network mode
+
+# prevent_host_network rule
+prevent_host_network = rule {
+  all job.task_groups as tg {
+    all tg.tasks as task {
+      (task.config.network_mode is not "host") else true
+    }
+  }
+}
+
+# Main rule
+main = rule {
+  prevent_host_network
+}
