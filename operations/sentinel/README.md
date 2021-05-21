@@ -418,6 +418,7 @@ Several years after this guide was written, Roger Berlind added the following Se
   * [prevent-docker-host-network.sentinel](./sentinel_policies/prevent-docker-host-network.sentinel)
   * [restrict-docker-images-and-prevent-latest-tag.sentinel](./sentinel_policies/restrict-docker-images-and-prevent-latest-tag.sentinel)
   * [bind-namespaces-to-clients.sentinel](./sentinel_policies/bind-namespaces-to-clients.sentinel)
+  * [require-docker-digests.sentinel](./sentinel_policies/require-docker-digests.sentinel)
 
 Variants of the first three of these were already in the [multi-job-demo](../multi-job-demo) section of this repository.
 

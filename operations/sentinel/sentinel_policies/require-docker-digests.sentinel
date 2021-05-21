@@ -1,0 +1,64 @@
+# Policy to enforce all images have digests except for listed exceptions
+# This requires explicit digest to be used instead of standard tags
+# even if the standard tag corresponds to a signed image. This protects against
+# updates to existing standard tags since the digest would change.
+
+# If you want all Docker images to be signed, instead of using this Sentinel
+# policy, just set the environment variable DOCKER_CONTENT_TRUST to 1
+# for the Docker client on all Nomad clients.
+
+# Standard strings import
+import "strings"
+
+# Exception Docker images (that do not have to be signed)
+exception_images = [
+  "nginx",
+]
+
+restrict_images = func(exceptions) {
+
+  # Initialize validated boolean
+  validated = true
+
+  # Iterate over all task groups and tasks
+  for job.task_groups as tg {
+    for tg.tasks as task {
+      if task.driver is "docker" {
+        # image specified for the task
+        full_image = task.config.image
+        split_image = strings.split(full_image, "@")
+
+        # Check if there was an explicit digest tag
+        # That will be the case is split_image has 2 elements.
+        if length(split_image) < 2 {
+          # There was no digest, but we have to parse out image name
+          base_image = split_image[0]
+          # Strip "https://" if present
+          base_image_no_protocol = strings.trim_prefix(base_image, "https://")
+          # Strip "http://" if present
+          base_image_no_protocol = strings.trim_prefix(base_image, "http://")
+          # Strip off tag
+          split_base_image = strings.split(base_image_no_protocol, "/")
+          image_with_tag = split_base_image[length(split_base_image) - 1]
+          image_without_tag = strings.split(image_with_tag, ":")[0]
+
+          # See if image name in exceptions
+          if image_without_tag not in exceptions {
+            print("Docker image", full_image, "did not have a digest and was",
+                  "not in the list of exception images", exceptions)
+            validated = false
+          }
+
+        } // end digest check
+      } // end if docker driver
+    } // end for tasks
+  } // end for task groups
+
+  return validated
+
+}
+
+# Main rule
+main = rule {
+  restrict_images(exception_images)
+}
