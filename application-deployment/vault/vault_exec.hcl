@@ -16,11 +16,11 @@ job "vault.service" {
       }
 
       artifact {
-        source      = "https://releases.hashicorp.com/vault/1.5.5/vault_1.5.5_${attr.kernel.name}_${attr.cpu.arch}.zip"
+        source      = "https://releases.hashicorp.com/vault/1.7.0/vault_1.7.0_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "/tmp/"
-        options {
-          checksum = "sha256:2a6958e6c8d6566d8d529fe5ef9378534903305d0f00744d526232d1c860e1ed"
-        }
+        #options {
+        #  checksum = "sha256:2a6958e6c8d6566d8d529fe5ef9378534903305d0f00744d526232d1c860e1ed"
+        #}
       }
 
       template {
