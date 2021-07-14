@@ -1,5 +1,5 @@
 output "IP_Addresses" {
-  sensitive = false
+  sensitive = true
   value = <<CONFIGURATION
 
 Client public IPs: ${join(", ", module.nomadconsul.client_public_ips[0])}
