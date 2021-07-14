@@ -17,7 +17,7 @@ resource "aws_security_group" "primary" {
   name   = "${var.name_tag_prefix}-sg"
   vpc_id = "${var.vpc_id}"
 
-  tags {
+  tags={
     Name = "${var.name_tag_prefix}-sg"
   }
 }
