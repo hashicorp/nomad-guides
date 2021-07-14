@@ -3,7 +3,7 @@ resource "aws_vpc" "catalogue" {
   cidr_block = "${var.vpc_cidr}"
   enable_dns_hostnames = true
 
-  tags {
+  tags={
     Name = "${var.name_tag_prefix} VPC"
   }
 }
@@ -12,7 +12,7 @@ resource "aws_vpc" "catalogue" {
 resource "aws_internet_gateway" "catalogue" {
   vpc_id = "${aws_vpc.catalogue.id}"
 
-  tags {
+  tags={
     Name = "${var.name_tag_prefix} IGW"
   }
 }
@@ -25,7 +25,7 @@ resource "aws_subnet" "public-subnet" {
   map_public_ip_on_launch = true
   depends_on = ["aws_internet_gateway.catalogue"]
 
-  tags {
+  tags={
     Name = "${var.name_tag_prefix} Public Subnet"
   }
 }
@@ -39,7 +39,7 @@ resource "aws_route_table" "public" {
     gateway_id = "${aws_internet_gateway.catalogue.id}"
   }
 
-  tags {
+  tags={
     Name = "${var.name_tag_prefix} Public Route Table"
   }
 }
