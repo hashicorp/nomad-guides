@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "nomadconsul" {
-  source = "modules/nomadconsul"
+  source = "./modules/nomadconsul"
 
   region            = "${var.region}"
   ami               = "${var.ami}"
@@ -32,7 +32,7 @@ resource "null_resource" "start_catalogue" {
     ]
 
     connection {
-      host = "${./module.nomadconsul.primary_server_public_ips[0]}"
+      host = "${module.nomadconsul.primary_server_public_ips[0]}"
       type = "ssh"
       agent = false
       user = "ubuntu"
