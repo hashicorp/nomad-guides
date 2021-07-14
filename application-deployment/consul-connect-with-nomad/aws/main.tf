@@ -28,11 +28,11 @@ resource "null_resource" "start_catalogue" {
   provisioner "remote-exec" {
     inline = [
       "sleep 180",
-      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/catalogue-with-connect.nomad",
+      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips}:4646 /home/ubuntu/catalogue-with-connect.nomad",
     ]
 
     connection {
-      host = "${module.nomadconsul.primary_server_public_ips[0]}"
+      host = "${module.nomadconsul.primary_server_public_ips}"
       type = "ssh"
       agent = false
       user = "ubuntu"
