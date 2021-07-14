@@ -32,7 +32,7 @@ resource "null_resource" "start_catalogue" {
     ]
 
     connection {
-      host = "${module.nomadconsul.primary_server_public_ips[0]}"
+      host = "${./module.nomadconsul.primary_server_public_ips[0]}"
       type = "ssh"
       agent = false
       user = "ubuntu"
