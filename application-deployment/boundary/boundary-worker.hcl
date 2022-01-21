@@ -25,9 +25,15 @@ job "boundary.service" {
 
       template {
         data        = <<EOF
+        # Sample Source: https://www.boundaryproject.io/docs/configuration/worker
         listener "tcp" {
+            # purpose = api/cluster/proxy
             purpose = "proxy"
+          
+            #tls_cert_file = "/etc/certs/Boundary.crt"
+            #tls_key_file  = "/etc/certs/Boundary.key"
             tls_disable = true
+          
             address = "0.0.0.0"
         }
 
