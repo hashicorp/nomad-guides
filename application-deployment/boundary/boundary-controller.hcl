@@ -124,11 +124,11 @@ job "boundary.service" {
         }
         /*/
         EOF
-        destination = "/etc/vault.d/vault.hcl"
+        destination = "/etc/boundary/controller.hcl"
       }
       config {
-        command = "/tmp/vault"
-        args = ["server", "-config=/etc/vault.d/vault.hcl"]
+        command = "/tmp/boundary"
+        args = ["controller", "-config=/etc/boundary/controller.hcl"]
       }
     }
   }
