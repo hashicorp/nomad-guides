@@ -11,12 +11,12 @@ cd /ops
 
 CONFIGDIR=/ops/shared/config
 
-: ${CONSULVERSION=1.4.1}
+: ${CONSULVERSION=1.10.1}
 CONSULDOWNLOAD=https://releases.hashicorp.com/consul/${CONSULVERSION}/consul_${CONSULVERSION}_linux_amd64.zip
 CONSULCONFIGDIR=/etc/consul.d
 CONSULDIR=/opt/consul
 
-: ${NOMADVERSION=0.8.7}
+: ${NOMADVERSION=1.1.2}
 NOMADDOWNLOAD=https://releases.hashicorp.com/nomad/${NOMADVERSION}/nomad_${NOMADVERSION}_linux_amd64.zip
 NOMADCONFIGDIR=/etc/nomad.d
 NOMADDIR=/opt/nomad

@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "nomadconsul" {
-  source = "modules/nomadconsul"
+  source = "./modules/nomadconsul"
 
   region            = "${var.region}"
   ami               = "${var.ami}"
@@ -24,19 +24,19 @@ module "nomadconsul" {
   ttl     = "${var.ttl}"
 }
 
-resource "null_resource" "start_catalogue" {
-  provisioner "remote-exec" {
-    inline = [
-      "sleep 180",
-      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/catalogue-with-connect.nomad",
-    ]
+#resource "null_resource" "start_catalogue" {
+#  provisioner "remote-exec" {
+#    inline = [
+#      "sleep 180",
+#      "nomad job run -address=http://${module.nomadconsul.primary_server_private_ips[0]}:4646 /home/ubuntu/catalogue-with-connect.nomad",
+#    ]
 
-    connection {
-      host = "${module.nomadconsul.primary_server_public_ips[0]}"
-      type = "ssh"
-      agent = false
-      user = "ubuntu"
-      private_key = "${var.private_key_data}"
-    }
-  }
-}
+#    connection {
+#      host = "${module.nomadconsul.primary_server_public_ips[0]}"
+#      type = "ssh"
+#      agent = false
+#      user = "ubuntu"
+#      private_key = "${var.private_key_data}"
+#    }
+#  }
+#}
