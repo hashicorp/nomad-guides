@@ -49,9 +49,11 @@ job "boundary.service" {
         listener "tcp" {
           # Should be the address of the NIC that the controller server will be reached on
           address = "::"
-          # The purpose of this listener block
+          # The purpose of this listener block api/cluster/proxy
           purpose = "api"
 
+          #tls_cert_file = "/etc/certs/Boundary.crt"
+          #tls_key_file  = "/etc/certs/Boundary.key"
           tls_disable = false
 
           # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
