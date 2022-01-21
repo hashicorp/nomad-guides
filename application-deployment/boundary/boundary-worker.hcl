@@ -34,7 +34,13 @@ job "boundary.service" {
             #tls_key_file  = "/etc/certs/Boundary.key"
             tls_disable = true
           
+            # 127.0.0.1 (loopback), 0.0.0.0 (all IPv4), or :: (all IPv4 and IPv6)
             address = "0.0.0.0"
+            
+            # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
+            # to appropriate values.
+            #cors_enabled = true
+            #cors_allowed_origins = ["https://yourcorp.yourdomain.com", "serve://boundary"]
         }
 
         worker {
