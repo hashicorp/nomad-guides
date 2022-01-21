@@ -4,7 +4,7 @@
 job "boundary.service" {
   datacenters = ["dc1"]
   type = "service"
-  group "controller" {
+  group "worker" {
     # Manage node count here:
     count = 1
 
