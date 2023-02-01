@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 variable "region" {}
 variable "ami" {}
 variable "server_instance_type" {}

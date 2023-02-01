@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 
 # Script to setup of Vault for the Nomad/Consul demo
 echo "Before running this, you must export your"
