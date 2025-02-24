@@ -3,6 +3,9 @@
 # even if the standard tag corresponds to a signed image. This protects against
 # updates to existing standard tags since the digest would change.
 
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # If you want all Docker images to be signed, instead of using this Sentinel
 # policy, just set the environment variable DOCKER_CONTENT_TRUST to 1
 # for the Docker client on all Nomad clients.

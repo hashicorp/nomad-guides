@@ -1,4 +1,7 @@
 # Prevent Docker containers from running with host network mode
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 prevent_host_network = rule {
   all job.task_groups as tg {
     all tg.tasks as task {

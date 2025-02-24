@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Security Group
 resource "aws_security_group" "primary" {
   name   = "${var.name_tag_prefix}-sg"

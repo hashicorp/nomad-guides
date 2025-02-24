@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 main = rule { task_users() }
 # Check that the namespace is using the correct user
 task_users = func() {

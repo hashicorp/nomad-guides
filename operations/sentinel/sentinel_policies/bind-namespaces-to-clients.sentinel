@@ -1,6 +1,9 @@
 # Force deployment of jobs to clients with namespace meta tag equal to the
 # namespace specified by the job
 
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Each Nomad client should have a client stanza like this:
 # client {
 #   enabled = true
