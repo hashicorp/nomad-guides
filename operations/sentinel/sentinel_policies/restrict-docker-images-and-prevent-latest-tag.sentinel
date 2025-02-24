@@ -1,6 +1,9 @@
 # This policy restricts which Docker images are allowed and also prevents use of
 # the "latest" tag since the image must specify a tag that starts with a number.
 
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Allowed Docker images
 allowed_images = [
   "nginx",

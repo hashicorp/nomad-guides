@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Outputs
 output "primary_server_private_ips" {
   value = ["${aws_instance.primary.*.private_ip}"]

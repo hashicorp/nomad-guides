@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # John Boero - jboero@hashicorp.com
 # A job spec to install and run Vault with 'exec' driver - no Docker.
 # Consul not used by default.  Add Consul to config template

@@ -1,4 +1,7 @@
 # Test policy only allows docker based tasks
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 main = rule { all_drivers_docker }
 
 # all_drivers_docker checks that all the drivers in use are docker
