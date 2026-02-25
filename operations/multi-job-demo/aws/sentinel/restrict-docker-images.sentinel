@@ -1,4 +1,7 @@
 # Allowed Docker images
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 allowed_images = [
   "nginx",
   "mongo",

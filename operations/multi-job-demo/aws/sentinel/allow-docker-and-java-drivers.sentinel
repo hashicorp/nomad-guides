@@ -1,5 +1,8 @@
 # Only allow Docker and Java drivers
 
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Allow Docker rule
 allow_docker_and_java = rule {
   all job.task_groups as tg {

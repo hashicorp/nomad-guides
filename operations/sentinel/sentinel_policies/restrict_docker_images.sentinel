@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 main = rule { all_drivers_docker and allowed_docker_images }
 
 allowed_images = [
