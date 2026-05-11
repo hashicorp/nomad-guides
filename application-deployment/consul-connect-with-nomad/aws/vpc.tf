@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # Define the VPC.
 resource "aws_vpc" "catalogue" {
   cidr_block = "${var.vpc_cidr}"

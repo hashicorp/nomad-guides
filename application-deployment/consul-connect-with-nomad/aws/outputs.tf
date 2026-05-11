@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 output "IP_Addresses" {
   sensitive = true
   value = <<CONFIGURATION

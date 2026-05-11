@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # Outputs
 output "primary_server_private_ips" {
   value = ["${aws_instance.primary.*.private_ip}"]

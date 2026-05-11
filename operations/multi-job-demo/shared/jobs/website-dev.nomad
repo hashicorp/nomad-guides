@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 job "website" {
   datacenters = ["dc1"]
   namespace = "dev"

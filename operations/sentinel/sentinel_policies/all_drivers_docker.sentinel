@@ -1,4 +1,6 @@
 # Test policy only allows docker based tasks
+# Copyright IBM Corp. 2017, 2026
+
 main = rule { all_drivers_docker }
 
 # all_drivers_docker checks that all the drivers in use are docker

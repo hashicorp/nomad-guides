@@ -1,6 +1,8 @@
 # Force deployment of jobs to clients with namespace meta tag equal to the
 # namespace specified by the job
 
+# Copyright IBM Corp. 2017, 2026
+
 # Each Nomad client should have a client stanza like this:
 # client {
 #   enabled = true

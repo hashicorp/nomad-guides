@@ -1,5 +1,7 @@
 # Only allow Docker and Java drivers
 
+# Copyright IBM Corp. 2017, 2026
+
 # Allow Docker rule
 allow_docker_and_java = rule {
   all job.task_groups as tg {

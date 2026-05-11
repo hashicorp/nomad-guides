@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # There can only be a single job definition per file. This job is named
 # "redis" so it will create a job with the ID and Name "redis".
 

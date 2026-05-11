@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # Define the VPC.
 resource "aws_vpc" "multi_job_demo" {
   cidr_block = "${var.vpc_cidr}"

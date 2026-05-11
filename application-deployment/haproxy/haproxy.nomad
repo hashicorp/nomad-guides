@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 job "lb" {
   region = "global"
   datacenters = ["dc1"]

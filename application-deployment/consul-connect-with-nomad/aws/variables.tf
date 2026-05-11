@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 variable "region" {
   description = "The AWS region to deploy to."
   default     = "us-east-1"

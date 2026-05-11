@@ -1,4 +1,6 @@
 # Allowed Docker images
+# Copyright IBM Corp. 2017, 2026
+
 allowed_images = [
   "nginx",
   "mongo",
