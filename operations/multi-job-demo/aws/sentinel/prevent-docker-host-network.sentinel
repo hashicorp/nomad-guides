@@ -1,4 +1,6 @@
 # Prevent Docker containers from running with host network mode
+# Copyright IBM Corp. 2017, 2026
+
 prevent_host_network = rule {
   all job.task_groups as tg {
     all tg.tasks as task {

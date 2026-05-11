@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 data_dir = "/opt/nomad/data"
 bind_addr = "IP_ADDRESS"
 

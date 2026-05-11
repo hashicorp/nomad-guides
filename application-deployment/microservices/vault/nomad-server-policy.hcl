@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # Allow creating tokens under "nomad-cluster" role. The role name should be
 # updated if "nomad-cluster" is not used.
 path "auth/token/create/nomad-cluster" {

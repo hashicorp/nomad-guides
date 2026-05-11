@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 # Security Group
 resource "aws_security_group" "primary" {
   name   = "${var.name_tag_prefix}-sg"

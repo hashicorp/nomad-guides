@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 main = rule { task_datacenter() }
 task_datacenter = func() {
   allowed_datacenter = "dc1"

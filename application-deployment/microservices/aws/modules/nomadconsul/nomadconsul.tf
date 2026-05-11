@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 variable "region" {}
 variable "ami" {}
 variable "server_instance_type" {}

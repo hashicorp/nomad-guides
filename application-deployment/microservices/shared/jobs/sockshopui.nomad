@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 job "sockshopui" {
   datacenters = ["dc1"]
 

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright IBM Corp. 2017, 2026
+
 
 # Script to setup of Vault for the Nomad/Consul demo
 echo "Before running this, you must export your"

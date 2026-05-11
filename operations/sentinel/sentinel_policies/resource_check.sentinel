@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2017, 2026
+
 import "units"
 
 resource_check = func(task_groups, resource) {
